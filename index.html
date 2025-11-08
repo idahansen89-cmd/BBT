@@ -53,6 +53,7 @@
       margin: auto;
       border: 1px solid #eee;
       border-radius: 10px;
+      background-color: #fff;
     }
 
     .tab-content.active {
@@ -143,19 +144,25 @@
     }
 
     /* LH-flik layout */
+    #lh {
+      background-color: #fff;
+      border-radius: 10px;
+      padding: 1rem;
+    }
+
     .lh-image {
       width: 100%;
       border-radius: 6px;
-      margin-top: 8px;
+      margin-top: 6px;
     }
 
     .lh-entry {
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
-      margin-bottom: 12px;
+      margin-bottom: 4px;
       border-bottom: 1px solid #eee;
-      padding-bottom: 8px;
+      padding-bottom: 4px;
     }
 
     .lh-info {
@@ -174,6 +181,28 @@
       margin-right: 0.5rem;
       font-size: 1.4rem;
     }
+
+    .lh-symbols-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: .4rem 0 .6rem;
+      justify-content: space-between;
+    }
+
+    .lh-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: .6rem;
+      margin-bottom: .8rem;
+    }
+
+    .lh-toolbar input[type="date"] {
+      flex: 1;
+      min-width: 150px;
+    }
   </style>
 </head>
 <body>
@@ -184,7 +213,8 @@
     <button class="tab" onclick="openTab('graf')">📈 Graf</button>
     <button class="tab" onclick="openTab('lh')">🧪 LH-test</button>
   </div>
-    <!-- Inmatning & Tabell -->
+
+  <!-- Inmatning & Tabell -->
   <div id="inmatning" class="tab-content active">
     <div>
       <label>Datum:</label><input type="date" id="date"><br>
@@ -245,16 +275,13 @@
 
   <!-- LH-test flik -->
   <div id="lh" class="tab-content">
-    <div class="button-row" style="display:flex;gap:.5rem;align-items:center;justify-content:space-between;margin-bottom:.6rem">
-      <div>
-        <button class="button" id="lhPickBtn">Välj bild</button>
-        <input type="file" id="lhFile" accept="image/*" style="display:none">
-      </div>
-      <input type="date" id="lhDate" style="width:auto">
+    <div class="lh-toolbar">
+      <button class="button" id="lhPickBtn">Välj bild</button>
+      <input type="file" id="lhFile" accept="image/*" style="display:none">
+      <input type="date" id="lhDate">
     </div>
 
-    <!-- Rad med valbara symboler -->
-    <div style="display:flex;flex-wrap:wrap;gap:10px;margin:.4rem 0 .6rem">
+    <div class="lh-symbols-row">
       <label class="lh-symbol-checkbox" title="Nästan positiv">🩷<br><input type="checkbox" class="lhSym" value="🩷"></label>
       <label class="lh-symbol-checkbox" title="LH-topp">❤️<br><input type="checkbox" class="lhSym" value="❤️"></label>
       <label class="lh-symbol-checkbox" title="Hög">💜<br><input type="checkbox" class="lhSym" value="💜"></label>
@@ -263,25 +290,16 @@
       <label class="lh-symbol-checkbox" title="Oklart">💛<br><input type="checkbox" class="lhSym" value="💛"></label>
     </div>
 
-    <div class="button-row" style="display:flex;gap:.5rem;align-items:center">
+    <div class="button-row" style="display:flex;gap:.5rem;align-items:center;margin-bottom:.5rem">
       <textarea id="lhNote" placeholder="Anteckning (valfritt)" style="flex:1"></textarea>
       <button class="button" id="lhSaveBtn">Spara</button>
     </div>
 
     <div id="lhList" style="margin-top:10px"></div>
   </div>
-</body>
- <script>
+  <script>
 document.addEventListener('DOMContentLoaded', () => {
-  // --- Elements ---
   const el = {
-    // tabs
-    tabBtns: document.querySelectorAll('.tab'),
-    inmatningTab: document.getElementById('inmatning'),
-    grafTab: document.getElementById('graf'),
-    lhTab: document.getElementById('lh'),
-
-    // inputs (inmatning)
     date: document.getElementById('date'),
     time: document.getElementById('time'),
     actual: document.getElementById('actual'),
@@ -292,21 +310,13 @@ document.addEventListener('DOMContentLoaded', () => {
     sex: document.getElementById('sex'),
     ovulation: document.getElementById('ovulation'),
     note: document.getElementById('note'),
-
-    // buttons
     saveBtn: document.getElementById('saveBtn'),
     exportBtn: document.getElementById('exportBtn'),
     importBtn: document.getElementById('importBtn'),
     importFile: document.getElementById('importFile'),
     clearBtn: document.getElementById('clearBtn'),
-
-    // table
     dataTableBody: document.querySelector('#dataTable tbody'),
-
-    // chart
     chartCanvas: document.getElementById('bbtChart'),
-
-    // LH
     lhPickBtn: document.getElementById('lhPickBtn'),
     lhFile: document.getElementById('lhFile'),
     lhDate: document.getElementById('lhDate'),
@@ -316,24 +326,21 @@ document.addEventListener('DOMContentLoaded', () => {
     lhSymChecks: () => Array.from(document.querySelectorAll('.lhSym:checked'))
   };
 
-  // --- State ---
   let dataEntries = JSON.parse(localStorage.getItem('bbtData') || '[]');
   let lhEntries   = JSON.parse(localStorage.getItem('lhData')  || '[]');
   let chart;
 
-  // --- Tabs ---
-  function openTab(tabId) {
+  // --- Flikväxling ---
+  window.openTab = function(tabId) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
     document.querySelector(`[onclick="openTab('${tabId}')"]`)?.classList.add('active');
     document.getElementById(tabId).classList.add('active');
     if (tabId === 'graf') renderChart();
-    if (tabId === 'lh')   renderLHList();
-  }
-  // exponera funktionen för knapparnas onclick
-  window.openTab = openTab;
+    if (tabId === 'lh') renderLHList();
+  };
 
-  // --- Helpers ---
+  // --- Hjälpfunktioner ---
   const minutesFrom0400 = (t) => {
     if (!t) return 0;
     const [h, m] = t.split(':').map(Number);
@@ -400,6 +407,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (chart) chart.destroy();
   }
 
+  // --- Graf ---
   function renderChart() {
     if (chart) chart.destroy();
     dataEntries.sort((a,b)=>a.date.localeCompare(b.date));
@@ -415,7 +423,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const firstNon = dataEntries.findIndex(e=>e.mens!=='Mens');
     const end = (firstNon===-1) ? labels.length-0.5 : firstNon-0.5;
     if (firstNon !== 0) anns.push({type:'box', xMin:0, xMax:end, backgroundColor:'rgba(255,230,230,.3)', borderWidth:0});
-    if (ovIndex > -1)   anns.push({type:'box', xMin:ovIndex+0.5, xMax:labels.length-0.5, backgroundColor:'rgba(230,210,255,.25)', borderWidth:0});
+    if (ovIndex > -1) anns.push({type:'box', xMin:ovIndex+0.5, xMax:labels.length-0.5, backgroundColor:'rgba(230,210,255,.25)', borderWidth:0});
 
     const symbols = dataEntries.map(e=>{
       const s=[];
@@ -458,6 +466,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // --- Export / Import ---
   function exportAll(){
     const blob = new Blob([JSON.stringify({bbtData:dataEntries, lhData:lhEntries}, null, 2)], {type:'application/json'});
     const a = document.createElement('a');
@@ -483,7 +492,8 @@ document.addEventListener('DOMContentLoaded', () => {
     r.readAsText(file);
   }
 
-  function blobToDataURL(b){
+  // --- LH-lista ---
+  async function blobToDataURL(b){
     return new Promise((res, rej)=>{
       const r = new FileReader();
       r.onload = () => res(r.result);
@@ -527,7 +537,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.appendChild(o);
   }
 
-  // --- Event listeners ---
+  // --- Händelser ---
   el.actual.addEventListener('blur', computeCorrected);
   el.time.addEventListener('change', ()=>{ if (el.actual.value) computeCorrected(); });
   el.saveBtn.addEventListener('click', saveEntry);
@@ -545,24 +555,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const dataUrl = await blobToDataURL(el.lhFile.files[0]);
     lhEntries.push({date: el.lhDate.value, symbols, note, dataUrl});
     localStorage.setItem('lhData', JSON.stringify(lhEntries));
-    el.lhSymChecks().forEach(()=>{}); // no-op, vi låter dem vara urkryssade
+    document.querySelectorAll('.lhSym').forEach(cb => cb.checked = false);
     el.lhNote.value = ''; el.lhFile.value = '';
     renderLHList();
   });
 
-  // initial render
+  // Init
   renderTable();
+  openTab('inmatning');
 });
-  // Enkel flikväxling – funkar självständigt
-  function openTab(id){
-    // 1) avmarkera alla flikknappar och flikinnehåll
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-    // 2) markera vald knapp + innehåll
-    const btn = document.querySelector(`[onclick="openTab('${id}')"]`);
-    if (btn) btn.classList.add('active');
-    const panel = document.getElementById(id);
-    if (panel) panel.classList.add('active');
-  }
 </script>
+</body>
 </html>
