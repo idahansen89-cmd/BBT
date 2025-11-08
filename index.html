@@ -337,6 +337,35 @@ function renderChart(){
     plugins:[
       mensBG,
       {
+  // 💗 Vertikal linje vid ägglossningsdag (0 DPO)
+  id: 'ovulationLine',
+  afterDatasetsDraw(chart) {
+    const ov = getOvulationDate();
+    if (!ov) return;
+
+    const { ctx, chartArea: { top, bottom }, scales: { x } } = chart;
+    const ovIndex = bbtData.findIndex(r => r.datum === ov.toISOString().split('T')[0]);
+    if (ovIndex < 0) return;
+
+    const xPos = x.getPixelForValue(ovIndex);
+    ctx.save();
+    ctx.strokeStyle = '#bbb';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath();
+    ctx.moveTo(xPos, top);
+    ctx.lineTo(xPos, bottom);
+    ctx.stroke();
+
+    // liten etikett upptill
+    ctx.fillStyle = '#888';
+    ctx.font = '11px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('ÄL', xPos, top + 12);
+    ctx.restore();
+  }
+},
+      {
         // 💗 bakgrundsgradient för hela grafytan
         id: 'backgroundGradient',
         beforeDraw(chart) {
