@@ -30,6 +30,32 @@ button:hover{background:#005ecb;}
 .legend{text-align:center;margin-top:10px;font-size:14px;}
 .legend span{margin:0 8px;display:inline-block;}
 .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;}
+<style>
+/* --- Rosa tema för knappar --- */
+button {
+  background-color: #f7b2c4;      /* mjuk rosa */
+  color: white;                   /* vit text */
+  border: none;                   
+  border-radius: 6px;             /* rundade hörn */
+  padding: 8px 14px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.1s;
+}
+
+/* När man håller över knappen */
+button:hover {
+  background-color: #f48aa8;      /* lite mörkare rosa */
+  transform: scale(1.03);
+}
+
+/* När man trycker ner */
+button:active {
+  background-color: #e86c93;
+  transform: scale(0.98);
+}
+</style>
 </style>
 </head>
 <body>
