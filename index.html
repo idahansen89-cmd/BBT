@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>BBT – Ida</title>
 
-  <!-- Ikon (lägg bilden i samma mapp som index.html) -->
   <link rel="icon" type="image/png" href="B29437FC-696F-4754-AAAB-A6ED096BC64C.png">
   <link rel="apple-touch-icon" href="B29437FC-696F-4754-AAAB-A6ED096BC64C.png">
 
@@ -13,421 +12,260 @@
 
   <style>
     :root{
-      --pink:#f9b7c5;
-      --pink-d:#f5a3b3;
-      --pink-soft:#ffe6ec;
-      --text:#444;
-      --border:#e6e6e6;
-      --bg:#ffffff;
-      --blue:#3a7bd5;
-      --red:#e57373;
-      --lav:#c8a2ff;
-      --gray:#bbb;
+      --pink:#f9b7c5; --pink-d:#f5a3b3; --border:#e6e6e6; --bg:#fff;
+      --blue:#3a7bd5; --red:#e57373; --lav:#c8a2ff; --gray:#bbb;
     }
-    *{box-sizing:border-box}
-    body{
-      margin:0; padding:16px;
-      background:var(--bg);
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      color:var(--text);
-    }
-    .container{ max-width:860px; margin:0 auto; }
+    body{margin:0;padding:16px;background:#fff;color:#333;
+      font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+    .container{max-width:900px;margin:0 auto;}
+    h1{text-align:center;margin:0 0 10px;}
 
     /* Flikar */
-    .tabs{
-      display:flex; border-bottom:1px solid var(--border); margin-bottom:14px;
-    }
-    .tab{
-      padding:12px 14px; cursor:pointer; user-select:none;
-      border:1px solid var(--border); border-bottom:none; border-radius:8px 8px 0 0;
-      margin-right:8px; background:#fafafa; font-weight:600; color:#666;
-    }
-    .tab.active{ background:#fff; color:#222; }
-    .panel{ display:none; background:#fff; border:1px solid var(--border); border-radius:0 8px 8px 8px; padding:14px; }
-    .panel.active{ display:block; }
+    .tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:14px;gap:8px;}
+    .tab{padding:12px 14px;border:1px solid var(--border);border-bottom:none;
+      border-radius:8px 8px 0 0;cursor:pointer;font-weight:600;color:#666;}
+    .tab.active{background:#fff;color:#222;}
+    .panel{display:none;border:1px solid var(--border);border-radius:0 8px 8px 8px;padding:14px;}
+    .panel.active{display:block;}
 
-    /* Form + knappar */
-    .row{ display:grid; grid-template-columns: 1fr 1fr; gap:10px 14px; margin-bottom:10px; align-items:center;}
-    .row label{ font-weight:600; }
-    .row .field{ display:flex; align-items:center; gap:8px; }
-    input[type="date"], input[type="time"], input[type="number"], input[type="text"], select{
-      width:100%; padding:8px; border:1px solid #ddd; border-radius:6px; font-size:15px;
-    }
-    .btn{
-      background:var(--pink); color:#fff; border:none; border-radius:8px;
-      padding:10px 14px; font-weight:700; cursor:pointer; transition:.15s;
-    }
-    .btn:hover{ background:var(--pink-d); transform: translateY(-1px); }
-    .btn-row{ display:flex; flex-wrap:wrap; gap:10px; margin:12px 0 6px; }
-    .btn.danger{ background:#f5c5c5; }
-    .muted{ color:#777; font-size:13px; }
+    /* Inputs/knappar */
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;align-items:center;margin-bottom:10px;}
+    input,select{width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;font-size:15px;}
+    .btn{background:var(--pink);color:#fff;border:none;border-radius:8px;padding:10px 14px;
+      font-weight:700;cursor:pointer;transition:.15s;}
+    .btn:hover{background:var(--pink-d);transform:translateY(-1px);}
+    .danger{background:#f5c5c5!important;color:#333;}
+    .btn-row{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0 6px;}
 
-    /* Tabell */
-    table{ width:100%; border-collapse:collapse; margin-top:8px; }
-    th, td{ border-bottom:1px solid var(--border); padding:8px 6px; text-align:left; font-size:14px; }
-    th{ background:#fafafa; font-weight:700; }
+    table{width:100%;border-collapse:collapse;margin-top:8px;}
+    th,td{padding:8px 6px;border-bottom:1px solid var(--border);font-size:14px;text-align:left;}
+    th{background:#fafafa;}
 
-    /* Graf + legend */
-    .chart-wrap{ padding:6px 0; }
-    canvas{ width:100%; height:480px !important; display:block; }
-    .legend{
-      margin-top:10px; text-align:center; font-size:14px;
-      display:flex; gap:14px; justify-content:center; flex-wrap:wrap;
-    }
-    .dot{ width:12px; height:12px; border-radius:50%; display:inline-block; vertical-align:middle; margin-right:6px; }
-    .blue{ background:var(--blue); }
-    .red{ background:var(--red); }
-    .lav{ background:var(--lav); }
-    .gry{ background:var(--gray); }
-    .pink{ background:#f8cdd0; }
+    canvas{width:100%;height:480px!important;display:block;}
 
-    @media (max-width:720px){
-      .row{ grid-template-columns: 1fr; }
+    /* LH-flik */
+    .lh-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 14px;align-items:center;}
+    .lh-chiprow{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;text-align:center;}
+    .lh-emoji{font-size:20px;display:block;}
+    .lh-label{font-size:12px;color:#555;margin:4px 0;}
+    .lh-list{display:flex;flex-direction:column;gap:14px;margin-top:10px;}
+    .lh-item{display:grid;grid-template-columns:130px 1fr auto;gap:12px;align-items:center;
+      border:1px solid var(--border);border-radius:10px;padding:10px;background:#fff;}
+    .lh-thumb{width:100%;height:90px;object-fit:cover;border-radius:6px;cursor:pointer;
+      border:1px solid #eee;transition:.2s;}
+    .lh-thumb:hover{transform:scale(1.02);}
+    .lh-meta{display:flex;flex-direction:column;gap:4px;}
+    .lh-date{font-weight:700;}
+    .lh-note{color:#555;}
+    .lh-del{background:#e9e9e9;color:#333;border:none;border-radius:8px;padding:8px 10px;cursor:pointer;}
+    .lh-del:hover{background:#ddd;}
+    .lh-actions{display:flex;gap:10px;align-items:center;}
+
+    /* Lightbox */
+    .lightbox{display:none;position:fixed;top:0;left:0;width:100%;height:100%;
+      background:rgba(0,0,0,0.85);justify-content:center;align-items:center;z-index:999;}
+    .lightbox img{max-width:90%;max-height:90%;border-radius:8px;box-shadow:0 0 10px rgba(0,0,0,0.4);}
+    .lightbox .close{position:absolute;top:20px;right:24px;color:#fff;font-size:30px;
+      cursor:pointer;font-weight:bold;}
+
+    @media(max-width:760px){
+      .row{grid-template-columns:1fr;}
+      .lh-grid{grid-template-columns:1fr;}
+      .lh-item{grid-template-columns:110px 1fr auto;}
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1 style="margin:0 0 8px; text-align:center;">BBT – Ida</h1>
+<div class="container">
+  <h1>BBT – Ida</h1>
 
-    <!-- Flikar -->
-    <div class="tabs">
-      <div class="tab active" data-target="#panel-input">📋 Inmatning & tabell</div>
-      <div class="tab" data-target="#panel-chart">📈 Graf</div>
-    </div>
-
-    <!-- Panel: Inmatning & tabell -->
-    <div class="panel active" id="panel-input">
-      <div class="row">
-        <label>Datum</label>
-        <div class="field"><input type="date" id="datum"></div>
-
-        <label>Tid (BBT)</label>
-        <div class="field"><input type="time" id="tid"></div>
-
-        <label>Faktisk temperatur (°C)</label>
-        <div class="field"><input type="number" step="0.01" id="faktisk" placeholder="t.ex. 36.31"></div>
-
-        <label>Korrigerad (°C)</label>
-        <div class="field">
-          <input type="number" step="0.01" id="korr" placeholder="beräknas automatiskt">
-          <button class="btn" id="btn-calc">Beräkna</button>
-        </div>
-
-        <label>Mensstatus</label>
-        <div class="field">
-          <select id="mens">
-            <option>Ingen</option>
-            <option>Spotting</option>
-            <option>Mens</option>
-          </select>
-        </div>
-
-        <label>Typ av sekret</label>
-        <div class="field">
-          <select id="sekret">
-            <option>-</option>
-            <option>Krämigt</option>
-            <option>Klart</option>
-            <option>Stretchigt</option>
-          </select>
-        </div>
-
-        <label>LH-test</label>
-        <div class="field">
-          <select id="lh">
-            <option>-</option>
-            <option>Negativt</option>
-            <option>Positivt</option>
-          </select>
-        </div>
-
-        <label>Ägglossningsdatum (ÄL)</label>
-        <div class="field"><input type="date" id="ovdatum"></div>
-
-        <label>Anteckning</label>
-        <div class="field"><input type="text" id="anteckning" placeholder="t.ex. sov dåligt, sjuk, samlag"></div>
-      </div>
-
-      <div class="btn-row">
-        <button class="btn" id="btn-save">Spara</button>
-        <button class="btn" id="btn-import">Importera JSON</button>
-        <button class="btn danger" id="btn-reset">Rensa all data</button>
-        <span class="muted">Sparar automatiskt lokalt i din webbläsare.</span>
-      </div>
-
-      <!-- Tabell -->
-      <div style="margin-top:6px;">
-        <table id="tbl">
-          <thead>
-            <tr>
-              <th>Datum</th><th>Tid</th><th>Faktisk</th><th>Korr</th><th>Mens</th><th>Sekret</th><th>LH</th><th>Anteckning</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Panel: Graf -->
-    <div class="panel" id="panel-chart">
-      <div class="chart-wrap">
-        <canvas id="chart"></canvas>
-      </div>
-
-      <!-- Export-knapp under grafen -->
-      <div class="btn-row" style="justify-content:center; margin-top:8px;">
-        <button class="btn" id="btn-export">Exportera graf</button>
-      </div>
-
-      <!-- Legend -->
-      <div class="legend" aria-hidden="true">
-        <div><span class="dot blue"></span>Faktisk</div>
-        <div><span class="dot red"></span>Korrigerad</div>
-        <div><span class="dot pink"></span>Mensdag</div>
-        <div><span class="dot lav"></span>Sekret (Klart)</div>
-        <div><span class="dot gry"></span>LH-positiv</div>
-      </div>
-    </div>
+  <div class="tabs">
+    <div class="tab active" data-target="#panel-input">📋 Inmatning & tabell</div>
+    <div class="tab" data-target="#panel-chart">📈 Graf</div>
+    <div class="tab" data-target="#panel-lh">🧪 LH-tester</div>
   </div>
 
-  <script>
-    /* ---------- Hjälp ---------- */
-    const $ = s => document.querySelector(s);
-    const $$ = s => Array.from(document.querySelectorAll(s));
+  <!-- Inmatning -->
+  <div class="panel active" id="panel-input">
+    <div class="row">
+      <label>Datum</label><input type="date" id="datum">
+      <label>Tid (BBT)</label><input type="time" id="tid">
+      <label>Faktisk (°C)</label><input type="number" step="0.01" id="faktisk">
+      <label>Korrigerad (°C)</label>
+      <div style="display:flex;gap:8px;"><input type="number" step="0.01" id="korr"><button class="btn" id="btn-calc">Beräkna</button></div>
+      <label>Mensstatus</label>
+      <select id="mens"><option>Ingen</option><option>Spotting</option><option>Mens</option></select>
+      <label>Typ av sekret</label>
+      <select id="sekret"><option>-</option><option>Krämigt</option><option>Klart</option><option>Stretchigt</option></select>
+      <label>LH-test</label>
+      <select id="lh"><option>-</option><option>Negativt</option><option>Positivt</option></select>
+      <label>Anteckning</label><input type="text" id="anteckning" placeholder="t.ex. sov dåligt, sjuk, samlag">
+    </div>
 
-    function loadData(){
-      try{ return JSON.parse(localStorage.getItem('bbtData') || '[]'); }
-      catch{ return []; }
-    }
-    function saveData(d){
-      localStorage.setItem('bbtData', JSON.stringify(d));
-    }
-    let rows = loadData();
+    <div class="btn-row">
+      <button class="btn" id="btn-save">Spara</button>
+      <button class="btn danger" id="btn-reset">Rensa data</button>
+      <button class="btn" id="btn-export-bbt">Exportera JSON</button>
+    </div>
 
-    /* ---------- Korrigering: 0,05 °C per 30 min från 04:00 ---------- */
-    function calcCorrValue(time, temp){
-      if(!time || isNaN(temp)) return null;
-      const [h,m] = time.split(':').map(Number);
-      const minsFrom0400 = (h*60 + m) - (4*60);
-      const steps = Math.abs(minsFrom0400) / 30;
-      const delta = (minsFrom0400 < 0) ? (steps * 0.05) : (-steps * 0.05);
-      return +(temp + delta).toFixed(2);
-    }
+    <table id="tbl"><thead><tr><th>Datum</th><th>Tid</th><th>Faktisk</th><th>Korr</th><th>Mens</th><th>Sekret</th><th>LH</th><th>Anteckning</th></tr></thead><tbody></tbody></table>
+  </div>
 
-    /* ---------- Tabell ---------- */
-    function renderTable(){
-      const tb = $('#tbl tbody');
-      tb.innerHTML = '';
-      rows.forEach(r=>{
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${r.datum||''}</td>
-          <td>${r.tid||''}</td>
-          <td>${(r.faktisk??'')}</td>
-          <td>${(r.korr??'')}</td>
-          <td>${r.mens||''}</td>
-          <td>${r.sekret||''}</td>
-          <td>${r.lh||''}</td>
-          <td>${r.anteckning||''}</td>
-        `;
-        tb.appendChild(tr);
-      });
-    }
+  <!-- Graf -->
+  <div class="panel" id="panel-chart">
+    <canvas id="chart"></canvas>
+  </div>
 
-    /* ---------- Graf ---------- */
-    const ctx = document.getElementById('chart').getContext('2d');
-    let chart;
+  <!-- LH-tester -->
+  <div class="panel" id="panel-lh">
+    <div class="lh-grid">
+      <input type="file" id="lh-file" accept="image/*">
+      <input type="date" id="lh-date">
 
-    function renderChart(){
-      const labels = rows.map(r=>r.datum);
-      const faktisk = rows.map(r=> (isFinite(r.faktisk)?r.faktisk:null) );
-      const korr = rows.map(r=> (isFinite(r.korr)?r.korr:null) );
+      <div class="lh-chiprow" style="grid-column:1 / -1;">
+        <label><span class="lh-emoji">🩷</span><span class="lh-label">Nästan</span><input type="checkbox" class="lh-flag" value="🩷"></label>
+        <label><span class="lh-emoji">❤️</span><span class="lh-label">Topp</span><input type="checkbox" class="lh-flag" value="❤️"></label>
+        <label><span class="lh-emoji">💜</span><span class="lh-label">Hög</span><input type="checkbox" class="lh-flag" value="💜"></label>
+        <label><span class="lh-emoji">💙</span><span class="lh-label">Låg</span><input type="checkbox" class="lh-flag" value="💙"></label>
+        <label><span class="lh-emoji">💚</span><span class="lh-label">Negativ</span><input type="checkbox" class="lh-flag" value="💚"></label>
+        <label><span class="lh-emoji">💛</span><span class="lh-label">Oklart</span><input type="checkbox" class="lh-flag" value="💛"></label>
+      </div>
 
-      // Indexlistor för markeringar
-      const mensIdx = rows.map((r,i)=> (r.mens==='Mens'||r.mens==='Spotting') ? i : null).filter(i=>i!==null);
-      const sekretIdx = rows.map((r,i)=> r.sekret==='Klart' ? i : null).filter(i=>i!==null);
-      const lhPosIdx = rows.map((r,i)=> r.lh==='Positivt' ? i : null).filter(i=>i!==null);
+      <button class="btn" id="lh-save">Spara</button>
+      <input type="text" id="lh-note" placeholder="Kort anteckning (valfritt)">
+    </div>
 
-      if(chart) chart.destroy();
+    <div class="lh-list" id="lh-list"></div>
+    <div class="btn-row" style="justify-content:center;margin-top:8px;">
+      <button class="btn" id="btn-export-lh">Exportera LH-data</button>
+    </div>
+  </div>
+</div>
 
-      // Plugin: rosa bakgrund för mens-dagar
-      const mensBG = {
-        id:'mensBG',
-        beforeDatasetsDraw(c){
-          const {ctx, chartArea:{left,right,top,bottom}, scales:{x}} = c;
-          if(!labels.length) return;
-          ctx.save();
-          const col = 'rgba(248,205,208,0.28)';
-          mensIdx.forEach(i=>{
-            const x1 = x.getPixelForValue(i-0.5);
-            const x2 = x.getPixelForValue(i+0.5);
-            ctx.fillStyle = col;
-            ctx.fillRect(x1, top, x2-x1, bottom-top);
-          });
-          ctx.restore();
-        }
-      };
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox">
+  <span class="close" id="lb-close">&times;</span>
+  <img id="lb-img" src="" alt="Förhandsvisning">
+</div>
 
-      chart = new Chart(ctx, {
-        type:'line',
-        data:{
-          labels,
-          datasets:[
-            {
-              label:'Faktisk',
-              data:faktisk,
-              borderColor:'#3a7bd5',
-              backgroundColor:'#3a7bd5',
-              tension:0.3,
-              fill:false,
-              pointRadius:3
-            },
-            {
-              label:'Korrigerad',
-              data:korr,
-              borderColor:'#e57373',
-              backgroundColor:'#e57373',
-              borderDash:[4,4],
-              tension:0.3,
-              fill:false,
-              pointRadius:3
-            },
-            // Sekret (Klart) – diskreta punkter nära nedre kanten
-            {
-              label:'Sekret (Klart)',
-              data: sekretIdx.map(i=>({x: i, y: 35.1})),
-              pointBackgroundColor: '#c8a2ff',
-              borderColor:'#c8a2ff',
-              showLine:false,
-              pointRadius:5,
-              type:'scatter'
-            },
-            // LH positiv – grå markörer nära nedre kanten
-            {
-              label:'LH positiv',
-              data: lhPosIdx.map(i=>({x: i, y: 35.05})),
-              pointBackgroundColor: '#bbb',
-              borderColor:'#bbb',
-              showLine:false,
-              pointRadius:5,
-              type:'scatter'
-            }
-          ]
-        },
-        options:{
-          maintainAspectRatio:false,
-          scales:{
-            y:{
-              min:35.0, max:38.5,
-              title:{display:true, text:'Temperatur (°C)'},
-              ticks:{ stepSize:0.05 }
-            },
-            x:{
-              ticks:{ autoSkip:false, maxRotation:45, minRotation:45 }
-            }
-          },
-          plugins:{
-            legend:{ display:false }
-          }
-        },
-        plugins:[mensBG]
-      });
-    }
+<script>
+const $ = s=>document.querySelector(s);
+const $$ = s=>Array.from(document.querySelectorAll(s));
+function load(k,f){try{return JSON.parse(localStorage.getItem(k)||JSON.stringify(f));}catch{return f;}}
+function save(k,v){localStorage.setItem(k,JSON.stringify(v));}
 
-    /* ---------- Händelser ---------- */
-    // Fliknavigering
-    $$('.tab').forEach(t=>{
-      t.addEventListener('click', ()=>{
-        $$('.tab').forEach(x=>x.classList.remove('active'));
-        $$('.panel').forEach(x=>x.classList.remove('active'));
-        t.classList.add('active');
-        document.querySelector(t.dataset.target).classList.add('active');
-        if(t.dataset.target==='#panel-chart'){ renderChart(); }
-      });
-    });
+let rows=load('bbtData',[]);
+let lhRows=load('lhData',[]);
 
-    // Beräkna korr
-    $('#btn-calc').addEventListener('click', ()=>{
-      const time = $('#tid').value;
-      const temp = parseFloat($('#faktisk').value);
-      if(!time || isNaN(temp)){ alert('Fyll i Tid och Faktisk temperatur först.'); return; }
-      const v = calcCorrValue(time, temp);
-      if(v!==null) $('#korr').value = v.toFixed(2);
-    });
+/* Flikar */
+$$('.tab').forEach(t=>t.onclick=()=>{
+  $$('.tab').forEach(x=>x.classList.remove('active'));
+  $$('.panel').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');
+  document.querySelector(t.dataset.target).classList.add('active');
+  if(t.dataset.target==='#panel-chart') renderChart();
+  if(t.dataset.target==='#panel-lh') renderLH();
+});
 
-    // Spara
-    $('#btn-save').addEventListener('click', ()=>{
-      const e = {
-        datum: $('#datum').value,
-        tid: $('#tid').value,
-        faktisk: parseFloat($('#faktisk').value),
-        korr: parseFloat($('#korr').value),
-        mens: $('#mens').value,
-        sekret: $('#sekret').value,
-        lh: $('#lh').value,
-        anteckning: $('#anteckning').value?.trim() || ''
-      };
-      if(!e.datum || !e.tid || isNaN(e.faktisk)){ alert('Fyll i minst Datum, Tid och Faktisk temperatur.'); return; }
-      if(isNaN(e.korr)){
-        const v = calcCorrValue(e.tid, e.faktisk);
-        if(v!==null){ e.korr = v; $('#korr').value = v.toFixed(2); }
-      }
-      const idx = rows.findIndex(r=>r.datum===e.datum);
-      if(idx>=0) rows[idx]=e; else rows.push(e);
-      rows.sort((a,b)=> a.datum.localeCompare(b.datum));
-      saveData(rows);
-      renderTable();
-      // Om graf-fliken är aktiv, uppdatera grafen direkt
-      if($('.tab.active')?.dataset.target === '#panel-chart'){ renderChart(); }
-    });
+/* Korrigering */
+function calcCorrValue(time,temp){
+  if(!time||isNaN(temp))return null;
+  const [h,m]=time.split(':').map(Number);
+  const mins=(h*60+m)-(4*60);
+  const steps=Math.abs(mins)/30;
+  const delta=(mins<0)?(steps*0.05):(-steps*0.05);
+  return +(temp+delta).toFixed(2);
+}
+$('#btn-calc').onclick=()=>{
+  const t=$('#tid').value,v=parseFloat($('#faktisk').value);
+  const c=calcCorrValue(t,v);if(c!==null)$('#korr').value=c.toFixed(2);
+};
 
-    // Import
-    $('#btn-import').addEventListener('click', ()=>{
-      const inp = document.createElement('input');
-      inp.type='file'; inp.accept='.json,application/json';
-      inp.onchange = e=>{
-        const f = e.target.files?.[0]; if(!f) return;
-        const r = new FileReader();
-        r.onload = ()=>{
-          try{
-            const d = JSON.parse(r.result);
-            if(!Array.isArray(d)) throw new Error('Fel format (förväntar array).');
-            rows = d;
-            saveData(rows);
-            renderTable();
-            if($('.tab.active')?.dataset.target === '#panel-chart'){ renderChart(); }
-          }catch(err){
-            alert('Kunde inte importera: '+err.message);
-          }
-        };
-        r.readAsText(f);
-      };
-      inp.click();
-    });
+/* Spara BBT */
+$('#btn-save').onclick=()=>{
+  const e={datum:$('#datum').value,tid:$('#tid').value,
+  faktisk:parseFloat($('#faktisk').value),
+  korr:parseFloat($('#korr').value),
+  mens:$('#mens').value,sekret:$('#sekret').value,lh:$('#lh').value,
+  anteckning:$('#anteckning').value.trim()};
+  if(!e.datum||!e.tid||isNaN(e.faktisk))return alert('Fyll i Datum, Tid och Faktisk temperatur.');
+  if(isNaN(e.korr)){e.korr=calcCorrValue(e.tid,e.faktisk);}
+  const i=rows.findIndex(r=>r.datum===e.datum);
+  if(i>=0)rows[i]=e;else rows.push(e);
+  rows.sort((a,b)=>a.datum.localeCompare(b.datum));
+  save('bbtData',rows);renderTable();
+};
 
-    // Rensa
-    $('#btn-reset').addEventListener('click', ()=>{
-      if(confirm('Vill du verkligen rensa all sparad data?')){
-        localStorage.removeItem('bbtData');
-        rows = [];
-        renderTable();
-        if($('.tab.active')?.dataset.target === '#panel-chart'){ renderChart(); }
-      }
-    });
+/* Tabell */
+function renderTable(){
+  const tb=$('#tbl tbody');tb.innerHTML='';
+  rows.forEach(r=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${r.datum}</td><td>${r.tid}</td><td>${r.faktisk||''}</td><td>${r.korr||''}</td>
+    <td>${r.mens}</td><td>${r.sekret}</td><td>${r.lh}</td><td>${r.anteckning}</td>`;
+    tb.appendChild(tr);
+  });
+}
+$('#btn-reset').onclick=()=>{if(confirm('Rensa all data?')){rows=[];save('bbtData',rows);renderTable();}};
+$('#btn-export-bbt').onclick=()=>{
+  const blob=new Blob([JSON.stringify(rows,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bbtData.json';a.click();
+};
 
-    // Exportera graf (datan)
-    $('#btn-export').addEventListener('click', ()=>{
-      const blob = new Blob([JSON.stringify(rows, null, 2)], {type:'application/json'});
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = 'bbtData.json';
-      a.click();
-      URL.revokeObjectURL(a.href);
-    });
+/* Graf */
+let chart;function renderChart(){
+  if(!rows.length)return;
+  const ctx=document.getElementById('chart').getContext('2d');
+  const labels=rows.map(r=>r.datum);
+  const f=rows.map(r=>r.faktisk||null);
+  const k=rows.map(r=>r.korr||null);
+  if(chart)chart.destroy();
+  chart=new Chart(ctx,{type:'line',data:{labels,
+    datasets:[{label:'Faktisk',data:f,borderColor:'#3a7bd5',pointBackgroundColor:'#3a7bd5',tension:.3,fill:false},
+              {label:'Korrigerad',data:k,borderColor:'#e57373',borderDash:[4,4],tension:.3,fill:false}]},
+    options:{maintainAspectRatio:false,scales:{y:{min:35,max:38.5}}}});
+}
 
-    // Init
-    renderTable();
-  </script>
+/* LH-hantering */
+function renderLH(){
+  const list=$('#lh-list');list.innerHTML='';
+  lhRows.sort((a,b)=>a.date.localeCompare(b.date));
+  lhRows.forEach((r,i)=>{
+    const div=document.createElement('div');div.className='lh-item';
+    div.innerHTML=`<img class="lh-thumb" src="${r.data}">
+      <div class="lh-meta"><div class="lh-date">${r.date}</div>
+      <div class="lh-note">${(r.flags||[]).join(' ')} ${r.note||''}</div></div>
+      <button class="lh-del" data-i="${i}">Ta bort</button>`;
+    list.appendChild(div);
+  });
+  $$('.lh-del').forEach(b=>b.onclick=()=>{lhRows.splice(b.dataset.i,1);save('lhData',lhRows);renderLH();});
+  $$('.lh-thumb').forEach(img=>img.onclick=()=>openLightbox(img.src));
+}
+
+function openLightbox(src){
+  const lb=$('#lightbox');$('#lb-img').src=src;lb.style.display='flex';
+}
+$('#lb-close').onclick=()=>$('#lightbox').style.display='none';
+$('#lightbox').onclick=e=>{if(e.target.id==='lightbox')$('#lightbox').style.display='none';};
+
+/* Spara LH */
+function fileToDataURL(file){return new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>res(fr.result);fr.onerror=rej;fr.readAsDataURL(file);});}
+$('#lh-save').onclick=async()=>{
+  const f=$('#lh-file').files[0];if(!f)return alert('Välj en bild.');
+  const d=$('#lh-date').value||new Date().toISOString().slice(0,10);
+  const data=await fileToDataURL(f);
+  const flags=$$('.lh-flag').filter(c=>c.checked).map(c=>c.value);
+  const note=$('#lh-note').value.trim();
+  lhRows.push({date:d,data,flags,note});save('lhData',lhRows);
+  $('#lh-file').value='';$('#lh-note').value='';$$('.lh-flag').forEach(c=>c.checked=false);
+  renderLH();
+};
+$('#btn-export-lh').onclick=()=>{
+  const blob=new Blob([JSON.stringify(lhRows,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='lhData.json';a.click();
+};
+
+(function init(){renderTable();renderLH();$('#lh-date').value=new Date().toISOString().slice(0,10);})();
+</script>
 </body>
 </html>
