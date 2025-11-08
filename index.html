@@ -1,310 +1,228 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BBT</title>
-
-<!-- Rosa stil -->
-<style>
-body {
-  font-family: 'Helvetica Neue', sans-serif;
-  background-color: #fff;
-  margin: 20px;
-  color: #333;
-}
-
-h1 {
-  color: #e6739f;
-  text-align: center;
-}
-
-label { display:block; margin-top:8px; font-weight:500; }
-
-input, select {
-  width:100%;
-  padding:6px;
-  margin-top:3px;
-  border:1px solid #ddd;
-  border-radius:5px;
-  font-size:14px;
-}
-
-button {
-  background-color:#f7b2c4;
-  color:white;
-  border:none;
-  border-radius:6px;
-  padding:8px 14px;
-  font-size:15px;
-  font-weight:600;
-  cursor:pointer;
-  transition:background-color 0.2s, transform 0.1s;
-  margin:4px 2px;
-}
-button:hover { background-color:#f48aa8; transform:scale(1.03); }
-button:active { background-color:#e86c93; transform:scale(0.98); }
-
-canvas { width:100%; max-width:1000px; margin-top:25px; }
-
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BBT Tracker – Ida</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      background: #fffafc;
+      font-family: system-ui, sans-serif;
+      margin: 0;
+      padding: 1em;
+    }
+    .container {
+      max-width: 700px;
+      margin: auto;
+    }
+    h1 {
+      text-align: center;
+      color: #444;
+    }
+    section {
+      background: white;
+      padding: 1.2em;
+      margin-bottom: 1.5em;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+    h2 {
+      margin-top: 0;
+      font-size: 1.2em;
+      color: #444;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 0.3em;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.7em 1em;
+    }
+    input, select {
+      padding: 0.4em;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    .pink-btn {
+      background-color: #f9b7c5;
+      border: none;
+      border-radius: 6px;
+      padding: 0.6em;
+      font-weight: 500;
+    }
+    .pink-btn:hover {
+      background-color: #f5a3b3;
+    }
+    .danger {
+      background-color: #f5c5c5;
+    }
+    .button-row {
+      grid-column: span 2;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5em;
+      justify-content: space-between;
+    }
+    .legend {
+      margin-top: 1em;
+      text-align: center;
+      font-size: 0.9em;
+    }
+    .dot {
+      height: 12px;
+      width: 12px;
+      display: inline-block;
+      border-radius: 50%;
+      margin: 0 4px;
+    }
+    .dot.blue { background: #3a7bd5; }
+    .dot.red { background: #e57373; }
+    .dot.lavender { background: #c8a2ff; }
+    .dot.gray { background: #bbb; }
+    .dot.pink { background: #f8cdd0; }
+  </style>
 </head>
-
 <body>
-<h1>Basaltemperatur</h1>
+  <div class="container">
+    <h1>BBT Tracker – Ida</h1>
 
-<!-- FORMULÄR -->
-<label>Datum:</label>
-<input type="date" id="datum">
+    <!-- 📋 Sektion 1: Ny registrering -->
+    <section id="input-section">
+      <h2>Ny registrering</h2>
+      <div class="form-grid">
+        <label>Datum:</label>
+        <input type="date" id="datum" />
 
-<label>Tid:</label>
-<input type="time" id="tid">
+        <label>Tid (BBT):</label>
+        <input type="time" id="tid" />
 
-<label>Faktisk temperatur:</label>
-<input type="number" id="faktisk" step="0.01">
+        <label>Faktisk temperatur (°C):</label>
+        <input type="number" step="0.01" id="faktisk" placeholder="t.ex. 36.31" />
 
-<label>Korrigerad temperatur:</label>
-<input type="number" id="korr" step="0.01" placeholder="Beräknas automatiskt">
+        <label>Korrigerad temperatur (°C):</label>
+        <input type="number" step="0.01" id="korr" placeholder="t.ex. 36.45" />
 
-<label>Mensstatus:</label>
-<select id="mens">
-  <option>Ingen</option>
-  <option>Spotting</option>
-  <option>Mens</option>
-</select>
+        <button id="calc" class="pink-btn">Beräkna korrigerad</button>
 
-<label>Typ av sekret:</label>
-<select id="sekret">
-  <option>-</option>
-  <option>Krämigt</option>
-  <option>Klart</option>
-  <option>Stretchigt</option>
-</select>
+        <label>Mensstatus:</label>
+        <select id="mens">
+          <option>Ingen</option>
+          <option>Mens</option>
+        </select>
 
-<label>LH-test:</label>
-<select id="lh">
-  <option>-</option>
-  <option>Negativt</option>
-  <option>Positivt</option>
-</select>
+        <label>Typ av sekret:</label>
+        <select id="sekret">
+          <option>-</option>
+          <option>Krämigt</option>
+          <option>Klart</option>
+          <option>Äggviteliknande</option>
+        </select>
 
-<label>Anteckning:</label>
-<input type="text" id="anteckning" placeholder="Ex. sov dåligt, sjuk, samlag...">
+        <label>LH-test:</label>
+        <select id="lh">
+          <option>-</option>
+          <option>Negativt</option>
+          <option>Positivt</option>
+        </select>
 
-<label>Ägglossningsdatum:</label>
-<input type="date" id="ovulationDate">
+        <label>Anteckning:</label>
+        <input type="text" id="anteckning" placeholder="Ex. sov dåligt, sjuk..." />
 
-<!-- KNAPPAR -->
-<div style="margin-top:10px;">
-  <button onclick="calcCorr()">Beräkna korrigerad</button>
-  <button onclick="addEntry()">Spara</button>
-  <button onclick="exportJSON()">Exportera JSON</button>
-  <button onclick="importJSON()">Importera JSON</button>
-  <button onclick="clearAllData()">🗑️ Rensa all data</button>
-</div>
+        <label>Ägglossningsdatum:</label>
+        <input type="date" id="ovdatum" />
 
-<!-- GRAF -->
-<canvas id="bbtChart" height="420"></canvas>
+        <div class="button-row">
+          <button id="save" class="pink-btn">Spara</button>
+          <button id="export" class="pink-btn">Exportera JSON</button>
+          <button id="import" class="pink-btn">Importera JSON</button>
+          <button id="reset" class="pink-btn danger">Rensa all data</button>
+        </div>
+      </div>
+    </section>
 
-<!-- SCRIPT -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-const $ = id => document.getElementById(id);
+    <!-- 📈 Sektion 2: Graf -->
+    <section id="chart-section">
+      <h2>BBT-kurva</h2>
+      <canvas id="chart" height="420"></canvas>
+      <div class="legend">
+        <span class="dot blue"></span> Faktisk
+        <span class="dot red"></span> Korrigerad
+        <span class="dot lavender"></span> Implantationsfönster
+        <span class="dot pink"></span> Lutealfas
+      </div>
+    </section>
+  </div>
 
-function loadData(){ try{return JSON.parse(localStorage.getItem('bbtData')||'[]');}catch{return[];} }
-function saveData(d){ localStorage.setItem('bbtData', JSON.stringify(d)); }
-
-let bbtData = loadData();
-let chart;
-
-function calcCorr(){
-  const time=$('tid').value, temp=parseFloat($('faktisk').value);
-  if(!time||isNaN(temp)){alert('Fyll i tid och temperatur.');return;}
-  const [h,m]=time.split(':').map(Number);
-  const mins=(h*60+m)-(4*60);
-  const steps=Math.abs(mins)/30;
-  const corr=temp+(mins<0?steps*0.05:-steps*0.05);
-  $('korr').value=corr.toFixed(2);
-}
-
-function addEntry(){
-  const e={
-    datum:$('datum').value,
-    tid:$('tid').value,
-    faktisk:parseFloat($('faktisk').value),
-    korr:parseFloat($('korr').value),
-    mens:$('mens').value,
-    sekret:$('sekret').value,
-    lh:$('lh').value,
-    anteckning:$('anteckning').value?.trim()||''
-  };
-  if(!e.datum||!e.tid||isNaN(e.faktisk)){alert('Fyll i minst Datum, Tid och Faktisk temperatur.');return;}
-  if(isNaN(e.korr)){calcCorr(); e.korr=parseFloat($('korr').value);}
-  const i=bbtData.findIndex(r=>r.datum===e.datum);
-  if(i>=0) bbtData[i]=e; else bbtData.push(e);
-  bbtData.sort((a,b)=>a.datum.localeCompare(b.datum));
-  saveData(bbtData); renderChart();
-}
-
-function exportJSON(){
-  const blob=new Blob([JSON.stringify(bbtData,null,2)],{type:'application/json'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);a.download='bbtData.json';a.click();
-  URL.revokeObjectURL(a.href);
-}
-function importJSON(){
-  const input=document.createElement('input');
-  input.type='file'; input.accept='.json';
-  input.onchange=e=>{
-    const f=e.target.files[0]; if(!f)return;
-    const r=new FileReader();
-    r.onload=()=>{try{
-      const d=JSON.parse(r.result); if(!Array.isArray(d))throw new Error('Fel format');
-      bbtData=d; saveData(bbtData); renderChart();
-    }catch(err){alert('Kunde inte importera: '+err.message);}};
-    r.readAsText(f);
-  };
-  input.click();
-}
-function clearAllData(){
-  if(confirm('Vill du verkligen rensa all data?')){
-    localStorage.removeItem('bbtData');
-    bbtData=[]; renderChart(); alert('All data raderad.');
-  }
-}
-
-function getOvulationDate(){const v=$('ovulationDate').value; return v?new Date(v):null;}
-function calculateDPO(data,ov){ if(!ov)return data.map(()=>null);
-  return data.map(r=>{const d=new Date(r.datum);
-  const diff=Math.round((d-ov)/(1000*60*60*24));
-  return diff>=0?diff:null;}); }
-
-function renderChart(){
-  const ctx=$('bbtChart').getContext('2d');
-  if(chart)chart.destroy();
-
-  const labels=bbtData.map(d=>d.datum);
-  const faktisk=bbtData.map(d=>isFinite(d.faktisk)?d.faktisk:null);
-  const korr=bbtData.map(d=>isFinite(d.korr)?d.korr:null);
-  const ov=getOvulationDate();
-  const dpoLabels=calculateDPO(bbtData,ov);
-  const mensMask=bbtData.map(d=>d.mens==='Mens'||d.mens==='Spotting');
-  const sekretIdx=bbtData.map((d,i)=>d.sekret==='Klart'?i:null).filter(i=>i!==null);
-
-  let forecast=null;
-  const last3=korr.filter(x=>x!=null).slice(-3);
-  if(last3.length>=2){
-    const avg=last3.reduce((a,b)=>a+b,0)/last3.length;
-    const slope=last3[last3.length-1]-last3[0];
-    const adjust=Math.max(-0.05,Math.min(0.05,slope/last3.length));
-    forecast=+(avg+adjust).toFixed(2);
-  }
-
-  const mensBG={id:'mensBG',
-    beforeDatasetsDraw(chart){
-      const{ctx,chartArea:{left,right,top,bottom},scales:{x}}=chart;
-      if(!labels.length)return;
-      const w=(right-left)/labels.length;
-      ctx.save();
-      for(let i=0;i<labels.length;i++){
-        if(mensMask[i]){
-          const xc=x.getPixelForValue(i);
-          const grad=ctx.createLinearGradient(0,top,0,bottom);
-          grad.addColorStop(0,'#ffd6dfcc');
-          grad.addColorStop(1,'#ffeef3aa');
-          ctx.fillStyle=grad;
-          ctx.fillRect(xc-w/2,top,w,bottom-top);
+  <script>
+    const ctx = document.getElementById('chart').getContext('2d');
+    const data = {
+      labels: [],
+      datasets: [
+        {
+          label: 'Faktisk temperatur',
+          data: [],
+          borderColor: '#3a7bd5',
+          backgroundColor: '#3a7bd5',
+          tension: 0.3,
+          fill: false
+        },
+        {
+          label: 'Korrigerad temperatur',
+          data: [],
+          borderColor: '#e57373',
+          backgroundColor: '#e57373',
+          borderDash: [4, 4],
+          tension: 0.3,
+          fill: false
         }
-      }
-      ctx.restore();
-  }};
-
-  chart=new Chart(ctx,{
-    type:'line',
-    data:{
-      labels:[...labels,forecast!==null?'Prognos':''],
-      datasets:[
-        {label:'Faktisk',data:[...faktisk,null],borderColor:'#007aff',backgroundColor:'#007aff',tension:0.3,fill:false,pointStyle:'circle'},
-        {label:'Korrigerad',data:[...korr,null],borderColor:'#e74c3c',backgroundColor:'#e74c3c',borderDash:[4,4],tension:0.3,fill:false,pointStyle:'triangle'},
-        {label:'Klart sekret',data:sekretIdx.map(i=>({x:i,y:35.1})),showLine:false,pointRadius:5,pointBackgroundColor:'#6fd3ff'},
-        {label:'Prognos',data:[...Array(labels.length).fill(null),forecast],borderColor:'#999',borderDash:[2,2],pointRadius:4,pointBackgroundColor:'#999'}
       ]
-    },
-    options:{
-      layout:{padding:{left:30,right:10,top:10,bottom:10}},
-      plugins:{legend:{position:'bottom',labels:{font:{size:12},color:'#444'}}},
-      scales:{
-        y:{min:35.0,max:38.5,
-          title:{display:true,text:'Temperatur (°C)',color:'#333',font:{size:13,weight:'600'}},
-          grid:{color:'#f2f2f2',lineWidth:0.6},
-          border:{display:true,color:'#ccc',width:0.8},
-          ticks:{stepSize:0.05,color:'#555',font:{size:11}}},
-        x:{ticks:{autoSkip:false,maxRotation:45,minRotation:45,color:'#444',font:{size:11}},
-           grid:{color:'#f8f8f8'},border:{display:true,color:'#ccc',width:0.8}}
-      },
-      aspectRatio:1.6
-    },
-    plugins:[
-      mensBG,
-      {
-        id:'ovulationLine',
-        afterDatasetsDraw(chart){
-          const ov=getOvulationDate();
-          if(!ov)return;
-          const{ctx,chartArea:{top,bottom},scales:{x}}=chart;
-          const idx=bbtData.findIndex(r=>r.datum===ov.toISOString().split('T')[0]);
-          if(idx<0)return;
-          const xp=x.getPixelForValue(idx);
-          ctx.save();
-          ctx.strokeStyle='#bbb';
-          ctx.lineWidth=1;
-          ctx.setLineDash([3,3]);
-          ctx.beginPath();
-          ctx.moveTo(xp,top);
-          ctx.lineTo(xp,bottom);
-          ctx.stroke();
-          ctx.fillStyle='#888';
-          ctx.font='11px sans-serif';
-          ctx.textAlign='center';
-          ctx.fillText('ÄL',xp,top+12);
-          ctx.restore();
+    };
+
+    const chart = new Chart(ctx, {
+      type: 'line',
+      data: data,
+      options: {
+        scales: {
+          y: {
+            min: 35.0,
+            max: 38.5,
+            title: { display: true, text: 'Temperatur (°C)' }
+          },
+          x: {
+            ticks: { maxRotation: 45, minRotation: 45 }
+          }
+        },
+        plugins: {
+          legend: { display: false }
         }
       },
-      {id:'backgroundGradient',
-        beforeDraw(chart){
-          const{ctx,chartArea}=chart;
-          if(!chartArea)return;
-          const g=ctx.createLinearGradient(0,chartArea.bottom,0,chartArea.top);
-          g.addColorStop(0,'#ffe6eb');
-          g.addColorStop(1,'#ffffff');
-          ctx.save();
-          ctx.fillStyle=g;
-          ctx.fillRect(chartArea.left,chartArea.top,chartArea.width,chartArea.height);
-          ctx.restore();
-      }},
-      {id:'dpoLabels',
-        afterDatasetsDraw(chart){
-          const{ctx}=chart;
-          ctx.save();ctx.font='10px sans-serif';ctx.fillStyle='#999';
-          chart.getDatasetMeta(0).data.forEach((pt,i)=>{
-            const dpo=dpoLabels[i];
-            if(dpo!==null&&pt&&isFinite(pt.x)&&isFinite(pt.y)){
-              ctx.beginPath();
-              ctx.arc(pt.x,pt.y-12,10,0,2*Math.PI);
-              ctx.fillStyle='#f4f4f4';
-              ctx.fill();
-              ctx.fillStyle='#555';
-              ctx.textAlign='center';
-              ctx.fillText(String(dpo),pt.x,pt.y-9);
-            }
-          });
-          ctx.restore();
-      }}
-    ]
-  });
-}
+      plugins: [{
+        id: 'phases',
+        beforeDraw(chart) {
+          const { ctx, chartArea: { top, bottom, left, right }, scales: { x } } = chart;
+          const ovulationDate = document.getElementById('ovdatum').value;
+          const ovIndex = data.labels.indexOf(ovulationDate);
+          if (ovIndex < 0) return;
 
-window.addEventListener('load',renderChart);
-</script>
+          // Lutealfas (0–13 DPO)
+          const lutealStart = ovIndex;
+          const lutealEnd = ovIndex + 13;
+          const xStartLut = x.getPixelForValue(lutealStart);
+          const xEndLut = x.getPixelForValue(lutealEnd);
+          ctx.fillStyle = 'rgba(255, 192, 203, 0.18)';
+          ctx.fillRect(xStartLut, top, xEndLut - xStartLut, bottom - top);
+
+          // Implantationsfönster (6–10 DPO)
+          const impStart = ovIndex + 6;
+          const impEnd = ovIndex + 10;
+          const xStartImp = x.getPixelForValue(impStart);
+          const xEndImp = x.getPixelForValue(impEnd);
+          ctx.fillStyle = 'rgba(200, 170, 255, 0.25)';
+          ctx.fillRect(xStartImp, top, xEndImp - xStartImp, bottom - top);
+        }
+      }]
+    });
+  </script>
 </body>
 </html>
