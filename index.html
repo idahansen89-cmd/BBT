@@ -3,201 +3,116 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BBT – Ida</title>
+<title>BBT & LH – Ida</title>
 <link rel="icon" type="image/png" href="B29437FC-696F-4754-AAAB-A6ED096BC64C.png" />
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.2.1"></script>
 <style>
-  body {
-    font-family: "Helvetica Neue", sans-serif;
-    background: #fff;
-    color: #333;
-    margin: 0;
-    padding: 0;
-  }
-  h1 {
-    text-align: center;
-    margin-top: 1rem;
-    color: #333;
-  }
+body {
+  font-family: "Helvetica Neue", sans-serif;
+  background: #fff;
+  color: #000;
+  margin: 0;
+  padding: 0;
+}
+h1 { text-align: center; margin-top: 1rem; }
+.tabs {
+  display: flex; justify-content: center;
+  margin: 1rem 0; border-bottom: 2px solid #ddd;
+}
+.tab {
+  padding: .7rem 1.2rem; cursor: pointer;
+  border: none; background: #f4f4f4;
+  border-radius: 8px 8px 0 0; margin: 0 .3rem;
+  font-weight: 600;
+}
+.tab.active {
+  background: #fff; border-bottom: 2px solid #fff; color: #e06b8f;
+}
+.tab-content {
+  display: none; padding: 1rem; max-width: 750px;
+  margin: auto; border: 1px solid #eee; border-radius: 10px;
+}
+.tab-content.active { display: block; }
 
-  /* Flikar */
-  .tabs {
-    display: flex;
-    justify-content: center;
-    margin: 1rem 0;
-    border-bottom: 2px solid #ddd;
-  }
-  .tab {
-    padding: 0.7rem 1.2rem;
-    cursor: pointer;
-    border: none;
-    background: #f4f4f4;
-    border-radius: 8px 8px 0 0;
-    margin: 0 0.3rem;
-    font-weight: 600;
-  }
-  .tab.active {
-    background: #fff;
-    border-bottom: 2px solid #fff;
-    color: #e06b8f;
-  }
-  .tab-content {
-    display: none;
-    padding: 1rem;
-    max-width: 750px;
-    margin: auto;
-    border: 1px solid #eee;
-    border-radius: 10px;
-  }
-  .tab-content.active { display: block; }
+label { display: inline-block; width: 130px; font-weight: 500; margin-bottom: .2rem; }
+input, select, textarea {
+  width: calc(100% - 140px); padding: .4rem;
+  border: 1px solid #ccc; border-radius: 6px;
+  font-size: .9rem; margin-bottom: .6rem;
+}
+textarea { resize: vertical; }
 
-  label {
-    display: inline-block;
-    width: 130px;
-    font-weight: 500;
-    margin-bottom: 0.2rem;
-  }
-  input, select, textarea {
-    width: calc(100% - 140px);
-    padding: 0.4rem;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    margin-bottom: 0.6rem;
-  }
+.button {
+  background: #f4b6c2; color: #333; border: none;
+  border-radius: 6px; padding: .5rem 1.2rem;
+  margin: .3rem; font-weight: 600; cursor: pointer;
+}
+.button:hover { background: #e599ab; }
 
-  .button {
-    background: #f4b6c2;
-    color: #333;
-    border: none;
-    border-radius: 6px;
-    padding: 0.5rem 1.2rem;
-    margin: 0.3rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-  .button:hover { background: #e599ab; }
+table {
+  width: 100%; border-collapse: collapse; margin-top: 1rem;
+}
+th, td { padding: .5rem; border: 1px solid #ddd; text-align: center; }
+tr.mens-row { background-color: #ffe5ec; }
+.table-container { overflow-x: auto; margin-top: 1rem; }
+#bbtChart { width: 100%; height: 420px; }
 
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 1rem;
-  }
-  th, td {
-    padding: 0.5rem;
-    border: 1px solid #ddd;
-    text-align: center;
-  }
-  tr.mens-row { background-color: #ffe5ec; }
+.bottom-buttons { text-align: center; margin-top: 1rem; }
 
-  .table-container { overflow-x: auto; margin-top: 1rem; }
+.symbol-checkbox { display: inline-block; margin-right: 1rem; font-size: 1.2rem; vertical-align: middle; }
 
-  #bbtChart { width: 100%; height: 420px; }
-
-  .bottom-buttons { text-align: center; margin-top: 1rem; }
-
-  .symbol-checkbox {
-    display: inline-block;
-    margin-right: 1rem;
-    font-size: 1.2rem;
-    vertical-align: middle;
-  }
-
-  /* LH-flik */
-  .lh-toolbar { display:flex;gap:.5rem;align-items:center;justify-content:space-between;margin-bottom:.5rem }
-  .lh-symbols-row { display:flex;justify-content:space-around;align-items:flex-end;gap:4px;margin:.3rem 0 .4rem; }
-  .lh-symbol-checkbox {
-    text-align:center;
-    font-size:1.3rem;
-    line-height:1.2;
-  }
-  .lh-symbol-checkbox input { margin-top:3px; }
-  .lh-symbol-checkbox small { display:block;font-size:0.7rem;color:#555;margin-top:-1px; }
-
-  .lh-entry {
-    display:flex;
-    align-items:flex-start;
-    justify-content:space-between;
-    margin-bottom:6px;
-    border-bottom:1px solid #eee;
-    padding-bottom:4px;
-  }
-  .lh-image {
-    width: 100%;
-    height: 60px;
-    object-fit: cover;
-    border-radius:6px;
-    cursor:pointer;
-  }
-  .lh-info { flex-grow:1; margin-left:10px; }
-  .lh-symbols { font-size:1.1rem; line-height:1.3rem; }
-
-  textarea { resize: vertical; }
-
+/* --- LH-flik --- */
+.lh-toolbar {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: .5rem;
+}
+.lh-symbols-row {
+  display: flex; justify-content: space-between; flex-wrap: wrap;
+  gap: 6px; margin: .3rem 0 .6rem;
+}
+.lh-symbol-checkbox {
+  text-align: center;
+  font-size: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.1rem;
+}
+.lh-symbol-checkbox input {
+  margin-top: -2px;
+}
+.lh-image {
+  width: auto;
+  max-height: 60px;
+  border-radius: 4px;
+  object-fit: cover;
+  cursor: pointer;
+}
+.lh-entry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #eee;
+  padding: 4px 0;
+}
+.lh-info {
+  flex-grow: 1;
+  margin-left: 10px;
+}
+.lh-symbols {
+  font-size: 1.1rem;
+  line-height: 1.5rem;
+}
 </style>
 </head>
 <body>
-<h1>BBT – Ida</h1>
+<h1>BBT & LH – Ida</h1>
 
 <div class="tabs">
   <button class="tab active" onclick="openTab('inmatning')">Inmatning & Tabell</button>
   <button class="tab" onclick="openTab('graf')">📈 Graf</button>
   <button class="tab" onclick="openTab('lh')">🧪 LH-test</button>
-</div>
-
-<!-- Inmatning & Tabell -->
-<div id="inmatning" class="tab-content active">
-  <div>
-    <label>Datum:</label><input type="date" id="date"><br>
-    <label>Tid (BBT):</label><input type="time" id="time"><br>
-    <label>Faktisk temp (°C):</label><input type="number" step="0.01" id="actual"><br>
-    <label>Korrigerad temp (°C):</label><input type="number" step="0.01" id="corrected" placeholder="Beräknas automatiskt"><br>
-    <label>Mensstatus:</label>
-    <select id="mens">
-      <option>–</option><option>Mens</option>
-    </select><br>
-    <label>Sekret:</label>
-    <select id="mucus">
-      <option>–</option><option>Klart</option><option>Äggviteliknande</option><option>Krämig</option>
-    </select><br>
-    <label>LH-test:</label>
-    <select id="lh">
-      <option>–</option><option>Positivt</option><option>Negativt</option>
-    </select><br>
-    <div>
-      <span class="symbol-checkbox" title="Samlag">💞 <input type="checkbox" id="sex"></span>
-      <span class="symbol-checkbox" title="Bekräftad ägglossning">🌼 <input type="checkbox" id="ovulation"></span>
-    </div>
-    <label>Anteckning:</label><textarea rows="2" id="note"></textarea><br>
-
-    <button class="button" id="saveBtn">Spara</button>
-    <button class="button" id="exportBtn">Exportera data</button>
-    <button class="button" id="importBtn">Importera data</button>
-    <input type="file" id="importFile" accept="application/json" style="display:none">
-  </div>
-
-  <div class="table-container">
-    <table id="dataTable">
-      <thead>
-        <tr>
-          <th>Datum</th><th>Tid</th><th>Faktisk</th><th>Korr</th>
-          <th>Mens</th><th>Sekret</th><th>LH</th><th>💞</th><th>🌼</th><th>Anteckning</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-
-  <div class="bottom-buttons">
-    <button class="button danger" id="clearBtn">Rensa all data</button>
-  </div>
-</div>
-
-<!-- Graf -->
-<div id="graf" class="tab-content">
-  <canvas id="bbtChart"></canvas>
 </div>
 
 <!-- LH-test -->
@@ -209,187 +124,103 @@
   </div>
 
   <div class="lh-symbols-row">
-    <label class="lh-symbol-checkbox" title="Nästan positiv">🩷<br><input type="checkbox" class="lhSym" value="🩷"><small>N</small></label>
-    <label class="lh-symbol-checkbox" title="LH-topp">❤️<br><input type="checkbox" class="lhSym" value="❤️"><small>T</small></label>
-    <label class="lh-symbol-checkbox" title="Hög">💜<br><input type="checkbox" class="lhSym" value="💜"><small>H</small></label>
-    <label class="lh-symbol-checkbox" title="Låg">💙<br><input type="checkbox" class="lhSym" value="💙"><small>L</small></label>
-    <label class="lh-symbol-checkbox" title="Negativ">💚<br><input type="checkbox" class="lhSym" value="💚"><small>–</small></label>
-    <label class="lh-symbol-checkbox" title="Oklart">💛<br><input type="checkbox" class="lhSym" value="💛"><small>?</small></label>
+    <label class="lh-symbol-checkbox" title="Nästan positiv">🩷<input type="checkbox" class="lhSym" value="🩷"><small>N</small></label>
+    <label class="lh-symbol-checkbox" title="LH-topp">❤️<input type="checkbox" class="lhSym" value="❤️"><small>T</small></label>
+    <label class="lh-symbol-checkbox" title="Hög">💜<input type="checkbox" class="lhSym" value="💜"><small>H</small></label>
+    <label class="lh-symbol-checkbox" title="Låg">💙<input type="checkbox" class="lhSym" value="💙"><small>L</small></label>
+    <label class="lh-symbol-checkbox" title="Negativ">💚<input type="checkbox" class="lhSym" value="💚"><small>–</small></label>
+    <label class="lh-symbol-checkbox" title="Oklart">💛<input type="checkbox" class="lhSym" value="💛"><small>?</small></label>
   </div>
 
-  <div class="button-row" style="display:flex;gap:.5rem;align-items:center">
+  <div class="button-row" style="display:flex;gap:.5rem;align-items:center;margin-bottom:.5rem">
     <textarea id="lhNote" placeholder="Anteckning (valfritt)" style="flex:1"></textarea>
     <button class="button" id="lhSaveBtn">Spara</button>
   </div>
 
-  <div id="lhList" style="margin-top:6px"></div>
+  <div id="lhList"></div>
 </div>
 
 <script>
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener('DOMContentLoaded', () => {
   const el = {
-    date: date, time: time, actual: actual, corrected: corrected,
-    mens: mens, mucus: mucus, lh: lh, sex: sex, ovulation: ovulation, note: note,
-    saveBtn, exportBtn, importBtn, importFile, clearBtn,
-    dataTableBody: document.querySelector("#dataTable tbody"),
-    chartCanvas: document.getElementById("bbtChart"),
-    lhPickBtn, lhFile, lhDate, lhNote, lhSaveBtn, lhList,
-    lhSymChecks: () => [...document.querySelectorAll(".lhSym:checked")]
-  };
-  let dataEntries = JSON.parse(localStorage.getItem("bbtData")||"[]");
-  let lhEntries = JSON.parse(localStorage.getItem("lhData")||"[]");
-  let chart;
-
-  // flikar
-  window.openTab = id => {
-    document.querySelectorAll(".tab,.tab-content").forEach(e=>e.classList.remove("active"));
-    document.querySelector(`[onclick="openTab('${id}')"]`)?.classList.add("active");
-    document.getElementById(id).classList.add("active");
-    if(id==="graf") renderChart();
-    if(id==="lh") renderLHList();
+    lhPickBtn: document.getElementById('lhPickBtn'),
+    lhFile: document.getElementById('lhFile'),
+    lhDate: document.getElementById('lhDate'),
+    lhNote: document.getElementById('lhNote'),
+    lhSaveBtn: document.getElementById('lhSaveBtn'),
+    lhList: document.getElementById('lhList'),
+    lhSymChecks: () => Array.from(document.querySelectorAll('.lhSym:checked'))
   };
 
-  const minutesFrom0400 = t => {
-    if(!t) return 0;
-    const [h,m]=t.split(":").map(Number);
-    return (h*60+m)-240;
-  };
-  function computeCorrectedRow(row){
-    if(!row.time||!row.actual) return row.corrected;
-    const mins=minutesFrom0400(row.time);
-    return +(row.actual+0.05*(mins/30)).toFixed(2);
-  }
-  function computeCorrected(){
-    const a=parseFloat(el.actual.value);
-    if(Number.isNaN(a))return;
-    const mins=minutesFrom0400(el.time.value||"04:00");
-    el.corrected.value=(a+0.05*(mins/30)).toFixed(2);
-  }
+  let lhEntries = JSON.parse(localStorage.getItem('lhData') || '[]');
 
-  function saveEntry(){
-    const e={date:el.date.value,time:el.time.value,actual:+el.actual.value||null,corrected:+el.corrected.value||null,
-      mens:el.mens.value,mucus:el.mucus.value,lh:el.lh.value,sex:el.sex.checked,ovulation:el.ovulation.checked,note:el.note.value};
-    if(!e.date)return alert("Välj datum.");
-    const i=dataEntries.findIndex(x=>x.date===e.date);
-    if(i>=0)dataEntries[i]=e;else dataEntries.push(e);
-    localStorage.setItem("bbtData",JSON.stringify(dataEntries));
-    renderTable();
-  }
-
-  function renderTable(){
-    el.dataTableBody.innerHTML="";
-    dataEntries.sort((a,b)=>a.date.localeCompare(b.date));
-    dataEntries.forEach((e,i)=>{
-      const tr=document.createElement("tr");
-      if(e.mens==="Mens")tr.classList.add("mens-row");
-      tr.innerHTML=`<td contenteditable>${e.date||""}</td><td contenteditable>${e.time||""}</td>
-      <td contenteditable>${e.actual??""}</td><td>${e.corrected??""}</td>
-      <td contenteditable>${e.mens||"–"}</td><td contenteditable>${e.mucus||"–"}</td>
-      <td contenteditable>${e.lh||"–"}</td><td>${e.sex?"💞":""}</td><td>${e.ovulation?"🌼":""}</td><td contenteditable>${e.note||""}</td>`;
-      tr.querySelectorAll("td[contenteditable]").forEach(td=>td.addEventListener("blur",()=>{
-        const cells=tr.querySelectorAll("td");
-        const obj={date:cells[0].innerText,time:cells[1].innerText,actual:+cells[2].innerText||null,
-          corrected:computeCorrectedRow({time:cells[1].innerText,actual:+cells[2].innerText||null}),
-          mens:cells[4].innerText,mucus:cells[5].innerText,lh:cells[6].innerText,
-          sex:e.sex,ovulation:e.ovulation,note:cells[9].innerText};
-        dataEntries[i]=obj;
-        localStorage.setItem("bbtData",JSON.stringify(dataEntries));
-        renderTable();
-      }));
-      el.dataTableBody.appendChild(tr);
+  async function blobToDataURL(b){
+    return new Promise((res, rej)=>{
+      const r = new FileReader();
+      r.onload = () => res(r.result);
+      r.onerror = rej;
+      r.readAsDataURL(b);
     });
   }
 
-  function renderChart(){
-    if(chart)chart.destroy();
-    dataEntries.sort((a,b)=>a.date.localeCompare(b.date));
-    const labels=dataEntries.map(e=>e.date);
-    const actual=dataEntries.map(e=>e.actual);
-    const corrected=dataEntries.map(e=>e.corrected);
-    const ovIndex=dataEntries.findIndex(e=>e.ovulation);
-    const pre=(ovIndex>0?actual.slice(0,ovIndex):actual).filter(v=>typeof v==="number");
-    const avg=pre.length?pre.reduce((a,b)=>a+b,0)/pre.length:null;
-    const anns=[];
-    const firstNon=dataEntries.findIndex(e=>e.mens!=="Mens");
-    const end=(firstNon===-1)?labels.length-0.5:firstNon-0.5;
-    if(firstNon!==0)anns.push({type:"box",xMin:0,xMax:end,backgroundColor:"rgba(255,230,230,.3)",borderWidth:0});
-    if(ovIndex>-1)anns.push({type:"box",xMin:ovIndex+0.5,xMax:labels.length-0.5,backgroundColor:"rgba(230,210,255,.25)",borderWidth:0});
-    const symbols=dataEntries.map(e=>{
-      const s=[];if(e.sex)s.push("💞");if(e.ovulation)s.push("🌼");if(e.mucus==="Äggviteliknande")s.push("💧");return s;
-    });
-    chart=new Chart(el.chartCanvas,{type:"line",
-      data:{labels,datasets:[
-        {label:"Faktisk temperatur",data:actual,borderColor:"#3b82f6",backgroundColor:"#3b82f6",tension:0.3,spanGaps:true},
-        {label:"Korrigerad temperatur",data:corrected,borderColor:"#ef4444",backgroundColor:"#ef4444",borderDash:[4,4],tension:0.3,spanGaps:true},
-        ...(avg?[{label:"Medel före ägglossning",data:Array(labels.length).fill(avg),borderColor:"#888",pointRadius:0,borderDash:[5,5]}]:[])
-      ]},
-      options:{scales:{y:{min:35,max:38.5,title:{display:true,text:"Temperatur (°C)"}},
-        x:{ticks:{autoSkip:false,maxRotation:0}}},
-        plugins:{legend:{position:"bottom",labels:{color:"#000"}},annotation:{annotations:anns}},animation:false},
-      plugins:[{id:"symbols",afterDatasetsDraw(c){const ctx=c.ctx;ctx.font="10px sans-serif";ctx.textAlign="center";
-        const meta=c.getDatasetMeta(0);c.data.labels.forEach((_,i)=>{const p=meta.data[i];if(!p)return;
-        const x=p.x,y=c.scales.y.bottom-18;if(symbols[i]?.length)symbols[i].forEach((sm,j)=>ctx.fillText(sm,x,y-j*13));});}}]
-    });
-  }
-
-  function exportAll(){const blob=new Blob([JSON.stringify({bbtData:dataEntries,lhData:lhEntries},null,2)],{type:"application/json"});
-    const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="BBT_Ida_data.json";a.click();URL.revokeObjectURL(a.href);}
-  function importAllFromFile(f){const r=new FileReader();r.onload=()=>{try{const o=JSON.parse(r.result);
-      if(o.bbtData)dataEntries=o.bbtData;if(o.lhData)lhEntries=o.lhData;
-      localStorage.setItem("bbtData",JSON.stringify(dataEntries));
-      localStorage.setItem("lhData",JSON.stringify(lhEntries));
-      renderTable();renderLHList();if(chart)renderChart();alert("Data importerad!");
-    }catch(e){alert("Ogiltig fil.");}};r.readAsText(f);}
-
-  async function blobToDataURL(b){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(b);});}
   function renderLHList(){
-    el.lhList.innerHTML="";
+    el.lhList.innerHTML = '';
     lhEntries.sort((a,b)=>a.date.localeCompare(b.date));
-    lhEntries.forEach((e,i)=>{
-      const row=document.createElement("div");
-      row.className="lh-entry";
-      row.innerHTML=`<img class="lh-image" src="${e.dataUrl}" alt="LH-bild">
-        <div class="lh-info"><strong>${e.date||""}</strong>
-        <div class="lh-symbols">${(e.symbols||[]).join(" ")}</div>
-        <small>${e.note||""}</small></div>
-        <button class="button danger" data-del="${i}">Ta bort</button>`;
-      row.querySelector("img").addEventListener("click",()=>openFullscreen(e.dataUrl));
-      row.querySelector("[data-del]").addEventListener("click",()=>{
-        lhEntries.splice(i,1);localStorage.setItem("lhData",JSON.stringify(lhEntries));renderLHList();
+    lhEntries.forEach((e, i)=>{
+      const row = document.createElement('div');
+      row.className = 'lh-entry';
+      row.innerHTML = `
+        <img class="lh-image" src="${e.dataUrl}" alt="LH-bild">
+        <div class="lh-info">
+          <strong>${e.date||''}</strong>
+          <div class="lh-symbols">${(e.symbols||[]).join(' ')}</div>
+          <small>${e.note||''}</small>
+        </div>
+        <button class="button danger" data-del="${i}">Ta bort</button>
+      `;
+      row.querySelector('img').addEventListener('click', ()=>openFullscreen(e.dataUrl));
+      row.querySelector('[data-del]').addEventListener('click', ()=>{
+        lhEntries.splice(i,1);
+        localStorage.setItem('lhData', JSON.stringify(lhEntries));
+        renderLHList();
       });
       el.lhList.appendChild(row);
     });
   }
+
   function openFullscreen(src){
-    const o=document.createElement("div");
-    o.style="position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:9999";
-    const img=document.createElement("img");
-    img.src=src;img.style="max-width:90%;max-height:90%;border-radius:8px;background:#fff";
-    o.appendChild(img);
-    o.addEventListener("click",()=>document.body.removeChild(o));
-    document.body.appendChild(o);
+    const overlay = document.createElement('div');
+    overlay.style = 'position:fixed;inset:0;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;z-index:9999;';
+    const img = document.createElement('img');
+    img.src = src; img.style='max-width:95%;max-height:95%;border-radius:8px;';
+    overlay.appendChild(img);
+    overlay.addEventListener('click', ()=>document.body.removeChild(overlay));
+    document.body.appendChild(overlay);
   }
 
-  el.actual.addEventListener("blur",computeCorrected);
-  el.time.addEventListener("change",()=>{if(el.actual.value)computeCorrected();});
-  el.saveBtn.addEventListener("click",saveEntry);
-  el.clearBtn.addEventListener("click",()=>{if(!confirm("Vill du verkligen rensa all data?"))return;dataEntries=[];lhEntries=[];localStorage.clear();renderTable();renderLHList();if(chart)chart.destroy();});
-  el.exportBtn.addEventListener("click",exportAll);
-  el.importBtn.addEventListener("click",()=>el.importFile.click());
-  el.importFile.addEventListener("change",e=>{if(e.target.files?.[0])importAllFromFile(e.target.files[0]);e.target.value="";});
-
-  el.lhPickBtn.addEventListener("click",()=>el.lhFile.click());
-  el.lhSaveBtn.addEventListener("click",async()=>{
-    if(!el.lhFile.files[0])return alert("Välj bild.");if(!el.lhDate.value)return alert("Välj datum.");
-    const symbols=el.lhSymChecks().map(x=>x.value),note=el.lhNote.value,dataUrl=await blobToDataURL(el.lhFile.files[0]);
-    lhEntries.push({date:el.lhDate.value,symbols,note,dataUrl});
-    localStorage.setItem("lhData",JSON.stringify(lhEntries));
-    document.querySelectorAll(".lhSym").forEach(cb=>cb.checked=false);
-    el.lhNote.value="";el.lhFile.value="";renderLHList();
+  el.lhPickBtn.addEventListener('click', ()=> el.lhFile.click());
+  el.lhSaveBtn.addEventListener('click', async ()=>{
+    if (!el.lhFile.files[0]) return alert('Välj bild.');
+    if (!el.lhDate.value) return alert('Välj datum.');
+    const symbols = el.lhSymChecks().map(x=>x.value);
+    const note = el.lhNote.value;
+    const dataUrl = await blobToDataURL(el.lhFile.files[0]);
+    lhEntries.push({date: el.lhDate.value, symbols, note, dataUrl});
+    localStorage.setItem('lhData', JSON.stringify(lhEntries));
+    document.querySelectorAll('.lhSym').forEach(cb => cb.checked = false);
+    el.lhNote.value = ''; el.lhFile.value = '';
+    renderLHList();
   });
 
-  renderTable();
+  renderLHList();
 });
+function openTab(id){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+  const btn = document.querySelector(`[onclick="openTab('${id}')"]`);
+  if(btn) btn.classList.add('active');
+  document.getElementById(id).classList.add('active');
+}
 </script>
 </body>
 </html>
