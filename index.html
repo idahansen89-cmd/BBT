@@ -73,7 +73,8 @@ button:hover{background:#005ecb;}
   <button onclick="addEntry()">Spara</button>
   <button onclick="exportJSON()">Exportera JSON</button>
   <button onclick="importJSON()">Importera JSON</button>
-
+  <button onclick="clearAllData()">🗑️ Rensa all data</button>
+  
   <div id="chartContainer">
     <canvas id="bbtChart"></canvas>
     <div class="legend">
@@ -289,7 +290,14 @@ function renderChart(){
 
 /* ===== Event-bindningar ===== */
 window.addEventListener('load', renderChart);
-</script>
+function clearAllData() {
+  if (confirm("Är du säker på att du vill ta bort alla sparade temperaturer?")) {
+    localStorage.removeItem('bbtData');
+    bbtData = [];
+    renderChart();
+    alert("All data har rensats. Grafen är nu tom.");
+  }
+}
 </script>
 </body>
 </html>
