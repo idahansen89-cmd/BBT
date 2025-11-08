@@ -2,270 +2,392 @@
 <html lang="sv">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BBT – Ida</title>
-
-  <link rel="icon" type="image/png" href="B29437FC-696F-4754-AAAB-A6ED096BC64C.png">
-  <link rel="apple-touch-icon" href="B29437FC-696F-4754-AAAB-A6ED096BC64C.png">
-
+  <link rel="icon" type="image/png" href="B29437FC-696F-4754-AAAB-A6ED096BC64C.png" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.2.1"></script>
   <style>
-    :root{
-      --pink:#f9b7c5; --pink-d:#f5a3b3; --border:#e6e6e6; --bg:#fff;
-      --blue:#3a7bd5; --red:#e57373; --lav:#c8a2ff; --gray:#bbb;
+    body {
+      font-family: "Helvetica Neue", sans-serif;
+      background: #fff;
+      color: #333;
+      margin: 0;
+      padding: 0;
     }
-    body{margin:0;padding:16px;background:#fff;color:#333;
-      font-family:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
-    .container{max-width:900px;margin:0 auto;}
-    h1{text-align:center;margin:0 0 10px;}
+
+    h1 {
+      text-align: center;
+      margin-top: 1rem;
+      color: #333;
+    }
 
     /* Flikar */
-    .tabs{display:flex;border-bottom:1px solid var(--border);margin-bottom:14px;gap:8px;}
-    .tab{padding:12px 14px;border:1px solid var(--border);border-bottom:none;
-      border-radius:8px 8px 0 0;cursor:pointer;font-weight:600;color:#666;}
-    .tab.active{background:#fff;color:#222;}
-    .panel{display:none;border:1px solid var(--border);border-radius:0 8px 8px 8px;padding:14px;}
-    .panel.active{display:block;}
+    .tabs {
+      display: flex;
+      justify-content: center;
+      margin: 1rem 0;
+      border-bottom: 2px solid #ddd;
+    }
 
-    /* Inputs/knappar */
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;align-items:center;margin-bottom:10px;}
-    input,select{width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;font-size:15px;}
-    .btn{background:var(--pink);color:#fff;border:none;border-radius:8px;padding:10px 14px;
-      font-weight:700;cursor:pointer;transition:.15s;}
-    .btn:hover{background:var(--pink-d);transform:translateY(-1px);}
-    .danger{background:#f5c5c5!important;color:#333;}
-    .btn-row{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0 6px;}
+    .tab {
+      padding: 0.7rem 1.2rem;
+      cursor: pointer;
+      border: none;
+      background: #f4f4f4;
+      border-radius: 8px 8px 0 0;
+      margin: 0 0.3rem;
+      font-weight: 600;
+    }
 
-    table{width:100%;border-collapse:collapse;margin-top:8px;}
-    th,td{padding:8px 6px;border-bottom:1px solid var(--border);font-size:14px;text-align:left;}
-    th{background:#fafafa;}
+    .tab.active {
+      background: #fff;
+      border-bottom: 2px solid #fff;
+      color: #e06b8f;
+    }
 
-    canvas{width:100%;height:480px!important;display:block;}
+    .tab-content {
+      display: none;
+      padding: 1rem;
+      max-width: 750px;
+      margin: auto;
+      border: 1px solid #eee;
+      border-radius: 10px;
+    }
 
-    /* LH-flik */
-    .lh-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 14px;align-items:center;}
-    .lh-chiprow{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;text-align:center;}
-    .lh-emoji{font-size:20px;display:block;}
-    .lh-label{font-size:12px;color:#555;margin:4px 0;}
-    .lh-list{display:flex;flex-direction:column;gap:14px;margin-top:10px;}
-    .lh-item{display:grid;grid-template-columns:130px 1fr auto;gap:12px;align-items:center;
-      border:1px solid var(--border);border-radius:10px;padding:10px;background:#fff;}
-    .lh-thumb{width:100%;height:90px;object-fit:cover;border-radius:6px;cursor:pointer;
-      border:1px solid #eee;transition:.2s;}
-    .lh-thumb:hover{transform:scale(1.02);}
-    .lh-meta{display:flex;flex-direction:column;gap:4px;}
-    .lh-date{font-weight:700;}
-    .lh-note{color:#555;}
-    .lh-del{background:#e9e9e9;color:#333;border:none;border-radius:8px;padding:8px 10px;cursor:pointer;}
-    .lh-del:hover{background:#ddd;}
-    .lh-actions{display:flex;gap:10px;align-items:center;}
+    .tab-content.active {
+      display: block;
+    }
 
-    /* Lightbox */
-    .lightbox{display:none;position:fixed;top:0;left:0;width:100%;height:100%;
-      background:rgba(0,0,0,0.85);justify-content:center;align-items:center;z-index:999;}
-    .lightbox img{max-width:90%;max-height:90%;border-radius:8px;box-shadow:0 0 10px rgba(0,0,0,0.4);}
-    .lightbox .close{position:absolute;top:20px;right:24px;color:#fff;font-size:30px;
-      cursor:pointer;font-weight:bold;}
+    label {
+      display: inline-block;
+      width: 130px;
+      font-weight: 500;
+      margin-bottom: 0.2rem;
+    }
 
-    @media(max-width:760px){
-      .row{grid-template-columns:1fr;}
-      .lh-grid{grid-template-columns:1fr;}
-      .lh-item{grid-template-columns:110px 1fr auto;}
+    input, select, textarea {
+      width: calc(100% - 140px);
+      padding: 0.4rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      margin-bottom: 0.6rem;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    .button {
+      background: #f4b6c2;
+      color: #333;
+      border: none;
+      border-radius: 6px;
+      padding: 0.5rem 1.2rem;
+      margin: 0.3rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .button:hover {
+      background: #e599ab;
+    }
+
+    .button.danger {
+      background: #f4b6c2;
+      color: #333;
+    }
+
+    .button.danger:hover {
+      background: #e599ab;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+
+    th, td {
+      padding: 0.5rem;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+
+    tr.mens-row {
+      background-color: #ffe5ec;
+    }
+
+    .table-container {
+      overflow-x: auto;
+      margin-top: 1rem;
+    }
+
+    #bbtChart {
+      width: 100%;
+      height: 420px;
+    }
+
+    .bottom-buttons {
+      text-align: center;
+      margin-top: 1rem;
+    }
+
+    .symbol-checkbox {
+      display: inline-block;
+      margin-right: 1rem;
+      font-size: 1.2rem;
+      vertical-align: middle;
     }
   </style>
 </head>
 <body>
-<div class="container">
   <h1>BBT – Ida</h1>
 
   <div class="tabs">
-    <div class="tab active" data-target="#panel-input">📋 Inmatning & tabell</div>
-    <div class="tab" data-target="#panel-chart">📈 Graf</div>
-    <div class="tab" data-target="#panel-lh">🧪 LH-tester</div>
+    <button class="tab active" onclick="openTab('inmatning')">Inmatning & Tabell</button>
+    <button class="tab" onclick="openTab('graf')">📈 Graf</button>
   </div>
 
-  <!-- Inmatning -->
-  <div class="panel active" id="panel-input">
-    <div class="row">
-      <label>Datum</label><input type="date" id="datum">
-      <label>Tid (BBT)</label><input type="time" id="tid">
-      <label>Faktisk (°C)</label><input type="number" step="0.01" id="faktisk">
-      <label>Korrigerad (°C)</label>
-      <div style="display:flex;gap:8px;"><input type="number" step="0.01" id="korr"><button class="btn" id="btn-calc">Beräkna</button></div>
-      <label>Mensstatus</label>
-      <select id="mens"><option>Ingen</option><option>Spotting</option><option>Mens</option></select>
-      <label>Typ av sekret</label>
-      <select id="sekret"><option>-</option><option>Krämigt</option><option>Klart</option><option>Stretchigt</option></select>
-      <label>LH-test</label>
-      <select id="lh"><option>-</option><option>Negativt</option><option>Positivt</option></select>
-      <label>Anteckning</label><input type="text" id="anteckning" placeholder="t.ex. sov dåligt, sjuk, samlag">
-    </div>
-
-    <div class="btn-row">
-      <button class="btn" id="btn-save">Spara</button>
-      <button class="btn danger" id="btn-reset">Rensa data</button>
-      <button class="btn" id="btn-export-bbt">Exportera JSON</button>
-    </div>
-
-    <table id="tbl"><thead><tr><th>Datum</th><th>Tid</th><th>Faktisk</th><th>Korr</th><th>Mens</th><th>Sekret</th><th>LH</th><th>Anteckning</th></tr></thead><tbody></tbody></table>
-  </div>
-
-  <!-- Graf -->
-  <div class="panel" id="panel-chart">
-    <canvas id="chart"></canvas>
-  </div>
-
-  <!-- LH-tester -->
-  <div class="panel" id="panel-lh">
-    <div class="lh-grid">
-      <input type="file" id="lh-file" accept="image/*">
-      <input type="date" id="lh-date">
-
-      <div class="lh-chiprow" style="grid-column:1 / -1;">
-        <label><span class="lh-emoji">🩷</span><span class="lh-label">Nästan</span><input type="checkbox" class="lh-flag" value="🩷"></label>
-        <label><span class="lh-emoji">❤️</span><span class="lh-label">Topp</span><input type="checkbox" class="lh-flag" value="❤️"></label>
-        <label><span class="lh-emoji">💜</span><span class="lh-label">Hög</span><input type="checkbox" class="lh-flag" value="💜"></label>
-        <label><span class="lh-emoji">💙</span><span class="lh-label">Låg</span><input type="checkbox" class="lh-flag" value="💙"></label>
-        <label><span class="lh-emoji">💚</span><span class="lh-label">Negativ</span><input type="checkbox" class="lh-flag" value="💚"></label>
-        <label><span class="lh-emoji">💛</span><span class="lh-label">Oklart</span><input type="checkbox" class="lh-flag" value="💛"></label>
+  <div id="inmatning" class="tab-content active">
+    <div>
+      <label>Datum:</label><input type="date" id="date"><br>
+      <label>Tid (BBT):</label><input type="time" id="time"><br>
+      <label>Faktisk temp (°C):</label><input type="number" step="0.01" id="actual"><br>
+      <label>Korrigerad temp (°C):</label><input type="number" step="0.01" id="corrected"><br>
+      <label>Mensstatus:</label>
+      <select id="mens">
+        <option>–</option>
+        <option>Mens</option>
+      </select><br>
+      <label>Sekret:</label>
+      <select id="mucus">
+        <option>–</option>
+        <option>Klart</option>
+        <option>Äggviteliknande</option>
+        <option>Grumligt</option>
+      </select><br>
+      <label>LH-test:</label>
+      <select id="lh">
+        <option>–</option>
+        <option>Positivt</option>
+        <option>Negativt</option>
+      </select><br>
+      <div>
+        <span class="symbol-checkbox">💞 <input type="checkbox" id="sex"></span>
+        <span class="symbol-checkbox">🌼 <input type="checkbox" id="ovulation"></span>
       </div>
-
-      <button class="btn" id="lh-save">Spara</button>
-      <input type="text" id="lh-note" placeholder="Kort anteckning (valfritt)">
+      <label>Anteckning:</label><textarea rows="2" id="note"></textarea><br>
+      <button class="button" onclick="saveEntry()">Spara</button>
     </div>
 
-    <div class="lh-list" id="lh-list"></div>
-    <div class="btn-row" style="justify-content:center;margin-top:8px;">
-      <button class="btn" id="btn-export-lh">Exportera LH-data</button>
+    <div class="table-container">
+      <table id="dataTable">
+        <thead>
+          <tr>
+            <th>Datum</th><th>Tid</th><th>Faktisk</th><th>Korr</th>
+            <th>Mens</th><th>Sekret</th><th>LH</th><th>💞</th><th>🌼</th><th>Anteckning</th><th>✏️</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="bottom-buttons">
+      <button class="button danger" onclick="clearData()">Rensa all data</button>
     </div>
   </div>
-</div>
 
-<!-- Lightbox -->
-<div class="lightbox" id="lightbox">
-  <span class="close" id="lb-close">&times;</span>
-  <img id="lb-img" src="" alt="Förhandsvisning">
-</div>
+  <div id="graf" class="tab-content">
+    <canvas id="bbtChart"></canvas>
+  </div>
 
-<script>
-const $ = s=>document.querySelector(s);
-const $$ = s=>Array.from(document.querySelectorAll(s));
-function load(k,f){try{return JSON.parse(localStorage.getItem(k)||JSON.stringify(f));}catch{return f;}}
-function save(k,v){localStorage.setItem(k,JSON.stringify(v));}
+  <script>
+    let dataEntries = JSON.parse(localStorage.getItem('bbtData') || '[]');
+    let chart;
 
-let rows=load('bbtData',[]);
-let lhRows=load('lhData',[]);
+    function openTab(tabId) {
+      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+      document.querySelector(`[onclick="openTab('${tabId}')"]`).classList.add("active");
+      document.getElementById(tabId).classList.add("active");
+      if (tabId === 'graf') renderChart();
+    }
 
-/* Flikar */
-$$('.tab').forEach(t=>t.onclick=()=>{
-  $$('.tab').forEach(x=>x.classList.remove('active'));
-  $$('.panel').forEach(x=>x.classList.remove('active'));
-  t.classList.add('active');
-  document.querySelector(t.dataset.target).classList.add('active');
-  if(t.dataset.target==='#panel-chart') renderChart();
-  if(t.dataset.target==='#panel-lh') renderLH();
-});
+    function saveEntry() {
+      const entry = {
+        date: date.value,
+        time: time.value,
+        actual: parseFloat(actual.value) || null,
+        corrected: parseFloat(corrected.value) || null,
+        mens: mens.value,
+        mucus: mucus.value,
+        lh: lh.value,
+        sex: sex.checked,
+        ovulation: ovulation.checked,
+        note: note.value
+      };
+      const existingIndex = dataEntries.findIndex(e => e.date === entry.date);
+      if (existingIndex >= 0) dataEntries[existingIndex] = entry;
+      else dataEntries.push(entry);
+      localStorage.setItem('bbtData', JSON.stringify(dataEntries));
+      renderTable();
+    }
 
-/* Korrigering */
-function calcCorrValue(time,temp){
-  if(!time||isNaN(temp))return null;
-  const [h,m]=time.split(':').map(Number);
-  const mins=(h*60+m)-(4*60);
-  const steps=Math.abs(mins)/30;
-  const delta=(mins<0)?(steps*0.05):(-steps*0.05);
-  return +(temp+delta).toFixed(2);
-}
-$('#btn-calc').onclick=()=>{
-  const t=$('#tid').value,v=parseFloat($('#faktisk').value);
-  const c=calcCorrValue(t,v);if(c!==null)$('#korr').value=c.toFixed(2);
-};
+    function renderTable() {
+      const tbody = document.querySelector("#dataTable tbody");
+      tbody.innerHTML = "";
+      dataEntries.forEach((e, i) => {
+        const tr = document.createElement("tr");
+        if (e.mens === "Mens") tr.classList.add("mens-row");
+        tr.innerHTML = `
+          <td>${e.date}</td><td>${e.time || ""}</td><td>${e.actual || ""}</td>
+          <td>${e.corrected || ""}</td><td>${e.mens || "–"}</td>
+          <td>${e.mucus || "–"}</td><td>${e.lh || "–"}</td>
+          <td>${e.sex ? "💞" : ""}</td><td>${e.ovulation ? "🌼" : ""}</td>
+          <td>${e.note || ""}</td>
+          <td><button class="button" onclick="editEntry(${i})">✏️</button></td>`;
+        tbody.appendChild(tr);
+      });
+    }
 
-/* Spara BBT */
-$('#btn-save').onclick=()=>{
-  const e={datum:$('#datum').value,tid:$('#tid').value,
-  faktisk:parseFloat($('#faktisk').value),
-  korr:parseFloat($('#korr').value),
-  mens:$('#mens').value,sekret:$('#sekret').value,lh:$('#lh').value,
-  anteckning:$('#anteckning').value.trim()};
-  if(!e.datum||!e.tid||isNaN(e.faktisk))return alert('Fyll i Datum, Tid och Faktisk temperatur.');
-  if(isNaN(e.korr)){e.korr=calcCorrValue(e.tid,e.faktisk);}
-  const i=rows.findIndex(r=>r.datum===e.datum);
-  if(i>=0)rows[i]=e;else rows.push(e);
-  rows.sort((a,b)=>a.datum.localeCompare(b.datum));
-  save('bbtData',rows);renderTable();
-};
+    function editEntry(i) {
+      const e = dataEntries[i];
+      date.value = e.date;
+      time.value = e.time;
+      actual.value = e.actual;
+      corrected.value = e.corrected;
+      mens.value = e.mens;
+      mucus.value = e.mucus;
+      lh.value = e.lh;
+      sex.checked = e.sex;
+      ovulation.checked = e.ovulation;
+      note.value = e.note;
+    }
 
-/* Tabell */
-function renderTable(){
-  const tb=$('#tbl tbody');tb.innerHTML='';
-  rows.forEach(r=>{
-    const tr=document.createElement('tr');
-    tr.innerHTML=`<td>${r.datum}</td><td>${r.tid}</td><td>${r.faktisk||''}</td><td>${r.korr||''}</td>
-    <td>${r.mens}</td><td>${r.sekret}</td><td>${r.lh}</td><td>${r.anteckning}</td>`;
-    tb.appendChild(tr);
-  });
-}
-$('#btn-reset').onclick=()=>{if(confirm('Rensa all data?')){rows=[];save('bbtData',rows);renderTable();}};
-$('#btn-export-bbt').onclick=()=>{
-  const blob=new Blob([JSON.stringify(rows,null,2)],{type:'application/json'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='bbtData.json';a.click();
-};
+    function clearData() {
+      if (confirm("Vill du verkligen rensa all data?")) {
+        dataEntries = [];
+        localStorage.removeItem('bbtData');
+        renderTable();
+        if (chart) chart.destroy();
+      }
+    }
 
-/* Graf */
-let chart;function renderChart(){
-  if(!rows.length)return;
-  const ctx=document.getElementById('chart').getContext('2d');
-  const labels=rows.map(r=>r.datum);
-  const f=rows.map(r=>r.faktisk||null);
-  const k=rows.map(r=>r.korr||null);
-  if(chart)chart.destroy();
-  chart=new Chart(ctx,{type:'line',data:{labels,
-    datasets:[{label:'Faktisk',data:f,borderColor:'#3a7bd5',pointBackgroundColor:'#3a7bd5',tension:.3,fill:false},
-              {label:'Korrigerad',data:k,borderColor:'#e57373',borderDash:[4,4],tension:.3,fill:false}]},
-    options:{maintainAspectRatio:false,scales:{y:{min:35,max:38.5}}}});
-}
+    function renderChart() {
+      if (chart) chart.destroy();
+      const ctx = document.getElementById('bbtChart');
 
-/* LH-hantering */
-function renderLH(){
-  const list=$('#lh-list');list.innerHTML='';
-  lhRows.sort((a,b)=>a.date.localeCompare(b.date));
-  lhRows.forEach((r,i)=>{
-    const div=document.createElement('div');div.className='lh-item';
-    div.innerHTML=`<img class="lh-thumb" src="${r.data}">
-      <div class="lh-meta"><div class="lh-date">${r.date}</div>
-      <div class="lh-note">${(r.flags||[]).join(' ')} ${r.note||''}</div></div>
-      <button class="lh-del" data-i="${i}">Ta bort</button>`;
-    list.appendChild(div);
-  });
-  $$('.lh-del').forEach(b=>b.onclick=()=>{lhRows.splice(b.dataset.i,1);save('lhData',lhRows);renderLH();});
-  $$('.lh-thumb').forEach(img=>img.onclick=()=>openLightbox(img.src));
-}
+      const labels = dataEntries.map(e => e.date);
+      const actualData = dataEntries.map(e => e.actual);
+      const correctedData = dataEntries.map(e => e.corrected);
 
-function openLightbox(src){
-  const lb=$('#lightbox');$('#lb-img').src=src;lb.style.display='flex';
-}
-$('#lb-close').onclick=()=>$('#lightbox').style.display='none';
-$('#lightbox').onclick=e=>{if(e.target.id==='lightbox')$('#lightbox').style.display='none';};
+      const ovulationIndex = dataEntries.findIndex(e => e.ovulation);
+      const preOvData = actualData.slice(0, ovulationIndex > 0 ? ovulationIndex : actualData.length);
+      const avgPreOv = preOvData.filter(Boolean).reduce((a, b) => a + b, 0) / preOvData.filter(Boolean).length;
 
-/* Spara LH */
-function fileToDataURL(file){return new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>res(fr.result);fr.onerror=rej;fr.readAsDataURL(file);});}
-$('#lh-save').onclick=async()=>{
-  const f=$('#lh-file').files[0];if(!f)return alert('Välj en bild.');
-  const d=$('#lh-date').value||new Date().toISOString().slice(0,10);
-  const data=await fileToDataURL(f);
-  const flags=$$('.lh-flag').filter(c=>c.checked).map(c=>c.value);
-  const note=$('#lh-note').value.trim();
-  lhRows.push({date:d,data,flags,note});save('lhData',lhRows);
-  $('#lh-file').value='';$('#lh-note').value='';$$('.lh-flag').forEach(c=>c.checked=false);
-  renderLH();
-};
-$('#btn-export-lh').onclick=()=>{
-  const blob=new Blob([JSON.stringify(lhRows,null,2)],{type:'application/json'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='lhData.json';a.click();
-};
+      const annotations = [];
 
-(function init(){renderTable();renderLH();$('#lh-date').value=new Date().toISOString().slice(0,10);})();
-</script>
+      // Rosa bakgrund för mens
+      annotations.push({
+        type: 'box',
+        xMin: 0,
+        xMax: dataEntries.findIndex(e => e.mens !== "Mens") - 0.5 || 0,
+        backgroundColor: 'rgba(255, 230, 230, 0.3)',
+        borderWidth: 0
+      });
+
+      // Lila bakgrund för lutealfas
+      if (ovulationIndex > 0) {
+        annotations.push({
+          type: 'box',
+          xMin: ovulationIndex + 0.5,
+          xMax: actualData.length - 0.5,
+          backgroundColor: 'rgba(230, 210, 255, 0.25)',
+          borderWidth: 0
+        });
+      }
+
+      const symbols = dataEntries.map((e) => {
+        let s = [];
+        if (e.sex) s.push("💞");
+        if (e.ovulation) s.push("🌼");
+        if (e.mucus === "Äggviteliknande") s.push("💧");
+        return s;
+      });
+
+      chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: "Faktisk temperatur",
+              data: actualData,
+              borderColor: "#3b82f6",
+              backgroundColor: "#3b82f6",
+              tension: 0.3
+            },
+            {
+              label: "Korrigerad temperatur",
+              data: correctedData,
+              borderColor: "#ef4444",
+              backgroundColor: "#ef4444",
+              borderDash: [4, 4],
+              tension: 0.3
+            },
+            {
+              label: "Medel före ägglossning",
+              data: Array(actualData.length).fill(avgPreOv),
+              borderColor: "#888",
+              borderDash: [5, 5],
+              pointRadius: 0,
+              fill: false
+            }
+          ]
+        },
+        options: {
+          scales: {
+            y: { min: 35, max: 38.5, title: { display: true, text: "Temperatur (°C)" } },
+          },
+          plugins: {
+            legend: { 
+              position: 'bottom', 
+              labels: { 
+                boxWidth: 12, 
+                color: '#000' 
+              } 
+            },
+            annotation: { annotations },
+            tooltip: { enabled: false },
+          },
+          animation: false
+        },
+        plugins: [{
+          id: 'symbols',
+          afterDatasetsDraw(chart) {
+            const ctx = chart.ctx;
+            ctx.font = "10px sans-serif";
+            ctx.textAlign = "center";
+            chart.data.labels.forEach((label, i) => {
+              const meta = chart.getDatasetMeta(0);
+              const x = meta.data[i]?.x;
+              const yAxis = chart.scales.y;
+              const y = yAxis.bottom - 18;
+              if (symbols[i]?.length) {
+                symbols[i].forEach((sym, idx) => {
+                  ctx.fillText(sym, x, y - (idx * 13));
+                });
+              }
+            });
+          }
+        }]
+      });
+    }
+
+    renderTable();
+  </script>
 </body>
 </html>
