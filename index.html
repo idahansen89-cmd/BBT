@@ -3,419 +3,204 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BBT – Ida</title>
+  <title>BBT</title>
   <link rel="icon" type="image/png" href="B29437FC-696F-4754-AAAB-A6ED096BC64C.png" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.2.1"></script>
   <style>
-    body {
-      font-family: "Helvetica Neue", sans-serif;
-      background: #fff;
-      color: #000;
-      margin: 0;
-      padding: 0;
-    }
-
-    h1 {
-      text-align: center;
-      margin-top: 1rem;
-      color: #000;
-    }
-
-    /* Flikar */
-    .tabs {
-      display: flex;
-      justify-content: center;
-      margin: 1rem 0;
-      border-bottom: 2px solid #ddd;
-    }
-
-    .tab {
-      padding: 0.7rem 1.2rem;
-      cursor: pointer;
-      border: none;
-      background: #f4f4f4;
-      border-radius: 8px 8px 0 0;
-      margin: 0 0.3rem;
-      font-weight: 600;
-    }
-
-    .tab.active {
-      background: #fff;
-      border-bottom: 2px solid #fff;
-      color: #e06b8f;
-    }
-
-    .tab-content {
-      display: none;
-      padding: 1rem;
-      max-width: 750px;
-      margin: auto;
-      border: 1px solid #eee;
-      border-radius: 10px;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
-    label {
-      display: inline-block;
-      width: 130px;
-      font-weight: 500;
-      margin-bottom: 0.2rem;
-    }
-
-    input, select, textarea {
-      width: calc(100% - 140px);
-      padding: 0.4rem;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 0.9rem;
-      margin-bottom: 0.6rem;
-    }
-
-    textarea { resize: vertical; }
-
-    .button {
-      background: #f4b6c2;
-      color: #000;
-      border: none;
-      border-radius: 6px;
-      padding: 0.5rem 1.2rem;
-      margin: 0.3rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .button:hover { background: #e599ab; }
-    .button.danger { background: #f4b6c2; color: #000; }
-    .button.danger:hover { background: #e599ab; }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1rem;
-    }
-
-    th, td {
-      padding: 0.5rem;
-      border: 1px solid #ddd;
-      text-align: center;
-      white-space: nowrap;
-    }
-
-    tr.mens-row { background-color: #ffe5ec; }
-
-    .table-container {
-      overflow-x: auto;
-      margin-top: 1rem;
-    }
-
-    #bbtChart {
-      width: 100%;
-      height: 420px;
-    }
-
-    .bottom-buttons {
-      text-align: center;
-      margin-top: 1rem;
-    }
-
-    .symbol-checkbox {
-      display: inline-block;
-      margin-right: 1rem;
-      font-size: 1.2rem;
-      vertical-align: middle;
-    }
-
-    /* LH-flik layout */
-    .lh-image {
-      width: 100%;
-      border-radius: 6px;
-      margin-top: 8px;
-    }
-
-    .lh-entry {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      margin-bottom: 8px;
-      border-bottom: 1px solid #eee;
-      padding-bottom: 8px;
-    }
-
-    .lh-info { flex-grow: 1; margin-left: 10px; }
-    .lh-symbols { font-size: 1.1rem; line-height: 1.5rem; }
-    .lh-symbol-checkbox {
-      display: inline-block;
-      text-align: center;
-      margin-right: 0.4rem;
-      font-size: 1.4rem;
-    }
+    body {font-family: Helvetica Neue, sans-serif; background:#fff; color:#000; margin:0;}
+    h1{text-align:center;margin-top:1rem;}
+    .tabs{display:flex;justify-content:center;margin:1rem 0;border-bottom:2px solid #eee;}
+    .tab{padding:.7rem 1.2rem;cursor:pointer;border:none;background:#f5f5f5;border-radius:8px 8px 0 0;margin:0 .3rem;font-weight:600;}
+    .tab.active{background:#fff;border-bottom:2px solid #fff;color:#e06b8f;}
+    .tab-content{display:none;max-width:750px;margin:auto;padding:1rem;border:1px solid #eee;border-radius:10px;}
+    .tab-content.active{display:block;}
+    label{display:inline-block;width:130px;}
+    input,select,textarea{width:calc(100% - 140px);margin-bottom:.6rem;padding:.4rem;border:1px solid #ccc;border-radius:6px;}
+    .button{background:#f4b6c2;border:none;border-radius:6px;padding:.5rem 1rem;margin:.2rem;font-weight:600;}
+    .button:hover{background:#e89bae;}
+    .danger{background:#f4b6c2;}
+    table{width:100%;border-collapse:collapse;margin-top:1rem;}
+    th,td{border:1px solid #ddd;padding:.5rem;text-align:center;white-space:nowrap;}
+    tr.mens-row{background:#ffe5ec;}
+    #bbtChart{width:100%;height:420px;}
+    .lh-entry{display:flex;align-items:flex-start;justify-content:space-between;border-bottom:1px solid #eee;padding:.5rem 0;}
+    .lh-image{width:35%;border-radius:6px;}
+    .lh-info{flex:1;margin-left:10px;}
+    .lh-symbols{font-size:1.2rem;}
+    .lh-symbol-checkbox{text-align:center;margin-right:.4rem;font-size:1.4rem;}
   </style>
 </head>
 <body>
   <h1>BBT – Ida</h1>
-
   <div class="tabs">
     <button class="tab active" onclick="openTab('inmatning')">Inmatning & Tabell</button>
     <button class="tab" onclick="openTab('graf')">📈 Graf</button>
     <button class="tab" onclick="openTab('lh')">🧪 LH-test</button>
   </div>
 
-  <!-- Inmatning & Tabell -->
+  <!-- Inmatning -->
   <div id="inmatning" class="tab-content active">
-    <div>
-      <label>Datum:</label><input type="date" id="date"><br>
-      <label>Tid (BBT):</label><input type="time" id="time"><br>
-      <label>Faktisk temp (°C):</label><input type="number" step="0.01" id="actual"><br>
-      <label>Korrigerad temp (°C):</label><input type="number" step="0.01" id="corrected" placeholder="Beräknas automatiskt"><br>
-      <label>Mensstatus:</label>
-      <select id="mens"><option>–</option><option>Mens</option></select><br>
-      <label>Sekret:</label>
-      <select id="mucus">
-        <option>–</option><option>Klart</option><option>Äggviteliknande</option><option>Krämig</option>
-      </select><br>
-      <label>LH-test:</label>
-      <select id="lh"><option>–</option><option>Positivt</option><option>Negativt</option></select><br>
-      <div>
-        <span class="symbol-checkbox" title="Samlag">💞 <input type="checkbox" id="sex"></span>
-        <span class="symbol-checkbox" title="Bekräftad ägglossning">🌼 <input type="checkbox" id="ovulation"></span>
-      </div>
-      <label>Anteckning:</label><textarea rows="2" id="note"></textarea><br>
-
-      <button class="button" id="saveBtn">Spara</button>
-      <button class="button" id="exportBtn">Exportera data</button>
-      <button class="button" id="importBtn">Importera data</button>
-      <input type="file" id="importFile" accept="application/json" style="display:none">
+    <label>Datum:</label><input type="date" id="date"><br>
+    <label>Tid (BBT):</label><input type="time" id="time"><br>
+    <label>Faktisk temp:</label><input type="number" step="0.01" id="actual"><br>
+    <label>Korrigerad temp:</label><input type="number" step="0.01" id="corrected" placeholder="Beräknas"><br>
+    <label>Mens:</label>
+    <select id="mens"><option>–</option><option>Mens</option></select><br>
+    <label>Sekret:</label>
+    <select id="mucus"><option>–</option><option>Klart</option><option>Äggviteliknande</option><option>Krämig</option></select><br>
+    <label>LH:</label><select id="lh"><option>–</option><option>Positivt</option><option>Negativt</option></select><br>
+    <span>💞 <input type="checkbox" id="sex"></span>
+    <span>🌼 <input type="checkbox" id="ovulation"></span><br>
+    <label>Anteckning:</label><textarea id="note"></textarea><br>
+    <button class="button" id="saveBtn">Spara</button>
+    <button class="button" id="exportBtn">Exportera</button>
+    <button class="button" id="importBtn">Importera</button>
+    <input type="file" id="importFile" accept="application/json" style="display:none">
+    <div style="overflow-x:auto">
+      <table id="dataTable"><thead><tr>
+        <th>Datum</th><th>Tid</th><th>Faktisk</th><th>Korr</th><th>Mens</th><th>Sekret</th><th>LH</th><th>💞</th><th>🌼</th><th>Anteckning</th>
+      </tr></thead><tbody></tbody></table>
     </div>
-
-    <div class="table-container">
-      <table id="dataTable">
-        <thead>
-          <tr>
-            <th>Datum</th><th>Tid</th><th>Faktisk</th><th>Korr</th>
-            <th>Mens</th><th>Sekret</th><th>LH</th><th>💞</th><th>🌼</th><th>Anteckning</th><th>✏️</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-
-    <div class="bottom-buttons">
-      <button class="button danger" id="clearBtn">Rensa all data</button>
+    <div style="text-align:center;margin-top:1rem;">
+      <button class="button danger" id="clearBtn">Rensa data</button>
     </div>
   </div>
 
   <!-- Graf -->
-  <div id="graf" class="tab-content">
-    <canvas id="bbtChart"></canvas>
-  </div>
+  <div id="graf" class="tab-content"><canvas id="bbtChart"></canvas></div>
 
-  <!-- LH-test flik -->
+  <!-- LH-test -->
   <div id="lh" class="tab-content">
-    <div style="display:flex;gap:.5rem;align-items:center;justify-content:space-between;margin-bottom:.6rem">
-      <div>
-        <button class="button" id="lhPickBtn">Välj bild</button>
-        <input type="file" id="lhFile" accept="image/*" style="display:none">
-      </div>
-      <input type="date" id="lhDate" style="width:auto">
+    <div style="display:flex;gap:.5rem;justify-content:space-between;">
+      <button class="button" id="lhPickBtn">Välj bild</button>
+      <input type="file" id="lhFile" accept="image/*" style="display:none">
+      <input type="date" id="lhDate">
     </div>
-
-    <div style="display:flex;flex-wrap:wrap;gap:10px;margin:.4rem 0 .6rem">
-      <label class="lh-symbol-checkbox" title="Nästan positiv">🩷<br><input type="checkbox" class="lhSym" value="🩷"></label>
-      <label class="lh-symbol-checkbox" title="LH-topp">❤️<br><input type="checkbox" class="lhSym" value="❤️"></label>
-      <label class="lh-symbol-checkbox" title="Hög">💜<br><input type="checkbox" class="lhSym" value="💜"></label>
-      <label class="lh-symbol-checkbox" title="Låg">💙<br><input type="checkbox" class="lhSym" value="💙"></label>
-      <label class="lh-symbol-checkbox" title="Negativ">💚<br><input type="checkbox" class="lhSym" value="💚"></label>
-      <label class="lh-symbol-checkbox" title="Oklart">💛<br><input type="checkbox" class="lhSym" value="💛"></label>
+    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:.5rem;">
+      <label class="lh-symbol-checkbox">🩷<br><input type="checkbox" class="lhSym" value="🩷"></label>
+      <label class="lh-symbol-checkbox">❤️<br><input type="checkbox" class="lhSym" value="❤️"></label>
+      <label class="lh-symbol-checkbox">💜<br><input type="checkbox" class="lhSym" value="💜"></label>
+      <label class="lh-symbol-checkbox">💙<br><input type="checkbox" class="lhSym" value="💙"></label>
+      <label class="lh-symbol-checkbox">💚<br><input type="checkbox" class="lhSym" value="💚"></label>
+      <label class="lh-symbol-checkbox">💛<br><input type="checkbox" class="lhSym" value="💛"></label>
     </div>
-
-    <div style="display:flex;gap:.5rem;align-items:center">
-      <textarea id="lhNote" placeholder="Anteckning (valfritt)" style="flex:1"></textarea>
+    <div style="display:flex;gap:.5rem;align-items:center;margin-top:.5rem;">
+      <textarea id="lhNote" placeholder="Anteckning" style="flex:1"></textarea>
       <button class="button" id="lhSaveBtn">Spara</button>
     </div>
-
-    <div id="lhList" style="margin-top:10px"></div>
+    <div id="lhList" style="margin-top:10px;"></div>
   </div>
 
   <script>
     let dataEntries = JSON.parse(localStorage.getItem('bbtData') || '[]');
-    let lhEntries   = JSON.parse(localStorage.getItem('lhData')  || '[]');
+    let lhEntries = JSON.parse(localStorage.getItem('lhData') || '[]');
     let chart;
 
-    function openTab(tabId) {
-      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-      document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
-      document.querySelector(`[onclick="openTab('${tabId}')"]`).classList.add("active");
-      document.getElementById(tabId).classList.add("active");
-      if (tabId === 'graf') renderChart();
-      if (tabId === 'lh')   renderLHList();
+    function openTab(id){
+      document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+      document.querySelectorAll(".tab-content").forEach(c=>c.classList.remove("active"));
+      document.querySelector(`[onclick="openTab('${id}')"]`).classList.add("active");
+      document.getElementById(id).classList.add("active");
+      if(id==="graf")renderChart();
+      if(id==="lh")renderLHList();
     }
 
-    function minutesFrom0400(timeStr) {
-      if (!timeStr) return 0;
-      const [hh, mm] = timeStr.split(':').map(Number);
-      return (hh * 60 + mm) - 240;
+    function minutesFrom0400(t){if(!t)return 0;const [h,m]=t.split(':').map(Number);return (h*60+m)-240;}
+    function computeCorrected(){const a=parseFloat(actual.value);if(isNaN(a))return;const c=a+0.05*(minutesFrom0400(time.value||"04:00")/30);corrected.value=c.toFixed(2);}
+    actual.onblur=computeCorrected;time.onchange=()=>{if(actual.value)computeCorrected();};
+
+    function saveEntry(){
+      const e={date:date.value,time:time.value,actual:+actual.value||null,corrected:+corrected.value||null,mens:mens.value,mucus:mucus.value,lh:lh.value,sex:sex.checked,ovulation:ovulation.checked,note:note.value};
+      if(!e.date)return alert("Välj datum");
+      const i=dataEntries.findIndex(x=>x.date===e.date);
+      if(i>=0)dataEntries[i]=e;else dataEntries.push(e);
+      localStorage.setItem('bbtData',JSON.stringify(dataEntries));renderTable();
     }
 
-    function computeCorrected() {
-      const a = parseFloat(actual.value);
-      if (isNaN(a)) return;
-      const mins = minutesFrom0400(time.value || "04:00");
-      const corr = a + 0.05 * (mins / 30);
-      corrected.value = corr.toFixed(2);
-    }
-
-    actual.addEventListener('blur', computeCorrected);
-    time.addEventListener('change', () => { if (actual.value) computeCorrected(); });
-
-    function saveEntry() {
-      const entry = {
-        date: date.value,
-        time: time.value,
-        actual: Number(actual.value) || null,
-        corrected: Number(corrected.value) || null,
-        mens: mens.value,
-        mucus: mucus.value,
-        lh: lh.value,
-        sex: sex.checked,
-        ovulation: ovulation.checked,
-        note: note.value
-      };
-      if (!entry.date) return alert("Välj datum.");
-      const i = dataEntries.findIndex(e => e.date === entry.date);
-      if (i >= 0) dataEntries[i] = entry; else dataEntries.push(entry);
-      localStorage.setItem('bbtData', JSON.stringify(dataEntries));
-      renderTable();
-    }
-
-    function renderTable() {
-      const tbody = document.querySelector("#dataTable tbody");
-      tbody.innerHTML = "";
+    function renderTable(){
+      const tb=document.querySelector("#dataTable tbody");tb.innerHTML="";
       dataEntries.sort((a,b)=>a.date.localeCompare(b.date));
-      dataEntries.forEach((e,i)=>{
-        const tr = document.createElement("tr");
-        if (e.mens === "Mens") tr.classList.add("mens-row");
-        tr.innerHTML = `
-          <td>${e.date||""}</td><td>${e.time||""}</td><td>${e.actual??""}</td>
-          <td>${e.corrected??""}</td><td>${e.mens||"–"}</td><td>${e.mucus||"–"}</td>
-          <td>${e.lh||"–"}</td><td>${e.sex?"💞":""}</td><td>${e.ovulation?"🌼":""}</td>
-          <td>${e.note||""}</td><td><button class="button" onclick="editEntry(${i})">✏️</button></td>`;
-        tbody.appendChild(tr);
-      });
+      for(const e of dataEntries){const tr=document.createElement("tr");
+        if(e.mens==="Mens")tr.classList.add("mens-row");
+        tr.innerHTML=`<td>${e.date}</td><td>${e.time||""}</td><td>${e.actual||""}</td><td>${e.corrected||""}</td>
+          <td>${e.mens||"–"}</td><td>${e.mucus||"–"}</td><td>${e.lh||"–"}</td>
+          <td>${e.sex?"💞":""}</td><td>${e.ovulation?"🌼":""}</td><td>${e.note||""}</td>`;
+        tb.appendChild(tr);
+      }
     }
 
-    function editEntry(i){
-      const e=dataEntries[i];
-      date.value=e.date||""; time.value=e.time||"";
-      actual.value=e.actual??""; corrected.value=e.corrected??"";
-      mens.value=e.mens||"–"; mucus.value=e.mucus||"–"; lh.value=e.lh||"–";
-      sex.checked=!!e.sex; ovulation.checked=!!e.ovulation; note.value=e.note||"";
-    }
-
-    function clearData(){
-      if(!confirm("Vill du verkligen rensa all data?"))return;
-      dataEntries=[]; lhEntries=[];
-      localStorage.clear();
-      renderTable(); renderLHList(); if(chart)chart.destroy();
-    }
+    function clearData(){if(!confirm("Rensa all data?"))return;dataEntries=[];lhEntries=[];localStorage.clear();renderTable();renderLHList();if(chart)chart.destroy();}
 
     function renderChart(){
       if(chart)chart.destroy();
       const ctx=document.getElementById('bbtChart');
       dataEntries.sort((a,b)=>a.date.localeCompare(b.date));
       const labels=dataEntries.map(e=>e.date);
-      const actualData=dataEntries.map(e=>e.actual);
-      const correctedData=dataEntries.map(e=>e.corrected);
-      const ovIndex=dataEntries.findIndex(e=>e.ovulation);
-      const preOv=(ovIndex>0?actualData.slice(0,ovIndex):actualData).filter(v=>typeof v==="number");
-      const avg=preOv.length?preOv.reduce((a,b)=>a+b,0)/preOv.length:null;
-      const ann=[];
+      const actual=dataEntries.map(e=>e.actual);
+      const corrected=dataEntries.map(e=>e.corrected);
+      const ov=dataEntries.findIndex(e=>e.ovulation);
+      const pre=(ov>0?actual.slice(0,ov):actual).filter(v=>v);
+      const avg=pre.length?pre.reduce((a,b)=>a+b)/pre.length:null;
+      const anns=[];
       const firstNon=dataEntries.findIndex(e=>e.mens!=="Mens");
       const end=(firstNon===-1)?dataEntries.length-0.5:firstNon-0.5;
-      if(firstNon!==0){ann.push({type:'box',xMin:0,xMax:end,backgroundColor:'rgba(255,230,230,.3)',borderWidth:0});}
-      if(ovIndex>-1){ann.push({type:'box',xMin:ovIndex+0.5,xMax:labels.length-0.5,backgroundColor:'rgba(230,210,255,.25)',borderWidth:0});}
-      const sym=dataEntries.map(e=>{const s=[];if(e.sex)s.push("💞");if(e.ovulation)s.push("🌼");if(e.mucus==="Äggviteliknande")s.push("💧");return s;});
+      if(firstNon!==0)anns.push({type:'box',xMin:0,xMax:end,backgroundColor:'rgba(255,230,230,.3)',borderWidth:0});
+      if(ov>-1)anns.push({type:'box',xMin:ov+0.5,xMax:labels.length-0.5,backgroundColor:'rgba(230,210,255,.25)',borderWidth:0});
+      const symbols=dataEntries.map(e=>{const s=[];if(e.sex)s.push("💞");if(e.ovulation)s.push("🌼");if(e.mucus==="Äggviteliknande")s.push("💧");return s;});
       chart=new Chart(ctx,{type:'line',data:{labels,datasets:[
-        {label:"Faktisk temperatur",data:actualData,borderColor:"#3b82f6",backgroundColor:"#3b82f6",spanGaps:true,tension:0.3},
-        {label:"Korrigerad temperatur",data:correctedData,borderColor:"#ef4444",backgroundColor:"#ef4444",borderDash:[4,4],spanGaps:true,tension:0.3},
-        ...(avg?[{label:"Medel före ägglossning",data:Array(labels.length).fill(avg),borderColor:"#888",borderDash:[5,5],pointRadius:0,fill:false}]:[])
-      ]},options:{scales:{y:{min:35,max:38.5,title:{display:true,text:"Temperatur (°C)"}},x:{ticks:{autoSkip:false,maxRotation:0}}},plugins:{legend:{position:'bottom',labels:{color:'#000'}},annotation:{annotations:ann}},animation:false},
-      plugins:[{id:'symbols',afterDatasetsDraw(c){const ctx=c.ctx;ctx.font="10px sans-serif";ctx.textAlign="center";const m=c.getDatasetMeta(0);c.data.labels.forEach((_,i)=>{const p=m.data[i];if(!p)return;const x=p.x,y=c.scales.y.bottom-18;if(sym[i]?.length){sym[i].forEach((sm,j)=>ctx.fillText(sm,x,y-(j*13)));}});}}]});
-    }
-
-    function exportAll(){
-      const o={version:"1.0",exported_at:new Date().toISOString(),bbtData:dataEntries,lhData:lhEntries};
-      const blob=new Blob([JSON.stringify(o,null,2)],{type:"application/json"});
-      const url=URL.createObjectURL(blob);
-      const a=document.createElement('a');
-      const d=new Date();a.href=url;
-      a.download=`BBT_Ida_cykel_${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}.json`;
-      a.click();URL.revokeObjectURL(url);
-    }
-
-    function importAllFromFile(f){
-      const r=new FileReader();
-      r.onload=()=>{try{const o=JSON.parse(r.result);
-        if(o.bbtData)dataEntries=o.bbtData;if(o.lhData)lhEntries=o.lhData;
-        localStorage.setItem('bbtData',JSON.stringify(dataEntries));
-        localStorage.setItem('lhData',JSON.stringify(lhEntries));
-        renderTable();renderLHList();if(chart)renderChart();alert("Data importerad!");
-      }catch(e){alert("Ogiltig fil.");}};
-      r.readAsText(f);
+        {label:"Faktisk",data:actual,borderColor:"#3b82f6",backgroundColor:"#3b82f6",tension:0.3},
+        {label:"Korrigerad",data:corrected,borderColor:"#ef4444",borderDash:[4,4],tension:0.3},
+        ...(avg?[{label:"Medel före ÄL",data:Array(labels.length).fill(avg),borderColor:"#888",borderDash:[5,5],pointRadius:0}]:[])
+      ]},options:{scales:{y:{min:35,max:38.5}},plugins:{legend:{labels:{color:'#000'}},annotation:{annotations:anns}},animation:false},
+      plugins:[{id:'symbols',afterDatasetsDraw(c){const ctx=c.ctx;ctx.font="10px sans-serif";ctx.textAlign="center";const m=c.getDatasetMeta(0);
+        c.data.labels.forEach((_,i)=>{const p=m.data[i];if(!p)return;const x=p.x,y=c.scales.y.bottom-18;if(symbols[i]?.length){symbols[i].forEach((s,j)=>ctx.fillText(s,x,y-(j*13)));}});}}]});
     }
 
     function renderLHList(){
-      lhEntries.sort((a,b)=>a.date.localeCompare(b.date));
       const list=document.getElementById('lhList');list.innerHTML="";
+      lhEntries.sort((a,b)=>a.date.localeCompare(b.date));
       lhEntries.forEach((e,i)=>{
-        const row=document.createElement('div');row.className="lh-entry";
-        row.innerHTML=`<img class="lh-image" src="${e.dataUrl}" alt="LH-bild">
-          <div class="lh-info"><strong>${e.date||""}</strong><br>
-          <div class="lh-symbols">${(e.symbols||[]).join(" ")}</div>
-          <small>${e.note||""}</small></div>
-          <button class="button danger" onclick="deleteLH(${i})">Ta bort</button>`;
-        row.querySelector('img').addEventListener('click',()=>openFullscreen(e.dataUrl));
-        list.appendChild(row);
+        const d=document.createElement('div');d.className="lh-entry";
+        d.innerHTML=`<img class="lh-image" src="${e.dataUrl}" alt=""><div class="lh-info"><strong>${e.date}</strong><div class="lh-symbols">${(e.symbols||[]).join(" ")}</div><small>${e.note||""}</small></div><button class="button danger" onclick="delLH(${i})">Ta bort</button>`;
+        d.querySelector('img').onclick=()=>full(e.dataUrl);
+        list.appendChild(d);
       });
     }
 
-    function deleteLH(i){lhEntries.splice(i,1);localStorage.setItem('lhData',JSON.stringify(lhEntries));renderLHList();}
+    function full(src){const o=document.createElement('div');o.style="position:fixed;inset:0;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;z-index:99";
+      const i=document.createElement('img');i.src=src;i.style="max-width:90%;max-height:90%;border-radius:8px;background:#fff";o.appendChild(i);
+      o.onclick=()=>document.body.removeChild(o);document.body.appendChild(o);}
+    function delLH(i){lhEntries.splice(i,1);localStorage.setItem('lhData',JSON.stringify(lhEntries));renderLHList();}
 
-    function openFullscreen(src){
-      const o=document.createElement('div');
-      o.style="position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:9999";
-      const img=document.createElement('img');
-      img.src=src;img.style="max-width:90%;max-height:90%;border-radius:8px;background:#fff";
-      o.appendChild(img);o.addEventListener('click',()=>document.body.removeChild(o));
-      document.body.appendChild(o);
-    }
-
-    document.getElementById('saveBtn').onclick=saveEntry;
-    document.getElementById('clearBtn').onclick=clearData;
-    document.getElementById('exportBtn').onclick=exportAll;
-    document.getElementById('importBtn').onclick=()=>importFile.click();
-    const importFile=document.getElementById('importFile');
-    importFile.onchange=e=>{if(e.target.files?.[0])importAllFromFile(e.target.files[0]);e.target.value="";};
-    document.getElementById('lhPickBtn').onclick=()=>lhFile.click();
-    const lhFile=document.getElementById('lhFile');
-    lhFile.onchange=e=>{const f=e.target.files?.[0];if(!f)return;lhFile.currentBlob=f;};
-    document.getElementById('lhSaveBtn').onclick=async()=>{
-      if(!lhFile.currentBlob)return alert("Välj bild först.");const d=lhDate.value;if(!d)return alert("Välj datum.");
-      const syms=[...document.querySelectorAll('.lhSym:checked')].map(x=>x.value);
-      const noteVal=lhNote.value;
-      const dataUrl=await blobToDataURL(lhFile.currentBlob);
-      lhEntries.push({date:d,symbols:syms,note:noteVal,dataUrl});
-      localStorage.setItem('lhData',JSON.stringify(lhEntries));
-      document.querySelectorAll('.lhSym').forEach(x=>x.checked=false);
-      lhNote.value="";lhFile.value="";lhFile.currentBlob=null;
-      renderLHList();
+    lhPickBtn.onclick=()=>lhFile.click();
+    lhSaveBtn.onclick=async()=>{
+      if(!lhFile.files[0])return alert("Välj bild");
+      if(!lhDate.value)return alert("Välj datum");
+      const s=[...document.querySelectorAll('.lhSym:checked')].map(x=>x.value);
+      const note=lhNote.value;const f=lhFile.files[0];
+      const r=new FileReader();r.onload=()=>{lhEntries.push({date:lhDate.value,symbols:s,note,dataUrl:r.result});
+        localStorage.setItem('lhData',JSON.stringify(lhEntries));
+        document.querySelectorAll('.lhSym').forEach(x=>x.checked=false);lhNote.value="";lhFile.value="";renderLHList();};
+      r.readAsDataURL(f);
     };
 
-    function blobToDataURL(b){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(b);});}
+    exportBtn.onclick=()=>{
+      const blob=new Blob([JSON.stringify({bbtData:dataEntries,lhData:lhEntries},null,2)],{type:"application/json"});
+      const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download="BBT_Ida_data.json";a.click();
+    };
+    importBtn.onclick=()=>importFile.click();
+    importFile.onchange=e=>{
+      const f=e.target.files[0];if(!f)return;
+      const r=new FileReader();r.onload=()=>{const d=JSON.parse(r.result);
+        if(d.bbtData)dataEntries=d.bbtData;if(d.lhData)lhEntries=d.lhData;
+        localStorage.setItem('bbtData',JSON.stringify(dataEntries));
+        localStorage.setItem('lhData',JSON.stringify(lhEntries));
+        renderTable();renderLHList();};
+      r.readAsText(f);
+    };
+    clearBtn.onclick=clearData;
+    saveBtn.onclick=saveEntry;
     renderTable();
   </script>
 </body>
