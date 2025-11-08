@@ -354,4 +354,69 @@
       const a=document.createElement('a');
       const d=new Date();a.href=url;
       a.download=`BBT_Ida_cykel_${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}.json`;
-      a.click();URL.revokeObjectURL(url
+      a.click();URL.revokeObjectURL(url);
+    }
+
+    function importAllFromFile(f){
+      const r=new FileReader();
+      r.onload=()=>{try{const o=JSON.parse(r.result);
+        if(o.bbtData)dataEntries=o.bbtData;if(o.lhData)lhEntries=o.lhData;
+        localStorage.setItem('bbtData',JSON.stringify(dataEntries));
+        localStorage.setItem('lhData',JSON.stringify(lhEntries));
+        renderTable();renderLHList();if(chart)renderChart();alert("Data importerad!");
+      }catch(e){alert("Ogiltig fil.");}};
+      r.readAsText(f);
+    }
+
+    function renderLHList(){
+      lhEntries.sort((a,b)=>a.date.localeCompare(b.date));
+      const list=document.getElementById('lhList');list.innerHTML="";
+      lhEntries.forEach((e,i)=>{
+        const row=document.createElement('div');row.className="lh-entry";
+        row.innerHTML=`<img class="lh-image" src="${e.dataUrl}" alt="LH-bild">
+          <div class="lh-info"><strong>${e.date||""}</strong><br>
+          <div class="lh-symbols">${(e.symbols||[]).join(" ")}</div>
+          <small>${e.note||""}</small></div>
+          <button class="button danger" onclick="deleteLH(${i})">Ta bort</button>`;
+        row.querySelector('img').addEventListener('click',()=>openFullscreen(e.dataUrl));
+        list.appendChild(row);
+      });
+    }
+
+    function deleteLH(i){lhEntries.splice(i,1);localStorage.setItem('lhData',JSON.stringify(lhEntries));renderLHList();}
+
+    function openFullscreen(src){
+      const o=document.createElement('div');
+      o.style="position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:9999";
+      const img=document.createElement('img');
+      img.src=src;img.style="max-width:90%;max-height:90%;border-radius:8px;background:#fff";
+      o.appendChild(img);o.addEventListener('click',()=>document.body.removeChild(o));
+      document.body.appendChild(o);
+    }
+
+    document.getElementById('saveBtn').onclick=saveEntry;
+    document.getElementById('clearBtn').onclick=clearData;
+    document.getElementById('exportBtn').onclick=exportAll;
+    document.getElementById('importBtn').onclick=()=>importFile.click();
+    const importFile=document.getElementById('importFile');
+    importFile.onchange=e=>{if(e.target.files?.[0])importAllFromFile(e.target.files[0]);e.target.value="";};
+    document.getElementById('lhPickBtn').onclick=()=>lhFile.click();
+    const lhFile=document.getElementById('lhFile');
+    lhFile.onchange=e=>{const f=e.target.files?.[0];if(!f)return;lhFile.currentBlob=f;};
+    document.getElementById('lhSaveBtn').onclick=async()=>{
+      if(!lhFile.currentBlob)return alert("Välj bild först.");const d=lhDate.value;if(!d)return alert("Välj datum.");
+      const syms=[...document.querySelectorAll('.lhSym:checked')].map(x=>x.value);
+      const noteVal=lhNote.value;
+      const dataUrl=await blobToDataURL(lhFile.currentBlob);
+      lhEntries.push({date:d,symbols:syms,note:noteVal,dataUrl});
+      localStorage.setItem('lhData',JSON.stringify(lhEntries));
+      document.querySelectorAll('.lhSym').forEach(x=>x.checked=false);
+      lhNote.value="";lhFile.value="";lhFile.currentBlob=null;
+      renderLHList();
+    };
+
+    function blobToDataURL(b){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(b);});}
+    renderTable();
+  </script>
+</body>
+</html>
