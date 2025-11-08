@@ -63,7 +63,7 @@
     th,td{ padding:.55rem; border:1px solid #ddd; text-align:center; }
     tr.mens-row{ background:#ffe5ec; }
 
-    .bottom-buttons{ text-align:center; margin-top:1rem; }
+    .top-buttons{ display:flex; gap:.6rem; flex-wrap:wrap; margin-top:.3rem; margin-bottom:.4rem; }
 
     /* Chart */
     #bbtChart{ width:100%; height:460px; }
@@ -71,13 +71,20 @@
 
     /* LH tab */
     .lh-toolbar{ display:flex; align-items:center; justify-content:space-between; gap:.6rem; flex-wrap:wrap; }
-    .lh-symbols-row{ display:flex; flex-wrap:wrap; gap:.6rem; }
-    .lh-symbol-checkbox{ display:inline-block; text-align:center; font-size:1.35rem; }
+    .lh-symbols-row{ display:flex; flex-wrap:wrap; gap:.8rem; }
+    .lh-symbol-checkbox{ display:inline-block; text-align:center; font-size:1.3rem; line-height:1.2; }
+    .lh-symbol-checkbox small{ display:block; color:#777; font-size:.75rem; margin-top:.15rem; }
     .lh-row{
-      display:flex; align-items:flex-start; justify-content:space-between; gap:.8rem;
-      padding:.6rem 0; border-bottom:1px solid #eee;
+      display:flex; align-items:flex-start; justify-content:space-between; gap:.6rem;
+      padding:.5rem 0; border-bottom:1px solid #eee;
     }
-    .lh-img{ width:100%; border-radius:8px; margin-top:.3rem; }
+    .lh-img{
+      width:100%;
+      max-height:120px; /* smalare rader */
+      object-fit:contain;
+      border-radius:8px;
+      background:#fff;
+    }
     .lh-info{ flex:1; }
   </style>
 </head>
@@ -143,7 +150,7 @@
       <textarea id="note" rows="2" placeholder="Valfritt"></textarea>
     </div>
 
-    <div style="display:flex; gap:.6rem; flex-wrap:wrap; margin-top:.3rem">
+    <div class="top-buttons">
       <button class="button" id="saveBtn">Spara</button>
       <button class="button" id="exportBtn">Exportera data</button>
       <button class="button" id="importBtn">Importera data</button>
@@ -162,7 +169,7 @@
       </table>
     </div>
 
-    <div class="bottom-buttons">
+    <div style="text-align:center; margin-top:1rem;">
       <button class="button danger" id="clearBtn">Rensa all data</button>
     </div>
   </div>
@@ -186,12 +193,12 @@
     </div>
 
     <div class="lh-symbols-row" style="margin:.6rem 0">
-      <label class="lh-symbol-checkbox" title="Nästan positiv">🩷<br><input type="checkbox" class="lhSym" value="🩷"></label>
-      <label class="lh-symbol-checkbox" title="LH-topp">❤️<br><input type="checkbox" class="lhSym" value="❤️"></label>
-      <label class="lh-symbol-checkbox" title="Hög">💜<br><input type="checkbox" class="lhSym" value="💜"></label>
-      <label class="lh-symbol-checkbox" title="Låg">💙<br><input type="checkbox" class="lhSym" value="💙"></label>
-      <label class="lh-symbol-checkbox" title="Negativ">💚<br><input type="checkbox" class="lhSym" value="💚"></label>
-      <label class="lh-symbol-checkbox" title="Oklart">💛<br><input type="checkbox" class="lhSym" value="💛"></label>
+      <label class="lh-symbol-checkbox" title="Nästan positiv">🩷<small>N</small><br><input type="checkbox" class="lhSym" value="🩷"></label>
+      <label class="lh-symbol-checkbox" title="LH-topp">❤️<small>T</small><br><input type="checkbox" class="lhSym" value="❤️"></label>
+      <label class="lh-symbol-checkbox" title="Hög">💜<small>H</small><br><input type="checkbox" class="lhSym" value="💜"></label>
+      <label class="lh-symbol-checkbox" title="Låg">💙<small>L</small><br><input type="checkbox" class="lhSym" value="💙"></label>
+      <label class="lh-symbol-checkbox" title="Negativ">💚<small>–</small><br><input type="checkbox" class="lhSym" value="💚"></label>
+      <label class="lh-symbol-checkbox" title="Oklart">💛<small>?</small><br><input type="checkbox" class="lhSym" value="💛"></label>
     </div>
 
     <div style="display:flex; gap:.5rem; align-items:center; margin-bottom:.5rem">
@@ -204,7 +211,7 @@
 
   <script>
   document.addEventListener('DOMContentLoaded', () => {
-    /* ===== Tabs (säker för iOS/GitHub) ===== */
+    /* ===== Tabs ===== */
     document.querySelectorAll('.tab').forEach(btn=>{
       btn.addEventListener('click', ()=>{
         const id = btn.dataset.tab;
@@ -258,14 +265,19 @@
     const minutesFrom0400 = (t) => {
       if(!t) return 0;
       const [h,m] = t.split(':').map(Number);
-      return (h*60 + m) - 240; // 04:00 = 240 minuter
+      return (h*60 + m) - 240; // 04:00 = 240 min
     };
-    function computeCorrected(){
+    function computeCorrectedFrom(a, timeStr){
+      if (Number.isNaN(a)) return null;
+      const mins = minutesFrom0400(timeStr || '04:00');
+      const corr = a + 0.05 * (mins/30);
+      return Number(corr.toFixed(2));
+    }
+    function computeCorrectedFormInputs(){
       const a = parseFloat(el.actual.value);
       if (Number.isNaN(a)) return;
-      const mins = minutesFrom0400(el.time.value || '04:00');
-      const corr = a + 0.05 * (mins/30);
-      el.corrected.value = corr.toFixed(2);
+      const corr = computeCorrectedFrom(a, el.time.value);
+      if (corr!==null) el.corrected.value = corr.toFixed(2);
     }
 
     function saveEntry(){
@@ -291,23 +303,77 @@
     function renderTable(){
       el.dataTableBody.innerHTML = '';
       dataEntries.sort((a,b)=>a.date.localeCompare(b.date));
-      for(const e of dataEntries){
+
+      dataEntries.forEach((e, idx)=>{
         const tr = document.createElement('tr');
         if(e.mens==='Mens') tr.classList.add('mens-row');
+        // bygg celler
         tr.innerHTML = `
-          <td>${e.date||''}</td>
-          <td>${e.time||''}</td>
-          <td>${e.actual??''}</td>
-          <td>${e.corrected??''}</td>
-          <td>${e.mens||'–'}</td>
-          <td>${e.mucus||'–'}</td>
-          <td>${e.lh||'–'}</td>
-          <td>${e.sex?'💞':''}</td>
-          <td>${e.ovulation?'🌼':''}</td>
-          <td>${e.note||''}</td>
+          <td data-field="date">${e.date||''}</td>
+          <td data-field="time" contenteditable="true">${e.time||''}</td>
+          <td data-field="actual" contenteditable="true">${e.actual??''}</td>
+          <td data-field="corrected">${e.corrected??''}</td>
+          <td data-field="mens" contenteditable="true">${e.mens||'–'}</td>
+          <td data-field="mucus" contenteditable="true">${e.mucus||'–'}</td>
+          <td data-field="lh" contenteditable="true">${e.lh||'–'}</td>
+          <td data-field="sex" contenteditable="true">${e.sex?'💞':''}</td>
+          <td data-field="ovulation" contenteditable="true">${e.ovulation?'🌼':''}</td>
+          <td data-field="note" contenteditable="true">${e.note||''}</td>
         `;
+        // lyssnare för varje redigerbar cell
+        tr.querySelectorAll('[contenteditable="true"]').forEach(td=>{
+          td.addEventListener('keydown', (ev)=>{
+            if(ev.key==='Enter'){ ev.preventDefault(); td.blur(); }
+          });
+          td.addEventListener('blur', ()=>{
+            const field = td.getAttribute('data-field');
+            let val = td.textContent.trim();
+            const row = dataEntries[idx];
+
+            // normalisera specialfält
+            if(field==='actual'){
+              const num = parseFloat(val.replace(',', '.'));
+              row.actual = Number.isNaN(num) ? null : Number(num.toFixed(2));
+              // räkna om korrigerad utifrån eventuellt uppdaterad tid
+              row.corrected = (row.actual!==null) ? computeCorrectedFrom(row.actual, row.time) : null;
+              // uppdatera korr-cellen i tabellen
+              tr.querySelector('td[data-field="corrected"]').textContent = (row.corrected??'');
+            } else if(field==='time'){
+              row.time = val;
+              // omräkna korrigerad om actual finns
+              if(typeof row.actual==='number'){
+                row.corrected = computeCorrectedFrom(row.actual, row.time);
+                tr.querySelector('td[data-field="corrected"]').textContent = (row.corrected??'');
+              }
+            } else if(field==='mens'){
+              row.mens = (val===''||val==='-') ? '–' : val;
+              if(row.mens==='Mens') tr.classList.add('mens-row'); else tr.classList.remove('mens-row');
+            } else if(field==='mucus'){
+              row.mucus = (val===''||val==='-') ? '–' : val;
+            } else if(field==='lh'){
+              row.lh = (val===''||val==='-') ? '–' : val;
+            } else if(field==='sex'){
+              // toggla på enkel text: tomt -> 💞, annars tomt
+              row.sex = (val==='💞');
+              td.textContent = row.sex ? '💞' : '';
+            } else if(field==='ovulation'){
+              row.ovulation = (val==='🌼');
+              td.textContent = row.ovulation ? '🌼' : '';
+            } else if(field==='note'){
+              row.note = val;
+            }
+
+            // spara + uppdatera graf
+            localStorage.setItem('bbtData', JSON.stringify(dataEntries));
+            // uppdatera graf om graf-fliken är aktiv
+            if(document.querySelector('.tab.active')?.dataset.tab==='graf'){
+              renderChart();
+            }
+          });
+        });
+
         el.dataTableBody.appendChild(tr);
-      }
+      });
     }
 
     function clearData(){
@@ -329,7 +395,7 @@
       const actual = dataEntries.map(e=>e.actual);
       const corrected = dataEntries.map(e=>e.corrected);
 
-      // Medel före ägglossning (beräkna på BBT från CD1 → ovulation)
+      // Medel före ägglossning (beräkna på BBT från CD1 → ovulation), rita över hela grafen
       const ovIndex = dataEntries.findIndex(e=>e.ovulation);
       const preVals = (ovIndex>0 ? actual.slice(0, ovIndex) : actual).filter(v=>typeof v==='number');
       const avg = preVals.length ? preVals.reduce((a,b)=>a+b,0)/preVals.length : null;
@@ -347,7 +413,7 @@
         anns.push({type:'box', xMin:ovIndex+0.5, xMax:labels.length-0.5, backgroundColor:'rgba(242,230,255,.5)', borderWidth:0});
       }
 
-      // Symboler
+      // Symboler för x-axel
       const symbols = dataEntries.map(e=>{
         const s=[];
         if(e.sex) s.push('💞');
@@ -455,7 +521,7 @@
 
     el.clearBtn.addEventListener('click', clearData);
 
-    /* ===== LH-list ===== */
+    /* ===== LH-lista & fullskärm med bläddring ===== */
     const blobToDataURL = b => new Promise((res,rej)=>{
       const r=new FileReader();
       r.onload=()=>res(r.result);
@@ -471,11 +537,11 @@
         row.className = 'lh-row';
         row.innerHTML = `
           <div style="flex:0 0 38%">
-            <img class="lh-img" src="${e.dataUrl}" alt="LH-bild">
+            <img class="lh-img" src="${e.dataUrl}" alt="LH-bild" data-idx="${i}">
           </div>
           <div class="lh-info">
             <div style="font-weight:700">${e.date||''}</div>
-            <div style="font-size:1.2rem; margin:.2rem 0;">${(e.symbols||[]).join(' ')}</div>
+            <div style="font-size:1.15rem; margin:.15rem 0;">${(e.symbols||[]).join(' ')}</div>
             <div style="font-size:.9rem; color:#555">${e.note||''}</div>
           </div>
           <div>
@@ -483,7 +549,7 @@
           </div>
         `;
         // fullskärm
-        row.querySelector('img').addEventListener('click', ()=>openFullscreen(e.dataUrl));
+        row.querySelector('img').addEventListener('click', (ev)=>openGallery(parseInt(ev.target.dataset.idx,10)));
         // radera
         row.querySelector('[data-del]').addEventListener('click', ()=>{
           lhEntries.splice(i,1);
@@ -494,20 +560,67 @@
       });
     }
 
-    function openFullscreen(src){
+    // Fullskärm + bläddring
+    let galleryIndex = 0;
+    function openGallery(startIdx){
+      if(!lhEntries.length) return;
+      galleryIndex = startIdx;
+
       const o = document.createElement('div');
-      o.style = 'position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:9999';
+      o.style = 'position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:9999';
       const img = document.createElement('img');
-      img.src = src;
       img.style = 'max-width:92%;max-height:92%;border-radius:10px;background:#fff';
-      o.appendChild(img);
+      const left = document.createElement('div');
+      const right = document.createElement('div');
+      left.style = right.style = 'position:absolute;top:0;width:50%;height:100%;';
+      left.style.left='0'; right.style.right='0';
+
+      function show(i){
+        if(i<0) i = lhEntries.length-1;
+        if(i>=lhEntries.length) i = 0;
+        galleryIndex = i;
+        img.src = lhEntries[galleryIndex].dataUrl;
+      }
+      show(galleryIndex);
+
+      // klickzoner
+      left.addEventListener('click', (e)=>{ e.stopPropagation(); show(galleryIndex-1); });
+      right.addEventListener('click', (e)=>{ e.stopPropagation(); show(galleryIndex+1); });
+      // stäng på klick utanför
       o.addEventListener('click', ()=>document.body.removeChild(o));
+      o.appendChild(img); o.appendChild(left); o.appendChild(right);
       document.body.appendChild(o);
+
+      // piltangenter
+      function onKey(ev){
+        if(ev.key==='ArrowLeft'){ show(galleryIndex-1); }
+        if(ev.key==='ArrowRight'){ show(galleryIndex+1); }
+        if(ev.key==='Escape'){ cleanup(); }
+      }
+      function cleanup(){
+        document.removeEventListener('keydown', onKey);
+        if(o.parentNode) document.body.removeChild(o);
+      }
+      document.addEventListener('keydown', onKey);
+
+      // svep (touch)
+      let sx=null, sy=null;
+      o.addEventListener('touchstart', (e)=>{ const t=e.changedTouches[0]; sx=t.clientX; sy=t.clientY; }, {passive:true});
+      o.addEventListener('touchend', (e)=>{
+        const t=e.changedTouches[0]; if(sx===null) return;
+        const dx = t.clientX - sx, dy = t.clientY - sy;
+        if(Math.abs(dx)>40 && Math.abs(dy)<60){
+          if(dx<0) show(galleryIndex+1); else show(galleryIndex-1);
+        } else {
+          cleanup();
+        }
+        sx=sy=null;
+      }, {passive:true});
     }
 
     /* ===== Events ===== */
-    el.actual.addEventListener('blur', computeCorrected);
-    el.time.addEventListener('change', ()=>{ if(el.actual.value) computeCorrected(); });
+    el.actual.addEventListener('blur', computeCorrectedFormInputs);
+    el.time.addEventListener('change', ()=>{ if(el.actual.value) computeCorrectedFormInputs(); });
     el.saveBtn.addEventListener('click', saveEntry);
 
     el.lhPickBtn.addEventListener('click', ()=> el.lhFile.click());
