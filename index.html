@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BBT Tracker – Ida</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+body {
+  font-family:"Helvetica Neue",Arial,sans-serif;
+  margin:20px;
+  background:#fff;
+  color:#333;
+}
+h1{text-align:center;margin-bottom:20px;}
+.container{max-width:760px;margin:0 auto;}
+label{display:block;font-weight:600;margin-top:10px;}
+input,select,textarea{
+  width:100%;padding:6px;margin-top:4px;
+  border:1px solid #ccc;border-radius:6px;font-size:15px;
+}
+button{
+  margin-top:12px;padding:10px 16px;border:none;
+  background:#007aff;color:#fff;font-weight:bold;
+  border-radius:8px;cursor:pointer;
+}
+button:hover{background:#005ecb;}
+#chartContainer{margin-top:35px;}
+.legend{text-align:center;margin-top:10px;font-size:14px;}
+.legend span{margin:0 8px;display:inline-block;}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>BBT Tracker – Ida</h1>
+
+  <label>Datum</label>
+  <input type="date" id="datum">
+
+  <label>Tid (BBT)</label>
+  <input type="time" id="tid">
+
+  <label>Faktisk temperatur (°C)</label>
+  <input type="number" id="faktisk" step="0.01" placeholder="t.ex. 36.31">
+
+  <label>Korrigerad temperatur (°C)</label>
+  <input type="number" id="korr" step="0.01" placeholder="t.ex. 36.45">
+  <button onclick="calcCorr()">Räkna ut korrigerad</button>
+
+  <label>Mensstatus</label>
+  <select id="mens">
+    <option>Ingen</option><option>Mens</option><option>Spotting</option>
+  </select>
+
+  <label>Sekret</label>
+  <select id="sekret">
+    <option>-</option><option>Krämigt</option><option>Klart</option><option>Torrt</option>
+  </select>
+
+  <label>LH-test</label>
+  <select id="lh">
+    <option>-</option><option>Negativt</option><option>Positivt</option>
+  </select>
+
+  <label>Anteckning (valfritt)</label>
+  <textarea id="anteckning" rows="2" placeholder="Sömn, sjukdom, värk m.m."></textarea>
+
+  <label>Ägglossningsdatum</label>
+  <input type="date" id="ovulationDate">
+
+  <button onclick="addEntry()">Spara</button>
+  <button onclick="exportJSON()">Exportera JSON</button>
+  <button onclick="importJSON()">Importera JSON</button>
+
+  <div id="chartContainer">
+    <canvas id="bbtChart"></canvas>
+    <div class="legend">
+      <span><span class="dot" style="background:#007aff"></span>Faktisk</span>
+      <span><span class="dot" style="background:#e74c3c"></span>Korrigerad</span>
+      <span><span class="dot" style="background:#6fd3ff"></span>Klart sekret</span>
+      <span><span class="dot" style="background:#ffb3b3"></span>Mensdag</span>
+      <span><span class="dot" style="background:#999"></span>Prognos</span>
+    </div>
+  </div>
+</div>
+
+<script>
+let bbtData = JSON.parse(localStorage.getItem("bbtData") || "[]");
+renderChart();
+
+function addEntry(){
+  const entry={
+    datum:datum.value, tid:tid.value,
+    faktisk:parseFloat(faktisk.value),
+    korr:parseFloat(korr.value),
+    mens:mens.value, sekret:sekret.value,
+    lh:lh.value, anteckning:anteckning.value
+  };
+  bbtData.push(entry);
+  localStorage.setItem("bbtData",JSON.stringify(bbtData));
+  renderChart();
+}
+
+function exportJSON(){
+  const blob=new Blob([JSON.stringify(bbtData,null,2)],{type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob); a.download="bbtData.json"; a.click();
+}
+
+function importJSON(){
+  const i=document.createElement("input"); i.type="file"; i.accept=".json";
+  i.onchange=e=>{
+    const f=e.target.files[0]; const r=new FileReader();
+    r.onload=()=>{bbtData=JSON.parse(r.result);
+      localStorage.setItem("bbtData",JSON.stringify(bbtData)); renderChart();};
+    r.readAsText(f);
+  };
+  i.click();
+}
+
+function calcCorr(){
+  const time=tid.value, temp=parseFloat(faktisk.value);
+  if(!time||isNaN(temp)){alert("Fyll i tid och temperatur.");return;}
+  const [h,m]=time.split(":").map(Number);
+  const mins=(h*60+m)-(4*60);
+  const steps=Math.abs(mins)/30;
+  const corr=temp+(mins<0?steps*0.05:-steps*0.05);
+  korr.value=corr.toFixed(2);
+}
+
+function getOvulationDate(){
+  const o=ovulationDate.value;
+  return o?new Date(o):null;
+}
+
+function calculateDPO(data,o){
+  if(!o)return data.map(()=>null);
+  return data.map(r=>{
+    const d=new Date(r.datum);
+    const diff=Math.round((d-o)/(1000*60*60*24));
+    return diff>=0?diff:null;
+  });
+}
+
+function renderChart(){
+  const ctx=document.getElementById("bbtChart").getContext("2d");
+  if(window.bbtChart) window.bbtChart.destroy();
+
+  const labels=bbtData.map(d=>d.datum);
+  const faktisk=bbtData.map(d=>d.faktisk);
+  const korr=bbtData.map(d=>d.korr);
+  const ovDate=getOvulationDate();
+  const dpoLabels=calculateDPO(bbtData,ovDate);
+
+  const mensMask=bbtData.map(d=>d.mens==="Mens"||d.mens==="Spotting");
+  const sekretIdx=bbtData.map((d,i)=>d.sekret==="Klart"?i:null).filter(i=>i!==null);
+
+  // Prognos = medel av senaste 3 korrigerade värden
+  let forecast=[];
+  if(korr.filter(x=>!isNaN(x)).length>=3){
+    const last3=korr.slice(-3).filter(x=>!isNaN(x));
+    const avg=last3.reduce((a,b)=>a+b,0)/last3.length;
+    forecast=[avg];
+  }
+
+  const mensBG={
+    id:"mensBG",
+    beforeDatasetsDraw(chart){
+      const {ctx,chartArea:{left,right,top,bottom},scales:{x}}=chart;
+      const w=(right-left)/labels.length;
+      ctx.save();
+      for(let i=0;i<labels.length;i++){
+        if(mensMask[i]){
+          const xc=x.getPixelForValue(i);
+          ctx.fillStyle="#ffe6e680";
+          ctx.fillRect(xc-w/2,top,w,bottom-top);
+        }
+      }
+      ctx.restore();
+    }
+  };
+
+  window.bbtChart=new Chart(ctx,{
+    type:"line",
+    data:{
+      labels:[...labels,"Prognos"],
+      datasets:[
+        {label:"Faktisk",data:[...faktisk,null],
+         borderColor:"#007aff",backgroundColor:"#007aff",tension:0.3,fill:false,pointStyle:"circle"},
+        {label:"Korrigerad",data:[...korr,null],
+         borderColor:"#e74c3c",backgroundColor:"#e74c3c",borderDash:[4,4],tension:0.3,fill:false,pointStyle:"triangle"},
+        {label:"Klart sekret",data:sekretIdx.map(i=>({x:i,y:35.85})),showLine:false,pointRadius:5,pointBackgroundColor:"#6fd3ff"},
+        {label:"Prognos",data:[...Array(labels.length).fill(null),forecast[0]||null],
+         borderColor:"#999",borderDash:[2,2],pointRadius:4,pointBackgroundColor:"#999"}
+      ]
+    },
+    options:{
+      layout:{padding:{left:30,right:10,top:10,bottom:10}},
+      plugins:{legend:{position:"bottom",labels:{font:{size:12}}}},
+      scales:{
+        y:{min:35.8,max:37.2,
+          title:{display:true,text:"Temperatur (°C)",color:"#333",font:{size:13,weight:"600"}},
+          grid:{color:"#eeeeee",lineWidth:0.8},
+          border:{display:true,color:"#999",width:1},
+          ticks:{stepSize:0.1,color:"#444"}},
+        x:{ticks:{autoSkip:false,maxRotation:45,minRotation:45,color:"#444"},
+          grid:{color:"#f5f5f5"},
+          border:{display:true,color:"#999",width:1}}
+      },
+      plugins:[mensBG,{
+        id:"dpoLabels",
+        afterDatasetsDraw(chart){
+          const {ctx}=chart;
+          ctx.save();
+          ctx.font="10px sans-serif";
+          ctx.fillStyle="#999";
+          chart.getDatasetMeta(0).data.forEach((point,i)=>{
+            const dpo=dpoLabels[i];
+            if(dpo!==null){
+              ctx.beginPath();
+              ctx.arc(point.x,point.y-12,10,0,2*Math.PI);
+              ctx.fillStyle="#f4f4f4";
+              ctx.fill();
+              ctx.fillStyle="#555";
+              ctx.textAlign="center";
+              ctx.fillText(`${dpo}`,point.x,point.y-9);
+            }
+          });
+          ctx.restore();
+        }
+      }]
+    }
+  });
+}
+</script>
+</body>
+</html>
