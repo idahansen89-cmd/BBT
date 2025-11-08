@@ -1,530 +1,310 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-  <link rel="apple-touch-icon" href="B29437FC-696F-4754-AAAB-A6ED096BC64C.png">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BBT Tracker – Ida</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<title>BBT</title>
+
+<!-- Rosa stil -->
 <style>
 body {
-  font-family:"Helvetica Neue",Arial,sans-serif;
-  margin:20px;
-  background:#fff;
-  color:#333;
+  font-family: 'Helvetica Neue', sans-serif;
+  background-color: #fff;
+  margin: 20px;
+  color: #333;
 }
-h1{text-align:center;margin-bottom:20px;}
-.container{max-width:760px;margin:0 auto;}
-label{display:block;font-weight:600;margin-top:10px;}
-input,select,textarea{
-  width:100%;padding:6px;margin-top:4px;
-  border:1px solid #ccc;border-radius:6px;font-size:15px;
-}
-button{
-  margin-top:12px;padding:10px 16px;border:none;
-  background:#007aff;color:#fff;font-weight:bold;
-  border-radius:8px;cursor:pointer;
-}
-button:hover{background:#005ecb;}
-#chartContainer{margin-top:35px;}
-.legend{text-align:center;margin-top:10px;font-size:14px;}
-.legend span{margin:0 8px;display:inline-block;}
-.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;}
 
-  <style>
-/* --- Rosa tema för knappar --- */
+h1 {
+  color: #e6739f;
+  text-align: center;
+}
+
+label { display:block; margin-top:8px; font-weight:500; }
+
+input, select {
+  width:100%;
+  padding:6px;
+  margin-top:3px;
+  border:1px solid #ddd;
+  border-radius:5px;
+  font-size:14px;
+}
+
 button {
-  background-color: #f7b2c4;      /* mjuk rosa */
-  color: white;                   /* vit text */
-  border: none;                   
-  border-radius: 6px;             /* rundade hörn */
-  padding: 8px 14px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s, transform 0.1s;
+  background-color:#f7b2c4;
+  color:white;
+  border:none;
+  border-radius:6px;
+  padding:8px 14px;
+  font-size:15px;
+  font-weight:600;
+  cursor:pointer;
+  transition:background-color 0.2s, transform 0.1s;
+  margin:4px 2px;
 }
+button:hover { background-color:#f48aa8; transform:scale(1.03); }
+button:active { background-color:#e86c93; transform:scale(0.98); }
 
-/* När man håller över knappen */
-button:hover {
-  background-color: #f48aa8;      /* lite mörkare rosa */
-  transform: scale(1.03);
-}
+canvas { width:100%; max-width:1000px; margin-top:25px; }
 
-/* När man trycker ner */
-button:active {
-  background-color: #e86c93;
-  transform: scale(0.98);
-}
 </style>
 </head>
+
 <body>
-<div class="container">
-  <h1>BBT Tracker – Ida</h1>
+<h1>Basaltemperatur</h1>
 
-  <label>Datum</label>
-  <input type="date" id="datum">
+<!-- FORMULÄR -->
+<label>Datum:</label>
+<input type="date" id="datum">
 
-  <label>Tid (BBT)</label>
-  <input type="time" id="tid">
+<label>Tid:</label>
+<input type="time" id="tid">
 
-  <label>Faktisk temperatur (°C)</label>
-  <input type="number" id="faktisk" step="0.01" placeholder="t.ex. 36.31">
+<label>Faktisk temperatur:</label>
+<input type="number" id="faktisk" step="0.01">
 
-  <label>Korrigerad temperatur (°C)</label>
-  <input type="number" id="korr" step="0.01" placeholder="t.ex. 36.45">
-  <button onclick="calcCorr()">Räkna ut korrigerad</button>
+<label>Korrigerad temperatur:</label>
+<input type="number" id="korr" step="0.01" placeholder="Beräknas automatiskt">
 
-  <label>Mensstatus</label>
-  <select id="mens">
-    <option>Ingen</option><option>Mens</option><option>Spotting</option>
-  </select>
+<label>Mensstatus:</label>
+<select id="mens">
+  <option>Ingen</option>
+  <option>Spotting</option>
+  <option>Mens</option>
+</select>
 
-  <label>Sekret</label>
-  <select id="sekret">
-    <option>-</option><option>Krämigt</option><option>Klart</option><option>Torrt</option>
-  </select>
+<label>Typ av sekret:</label>
+<select id="sekret">
+  <option>-</option>
+  <option>Krämigt</option>
+  <option>Klart</option>
+  <option>Stretchigt</option>
+</select>
 
-  <label>LH-test</label>
-  <select id="lh">
-    <option>-</option><option>Negativt</option><option>Positivt</option>
-  </select>
+<label>LH-test:</label>
+<select id="lh">
+  <option>-</option>
+  <option>Negativt</option>
+  <option>Positivt</option>
+</select>
 
-  <label>Anteckning (valfritt)</label>
-  <textarea id="anteckning" rows="2" placeholder="Sömn, sjukdom, värk m.m."></textarea>
+<label>Anteckning:</label>
+<input type="text" id="anteckning" placeholder="Ex. sov dåligt, sjuk, samlag...">
 
-  <label>Ägglossningsdatum</label>
-  <input type="date" id="ovulationDate">
+<label>Ägglossningsdatum:</label>
+<input type="date" id="ovulationDate">
 
+<!-- KNAPPAR -->
+<div style="margin-top:10px;">
+  <button onclick="calcCorr()">Beräkna korrigerad</button>
   <button onclick="addEntry()">Spara</button>
   <button onclick="exportJSON()">Exportera JSON</button>
   <button onclick="importJSON()">Importera JSON</button>
-  <button onclick="clearAllData()">Rensa all data</button>
-  
-  <div id="chartContainer">
-    <canvas id="bbtChart"></canvas>
-    <div class="legend">
-      <span><span class="dot" style="background:#007aff"></span>Faktisk</span>
-      <span><span class="dot" style="background:#e74c3c"></span>Korrigerad</span>
-      <span><span class="dot" style="background:#6fd3ff"></span>Klart sekret</span>
-      <span><span class="dot" style="background:#ffb3b3"></span>Mensdag</span>
-      <span><span class="dot" style="background:#999"></span>Prognos</span>
-    </div>
-  </div>
+  <button onclick="clearAllData()">🗑️ Rensa all data</button>
 </div>
 
-<script>
+<!-- GRAF -->
+<canvas id="bbtChart" height="420"></canvas>
+
+<!-- SCRIPT -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-/* ===== Hjälpare ===== */
 const $ = id => document.getElementById(id);
 
-/* ===== Lagring ===== */
-function loadData(){
-  try { return JSON.parse(localStorage.getItem('bbtData')||'[]'); }
-  catch { return []; }
-}
-function saveData(rows){
-  localStorage.setItem('bbtData', JSON.stringify(rows));
-}
+function loadData(){ try{return JSON.parse(localStorage.getItem('bbtData')||'[]');}catch{return[];} }
+function saveData(d){ localStorage.setItem('bbtData', JSON.stringify(d)); }
 
 let bbtData = loadData();
+let chart;
 
-/* ===== UI: lägg till post ===== */
-function addEntry(){
-  const entry = {
-    datum: $('datum').value,
-    tid: $('tid').value,
-    faktisk: parseFloat($('faktisk').value),
-    korr: parseFloat($('korr').value),
-    mens: $('mens').value,
-    sekret: $('sekret').value,
-    lh: $('lh').value,
-    anteckning: $('anteckning').value?.trim() || ''
-  };
-
-  if (!entry.datum || !entry.tid || isNaN(entry.faktisk)) {
-    alert('Fyll i minst Datum, Tid och Faktisk temperatur.'); return;
-  }
-  // Om korr saknas: räkna fram från tid/faktisk (0,05 °C/30 min från 04:00)
-  if (isNaN(entry.korr)) {
-    const [h,m] = entry.tid.split(':').map(Number);
-    const mins = (h*60+m) - (4*60);
-    const steps = Math.abs(mins)/30;
-    entry.korr = +(entry.faktisk + (mins<0 ? steps*0.05 : -steps*0.05)).toFixed(2);
-    $('korr').value = entry.korr.toFixed(2);
-  }
-
-  // Uppdatera post per datum (ersätt om samma datum redan finns)
-  const i = bbtData.findIndex(r => r.datum === entry.datum);
-  if (i >= 0) bbtData[i] = entry; else bbtData.push(entry);
-
-  // Sortera stigande på datum
-  bbtData.sort((a,b)=> a.datum.localeCompare(b.datum));
-
-  saveData(bbtData);
-  renderChart();
-
-  // (valfritt) töm fält efter spar
-  // $('faktisk').value=''; $('korr').value='';
-  // $('anteckning').value='';
+function calcCorr(){
+  const time=$('tid').value, temp=parseFloat($('faktisk').value);
+  if(!time||isNaN(temp)){alert('Fyll i tid och temperatur.');return;}
+  const [h,m]=time.split(':').map(Number);
+  const mins=(h*60+m)-(4*60);
+  const steps=Math.abs(mins)/30;
+  const corr=temp+(mins<0?steps*0.05:-steps*0.05);
+  $('korr').value=corr.toFixed(2);
 }
 
-/* ===== Export / Import ===== */
+function addEntry(){
+  const e={
+    datum:$('datum').value,
+    tid:$('tid').value,
+    faktisk:parseFloat($('faktisk').value),
+    korr:parseFloat($('korr').value),
+    mens:$('mens').value,
+    sekret:$('sekret').value,
+    lh:$('lh').value,
+    anteckning:$('anteckning').value?.trim()||''
+  };
+  if(!e.datum||!e.tid||isNaN(e.faktisk)){alert('Fyll i minst Datum, Tid och Faktisk temperatur.');return;}
+  if(isNaN(e.korr)){calcCorr(); e.korr=parseFloat($('korr').value);}
+  const i=bbtData.findIndex(r=>r.datum===e.datum);
+  if(i>=0) bbtData[i]=e; else bbtData.push(e);
+  bbtData.sort((a,b)=>a.datum.localeCompare(b.datum));
+  saveData(bbtData); renderChart();
+}
+
 function exportJSON(){
-  const blob = new Blob([JSON.stringify(bbtData,null,2)], {type:'application/json'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'bbtData.json';
-  a.click();
+  const blob=new Blob([JSON.stringify(bbtData,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);a.download='bbtData.json';a.click();
   URL.revokeObjectURL(a.href);
 }
 function importJSON(){
-  const input = document.createElement('input');
-  input.type = 'file'; input.accept = '.json';
-  input.onchange = e => {
-    const f = e.target.files[0]; if (!f) return;
-    const r = new FileReader();
-    r.onload = () => {
-      try {
-        const data = JSON.parse(r.result);
-        if (!Array.isArray(data)) throw new Error('Fel format');
-        bbtData = data;
-        saveData(bbtData);
-        renderChart();
-      } catch (err) { alert('Kunde inte importera: ' + err.message); }
-    };
+  const input=document.createElement('input');
+  input.type='file'; input.accept='.json';
+  input.onchange=e=>{
+    const f=e.target.files[0]; if(!f)return;
+    const r=new FileReader();
+    r.onload=()=>{try{
+      const d=JSON.parse(r.result); if(!Array.isArray(d))throw new Error('Fel format');
+      bbtData=d; saveData(bbtData); renderChart();
+    }catch(err){alert('Kunde inte importera: '+err.message);}};
     r.readAsText(f);
   };
   input.click();
 }
-
-/* ===== Auto-korrigering (knappen) ===== */
-function calcCorr(){
-  const time = $('tid').value;
-  const temp = parseFloat($('faktisk').value);
-  if(!time || isNaN(temp)){ alert('Fyll i tid och temperatur.'); return; }
-  const [h,m] = time.split(':').map(Number);
-  const mins = (h*60+m) - (4*60);
-  const steps = Math.abs(mins)/30;
-  const corr = temp + (mins<0 ? steps*0.05 : -steps*0.05);
-  $('korr').value = corr.toFixed(2);
+function clearAllData(){
+  if(confirm('Vill du verkligen rensa all data?')){
+    localStorage.removeItem('bbtData');
+    bbtData=[]; renderChart(); alert('All data raderad.');
+  }
 }
 
-/* ===== DPO ===== */
-function getOvulationDate(){
-  const v = $('ovulationDate')?.value;
-  return v ? new Date(v) : null;
-}
-function calculateDPO(data, ov){
-  if (!ov) return data.map(()=>null);
-  return data.map(r=>{
-    const d = new Date(r.datum);
-    const diff = Math.round((d - ov)/(1000*60*60*24));
-    return diff >= 0 ? diff : null;
-  });
-}
+function getOvulationDate(){const v=$('ovulationDate').value; return v?new Date(v):null;}
+function calculateDPO(data,ov){ if(!ov)return data.map(()=>null);
+  return data.map(r=>{const d=new Date(r.datum);
+  const diff=Math.round((d-ov)/(1000*60*60*24));
+  return diff>=0?diff:null;}); }
 
-/* ===== Chart ===== */
-let chart;
 function renderChart(){
-  const ctx = document.getElementById('bbtChart').getContext('2d');
-  if (chart) chart.destroy();
+  const ctx=$('bbtChart').getContext('2d');
+  if(chart)chart.destroy();
 
-  const labels = bbtData.map(d=>d.datum);
-  const faktisk = bbtData.map(d=>isFinite(d.faktisk)?d.faktisk:null);
-  const korr = bbtData.map(d=>isFinite(d.korr)?d.korr:null);
+  const labels=bbtData.map(d=>d.datum);
+  const faktisk=bbtData.map(d=>isFinite(d.faktisk)?d.faktisk:null);
+  const korr=bbtData.map(d=>isFinite(d.korr)?d.korr:null);
+  const ov=getOvulationDate();
+  const dpoLabels=calculateDPO(bbtData,ov);
+  const mensMask=bbtData.map(d=>d.mens==='Mens'||d.mens==='Spotting');
+  const sekretIdx=bbtData.map((d,i)=>d.sekret==='Klart'?i:null).filter(i=>i!==null);
 
-  const ov = getOvulationDate();
-  const dpoLabels = calculateDPO(bbtData, ov);
-
-  const mensMask = bbtData.map(d=>d.mens==='Mens'||d.mens==='Spotting');
-  const sekretIdx = bbtData.map((d,i)=> d.sekret==='Klart' ? i : null).filter(i=>i!==null);
-
-  // Prognos: genomsnitt + trend av senaste 3 korr
-  let forecast = null;
-  const last3 = korr.filter(x=>x!=null).slice(-3);
-  if (last3.length >= 2) {
-    const avg = last3.reduce((a,b)=>a+b,0)/last3.length;
-    const slope = last3[last3.length-1] - last3[0];
-    const adjust = Math.max(-0.05, Math.min(0.05, slope/last3.length));
-    forecast = +(avg + adjust).toFixed(2);
+  let forecast=null;
+  const last3=korr.filter(x=>x!=null).slice(-3);
+  if(last3.length>=2){
+    const avg=last3.reduce((a,b)=>a+b,0)/last3.length;
+    const slope=last3[last3.length-1]-last3[0];
+    const adjust=Math.max(-0.05,Math.min(0.05,slope/last3.length));
+    forecast=+(avg+adjust).toFixed(2);
   }
 
-  // --- Mensbakgrund (mjuk rosa toning) ---
-  const mensBG = {
-    id: 'mensBG',
-    beforeDatasetsDraw(chart) {
-      const { ctx, chartArea: { left, right, top, bottom }, scales: { x } } = chart;
-      if (!labels.length) return;
-      const barWidth = (right - left) / labels.length;
+  const mensBG={id:'mensBG',
+    beforeDatasetsDraw(chart){
+      const{ctx,chartArea:{left,right,top,bottom},scales:{x}}=chart;
+      if(!labels.length)return;
+      const w=(right-left)/labels.length;
       ctx.save();
-      for (let i = 0; i < labels.length; i++) {
-        if (mensMask[i]) {
-          const xc = x.getPixelForValue(i);
-          const grad = ctx.createLinearGradient(0, top, 0, bottom);
-          grad.addColorStop(0, '#ffd6dfcc');   // ljusare rosa upptill
-          grad.addColorStop(1, '#ffeef3aa');   // transparent nedtill
-          ctx.fillStyle = grad;
-          ctx.fillRect(xc - barWidth / 2, top, barWidth, bottom - top);
+      for(let i=0;i<labels.length;i++){
+        if(mensMask[i]){
+          const xc=x.getPixelForValue(i);
+          const grad=ctx.createLinearGradient(0,top,0,bottom);
+          grad.addColorStop(0,'#ffd6dfcc');
+          grad.addColorStop(1,'#ffeef3aa');
+          ctx.fillStyle=grad;
+          ctx.fillRect(xc-w/2,top,w,bottom-top);
         }
       }
       ctx.restore();
-    }
-  };
+  }};
 
-  // --- Själva grafen ---
-  chart = new Chart(ctx, {
-    type: 'line',
+  chart=new Chart(ctx,{
+    type:'line',
     data:{
-      labels:[...labels, forecast!==null ? 'Prognos' : ''],
+      labels:[...labels,forecast!==null?'Prognos':''],
       datasets:[
-        {label:'Faktisk', data:[...faktisk, null], borderColor:'#007aff', backgroundColor:'#007aff', tension:0.3, fill:false, pointStyle:'circle'},
-        {label:'Korrigerad', data:[...korr, null], borderColor:'#e74c3c', backgroundColor:'#e74c3c', borderDash:[4,4], tension:0.3, fill:false, pointStyle:'triangle'},
-        {label:'Klart sekret', data:sekretIdx.map(i=>({x:i,y:35.1})), showLine:false, pointRadius:5, pointBackgroundColor:'#6fd3ff'},
-        {label:'Prognos', data:[...Array(labels.length).fill(null), forecast], borderColor:'#999', borderDash:[2,2], pointRadius:4, pointBackgroundColor:'#999'}
+        {label:'Faktisk',data:[...faktisk,null],borderColor:'#007aff',backgroundColor:'#007aff',tension:0.3,fill:false,pointStyle:'circle'},
+        {label:'Korrigerad',data:[...korr,null],borderColor:'#e74c3c',backgroundColor:'#e74c3c',borderDash:[4,4],tension:0.3,fill:false,pointStyle:'triangle'},
+        {label:'Klart sekret',data:sekretIdx.map(i=>({x:i,y:35.1})),showLine:false,pointRadius:5,pointBackgroundColor:'#6fd3ff'},
+        {label:'Prognos',data:[...Array(labels.length).fill(null),forecast],borderColor:'#999',borderDash:[2,2],pointRadius:4,pointBackgroundColor:'#999'}
       ]
     },
     options:{
       layout:{padding:{left:30,right:10,top:10,bottom:10}},
-      plugins:{
-        legend:{
-          position:'bottom',
-          labels:{font:{size:12},color:'#444'}
-        }
-      },
+      plugins:{legend:{position:'bottom',labels:{font:{size:12},color:'#444'}}},
       scales:{
-        y:{
-          min:35.0,
-          max:38.5,
-          title:{
-            display:true,
-            text:'Temperatur (°C)',
-            color:'#333',
-            font:{size:13,weight:'600'}
-          },
-          grid:{
-            color:'#f2f2f2',
-            lineWidth:0.6,
-            drawTicks:true,
-            drawBorder:true
-          },
-          border:{
-            display:true,
-            color:'#ccc',
-            width:0.8
-          },
-          ticks:{
-            stepSize:0.05,
-            color:'#555',
-            font:{size:11}
-          }
-        },
-        x:{
-          ticks:{
-            autoSkip:false,
-            maxRotation:45,
-            minRotation:45,
-            color:'#444',
-            font:{size:11}
-          },
-          grid:{color:'#f8f8f8'},
-          border:{display:true,color:'#ccc',width:0.8}
-        }
+        y:{min:35.0,max:38.5,
+          title:{display:true,text:'Temperatur (°C)',color:'#333',font:{size:13,weight:'600'}},
+          grid:{color:'#f2f2f2',lineWidth:0.6},
+          border:{display:true,color:'#ccc',width:0.8},
+          ticks:{stepSize:0.05,color:'#555',font:{size:11}}},
+        x:{ticks:{autoSkip:false,maxRotation:45,minRotation:45,color:'#444',font:{size:11}},
+           grid:{color:'#f8f8f8'},border:{display:true,color:'#ccc',width:0.8}}
       },
       aspectRatio:1.6
     },
     plugins:[
       mensBG,
       {
-  // 💗 Vertikal linje vid ägglossningsdag (0 DPO)
-  id: 'ovulationLine',
-  afterDatasetsDraw(chart) {
-    const ov = getOvulationDate();
-    if (!ov) return;
-
-    const { ctx, chartArea: { top, bottom }, scales: { x } } = chart;
-    const ovIndex = bbtData.findIndex(r => r.datum === ov.toISOString().split('T')[0]);
-    if (ovIndex < 0) return;
-
-    const xPos = x.getPixelForValue(ovIndex);
-    ctx.save();
-    ctx.strokeStyle = '#bbb';
-    ctx.lineWidth = 1;
-    ctx.setLineDash([3, 3]);
-    ctx.beginPath();
-    ctx.moveTo(xPos, top);
-    ctx.lineTo(xPos, bottom);
-    ctx.stroke();
-
-    // liten etikett upptill
-    ctx.fillStyle = '#888';
-    ctx.font = '11px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('ÄL', xPos, top + 12);
-    ctx.restore();
-  }
-},
-      {
-        // 💗 bakgrundsgradient för hela grafytan
-        id: 'backgroundGradient',
-        beforeDraw(chart) {
-          const { ctx, chartArea } = chart;
-          if (!chartArea) return;
-          const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-          gradient.addColorStop(0, '#ffe6eb');   // ljus rosa nederst
-          gradient.addColorStop(1, '#ffffff');   // vitt upptill
+        id:'ovulationLine',
+        afterDatasetsDraw(chart){
+          const ov=getOvulationDate();
+          if(!ov)return;
+          const{ctx,chartArea:{top,bottom},scales:{x}}=chart;
+          const idx=bbtData.findIndex(r=>r.datum===ov.toISOString().split('T')[0]);
+          if(idx<0)return;
+          const xp=x.getPixelForValue(idx);
           ctx.save();
-          ctx.fillStyle = gradient;
-          ctx.fillRect(chartArea.left, chartArea.top, chartArea.width, chartArea.height);
+          ctx.strokeStyle='#bbb';
+          ctx.lineWidth=1;
+          ctx.setLineDash([3,3]);
+          ctx.beginPath();
+          ctx.moveTo(xp,top);
+          ctx.lineTo(xp,bottom);
+          ctx.stroke();
+          ctx.fillStyle='#888';
+          ctx.font='11px sans-serif';
+          ctx.textAlign='center';
+          ctx.fillText('ÄL',xp,top+12);
           ctx.restore();
         }
       },
-      {
-        // 💬 DPO-etiketter
-        id: 'dpoLabels',
-        afterDatasetsDraw(chart){
-          const {ctx} = chart;
+      {id:'backgroundGradient',
+        beforeDraw(chart){
+          const{ctx,chartArea}=chart;
+          if(!chartArea)return;
+          const g=ctx.createLinearGradient(0,chartArea.bottom,0,chartArea.top);
+          g.addColorStop(0,'#ffe6eb');
+          g.addColorStop(1,'#ffffff');
           ctx.save();
-          ctx.font = '10px sans-serif';
-          ctx.fillStyle = '#999';
+          ctx.fillStyle=g;
+          ctx.fillRect(chartArea.left,chartArea.top,chartArea.width,chartArea.height);
+          ctx.restore();
+      }},
+      {id:'dpoLabels',
+        afterDatasetsDraw(chart){
+          const{ctx}=chart;
+          ctx.save();ctx.font='10px sans-serif';ctx.fillStyle='#999';
           chart.getDatasetMeta(0).data.forEach((pt,i)=>{
-            const dpo = dpoLabels[i];
-            if(dpo!==null && pt && isFinite(pt.x) && isFinite(pt.y)){
+            const dpo=dpoLabels[i];
+            if(dpo!==null&&pt&&isFinite(pt.x)&&isFinite(pt.y)){
               ctx.beginPath();
-              ctx.arc(pt.x, pt.y-12, 10, 0, 2*Math.PI);
+              ctx.arc(pt.x,pt.y-12,10,0,2*Math.PI);
               ctx.fillStyle='#f4f4f4';
               ctx.fill();
               ctx.fillStyle='#555';
               ctx.textAlign='center';
-              ctx.fillText(String(dpo), pt.x, pt.y-9);
+              ctx.fillText(String(dpo),pt.x,pt.y-9);
             }
           });
           ctx.restore();
-        }
-      }
+      }}
     ]
   });
 }
-  chart = new Chart(ctx, {
-    type:'line',
-    data:{
-      labels:[...labels, forecast!==null ? 'Prognos' : ''],
-      datasets:[
-        {label:'Faktisk', data:[...faktisk, null], borderColor:'#007aff', backgroundColor:'#007aff', tension:0.3, fill:false, pointStyle:'circle'},
-        {label:'Korrigerad', data:[...korr, null], borderColor:'#e74c3c', backgroundColor:'#e74c3c', borderDash:[4,4], tension:0.3, fill:false, pointStyle:'triangle'},
-        {label:'Klart sekret', data:sekretIdx.map(i=>({x:i,y:35.85})), showLine:false, pointRadius:5, pointBackgroundColor:'#6fd3ff'},
-        {label:'Prognos', data:[...Array(labels.length).fill(null), forecast], borderColor:'#999', borderDash:[2,2], pointRadius:4, pointBackgroundColor:'#999'}
-      ]
-    },
-    options: {
-  layout: {
-    padding: { left: 30, right: 10, top: 10, bottom: 10 }
-  },
-  plugins: {
-    legend: {
-      position: 'bottom',
-      labels: {
-        font: { size: 12 },
-        color: '#444'
-      }
-    }
-  },
-  scales: {
-    y: {
-      min: 35.0,
-      max: 38.5,
-      title: {
-        display: true,
-        text: 'Temperatur (°C)',
-        color: '#333',
-        font: { size: 13, weight: '600' }
-      },
-      grid: {
-        color: '#f2f2f2',
-        lineWidth: 0.6,
-        drawTicks: true,
-        drawBorder: true
-      },
-      border: {
-        display: true,
-        color: '#ccc',
-        width: 0.8
-      },
-      ticks: {
-        stepSize: 0.05,
-        color: '#555',
-        font: { size: 11 }
-      }
-    },
-    x: {
-      ticks: {
-        autoSkip: false,
-        maxRotation: 45,
-        minRotation: 45,
-        color: '#444',
-        font: { size: 11 }
-      },
-      grid: {
-        color: '#f8f8f8'
-      },
-      border: {
-        display: true,
-        color: '#ccc',
-        width: 0.8
-      }
-    }
-  },
-  aspectRatio: 1.6
-},
-plugins: [
-  {
-    // 💗 bakgrundsgradient för grafytan
-    id: 'backgroundGradient',
-    beforeDraw(chart) {
-      const { ctx, chartArea } = chart;
-      const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-      gradient.addColorStop(0, '#ffe6eb');   // ljus rosa längst ner
-      gradient.addColorStop(1, '#ffffff');   // vitt upptill
-      ctx.save();
-      ctx.fillStyle = gradient;
-      ctx.fillRect(chartArea.left, chartArea.top, chartArea.width, chartArea.height);
-      ctx.restore();
-    }
-  }
-]
-      const mensBG = {
-  id: 'mensBG',
-  beforeDatasetsDraw(chart) {
-    const { ctx, chartArea: { left, right, top, bottom }, scales: { x } } = chart;
-    if (!labels.length) return;
-    const barWidth = (right - left) / labels.length;
-    ctx.save();
-    for (let i = 0; i < labels.length; i++) {
-      if (mensMask[i]) {
-        const xc = x.getPixelForValue(i);
-        const grad = ctx.createLinearGradient(0, top, 0, bottom);
-        grad.addColorStop(0, '#ffd6dfcc');   // ljusare rosa upptill
-        grad.addColorStop(1, '#ffeef3aa');   // nästan genomskinlig nedtill
-        ctx.fillStyle = grad;
-        ctx.fillRect(xc - barWidth / 2, top, barWidth, bottom - top);
-      }
-    }
-    ctx.restore();
-  }
-};
 
-
-/* ===== Event-bindningar ===== */
-window.addEventListener('load', renderChart);
-function clearAllData() {
-  if (confirm("Är du säker på att du vill ta bort alla sparade temperaturer?")) {
-    localStorage.removeItem('bbtData');
-    bbtData = [];
-    renderChart();
-    alert("All data har rensats. Grafen är nu tom.");
-  }
-}
+window.addEventListener('load',renderChart);
 </script>
 </body>
 </html>
