@@ -564,6 +564,25 @@ document.addEventListener('DOMContentLoaded', () => {
   renderTable();
   openTab('inmatning');
 });
+    // --- Fix för att alltid visa LH-fliken korrekt även utan data ---
+document.addEventListener("DOMContentLoaded", () => {
+  const lhTab = document.getElementById("lh");
+  if (lhTab && lhTab.querySelector("#lhList")) {
+    renderLHList(); // säkerställ att LH-fliken byggs även om ingen data finns
+  }
+
+  // Kontrollera att flikväxlingen verkligen fungerar
+  document.querySelectorAll(".tab").forEach(tab => {
+    tab.addEventListener("click", () => {
+      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+      const id = tab.getAttribute("onclick").match(/'(.*?)'/)[1];
+      tab.classList.add("active");
+      document.getElementById(id).classList.add("active");
+      if (id === "lh") renderLHList();
+    });
+  });
+});
 </script>
 </body>
 </html>
