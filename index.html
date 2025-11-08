@@ -8,199 +8,635 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.2.1"></script>
   <style>
-    body {font-family: Helvetica Neue, sans-serif; background:#fff; color:#000; margin:0;}
-    h1{text-align:center;margin-top:1rem;}
-    .tabs{display:flex;justify-content:center;margin:1rem 0;border-bottom:2px solid #eee;}
-    .tab{padding:.7rem 1.2rem;cursor:pointer;border:none;background:#f5f5f5;border-radius:8px 8px 0 0;margin:0 .3rem;font-weight:600;}
-    .tab.active{background:#fff;border-bottom:2px solid #fff;color:#e06b8f;}
-    .tab-content{display:none;max-width:750px;margin:auto;padding:1rem;border:1px solid #eee;border-radius:10px;}
-    .tab-content.active{display:block;}
-    label{display:inline-block;width:130px;}
-    input,select,textarea{width:calc(100% - 140px);margin-bottom:.6rem;padding:.4rem;border:1px solid #ccc;border-radius:6px;}
-    .button{background:#f4b6c2;border:none;border-radius:6px;padding:.5rem 1rem;margin:.2rem;font-weight:600;}
-    .button:hover{background:#e89bae;}
-    .danger{background:#f4b6c2;}
-    table{width:100%;border-collapse:collapse;margin-top:1rem;}
-    th,td{border:1px solid #ddd;padding:.5rem;text-align:center;white-space:nowrap;}
-    tr.mens-row{background:#ffe5ec;}
-    #bbtChart{width:100%;height:420px;}
-    .lh-entry{display:flex;align-items:flex-start;justify-content:space-between;border-bottom:1px solid #eee;padding:.5rem 0;}
-    .lh-image{width:35%;border-radius:6px;}
-    .lh-info{flex:1;margin-left:10px;}
-    .lh-symbols{font-size:1.2rem;}
-    .lh-symbol-checkbox{text-align:center;margin-right:.4rem;font-size:1.4rem;}
+    body {
+      font-family: "Helvetica Neue", sans-serif;
+      background: #fff;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+
+    h1 {
+      text-align: center;
+      margin-top: 1rem;
+      color: #333;
+    }
+
+    /* Flikar */
+    .tabs {
+      display: flex;
+      justify-content: center;
+      margin: 1rem 0;
+      border-bottom: 2px solid #ddd;
+    }
+
+    .tab {
+      padding: 0.7rem 1.2rem;
+      cursor: pointer;
+      border: none;
+      background: #f4f4f4;
+      border-radius: 8px 8px 0 0;
+      margin: 0 0.3rem;
+      font-weight: 600;
+    }
+
+    .tab.active {
+      background: #fff;
+      border-bottom: 2px solid #fff;
+      color: #e06b8f;
+    }
+
+    .tab-content {
+      display: none;
+      padding: 1rem;
+      max-width: 750px;
+      margin: auto;
+      border: 1px solid #eee;
+      border-radius: 10px;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    label {
+      display: inline-block;
+      width: 130px;
+      font-weight: 500;
+      margin-bottom: 0.2rem;
+    }
+
+    input, select, textarea {
+      width: calc(100% - 140px);
+      padding: 0.4rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      margin-bottom: 0.6rem;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    .button {
+      background: #f4b6c2;
+      color: #333;
+      border: none;
+      border-radius: 6px;
+      padding: 0.5rem 1.2rem;
+      margin: 0.3rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .button:hover {
+      background: #e599ab;
+    }
+
+    .button.danger {
+      background: #f4b6c2;
+      color: #333;
+    }
+
+    .button.danger:hover {
+      background: #e599ab;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+    }
+
+    th, td {
+      padding: 0.5rem;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+
+    tr.mens-row {
+      background-color: #ffe5ec;
+    }
+
+    .table-container {
+      overflow-x: auto;
+      margin-top: 1rem;
+    }
+
+    #bbtChart {
+      width: 100%;
+      height: 420px;
+    }
+
+    .bottom-buttons {
+      text-align: center;
+      margin-top: 1rem;
+    }
+
+    .symbol-checkbox {
+      display: inline-block;
+      margin-right: 1rem;
+      font-size: 1.2rem;
+      vertical-align: middle;
+    }
+
+    /* LH-flik layout */
+    .lh-image {
+      width: 100%;
+      border-radius: 6px;
+      margin-top: 8px;
+    }
+
+    .lh-entry {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 8px;
+    }
+
+    .lh-info {
+      flex-grow: 1;
+      margin-left: 10px;
+    }
+
+    .lh-symbols {
+      font-size: 1.1rem;
+      line-height: 1.5rem;
+    }
+
+    .lh-symbol-checkbox {
+      display: inline-block;
+      text-align: center;
+      margin-right: 0.5rem;
+      font-size: 1.4rem;
+    }
   </style>
 </head>
 <body>
   <h1>BBT – Ida</h1>
+
   <div class="tabs">
     <button class="tab active" onclick="openTab('inmatning')">Inmatning & Tabell</button>
     <button class="tab" onclick="openTab('graf')">📈 Graf</button>
     <button class="tab" onclick="openTab('lh')">🧪 LH-test</button>
   </div>
-
-  <!-- Inmatning -->
+    <!-- Inmatning & Tabell -->
   <div id="inmatning" class="tab-content active">
-    <label>Datum:</label><input type="date" id="date"><br>
-    <label>Tid (BBT):</label><input type="time" id="time"><br>
-    <label>Faktisk temp:</label><input type="number" step="0.01" id="actual"><br>
-    <label>Korrigerad temp:</label><input type="number" step="0.01" id="corrected" placeholder="Beräknas"><br>
-    <label>Mens:</label>
-    <select id="mens"><option>–</option><option>Mens</option></select><br>
-    <label>Sekret:</label>
-    <select id="mucus"><option>–</option><option>Klart</option><option>Äggviteliknande</option><option>Krämig</option></select><br>
-    <label>LH:</label><select id="lh"><option>–</option><option>Positivt</option><option>Negativt</option></select><br>
-    <span>💞 <input type="checkbox" id="sex"></span>
-    <span>🌼 <input type="checkbox" id="ovulation"></span><br>
-    <label>Anteckning:</label><textarea id="note"></textarea><br>
-    <button class="button" id="saveBtn">Spara</button>
-    <button class="button" id="exportBtn">Exportera</button>
-    <button class="button" id="importBtn">Importera</button>
-    <input type="file" id="importFile" accept="application/json" style="display:none">
-    <div style="overflow-x:auto">
-      <table id="dataTable"><thead><tr>
-        <th>Datum</th><th>Tid</th><th>Faktisk</th><th>Korr</th><th>Mens</th><th>Sekret</th><th>LH</th><th>💞</th><th>🌼</th><th>Anteckning</th>
-      </tr></thead><tbody></tbody></table>
+    <div>
+      <label>Datum:</label><input type="date" id="date"><br>
+      <label>Tid (BBT):</label><input type="time" id="time"><br>
+      <label>Faktisk temp (°C):</label><input type="number" step="0.01" id="actual"><br>
+      <label>Korrigerad temp (°C):</label><input type="number" step="0.01" id="corrected" placeholder="Beräknas automatiskt"><br>
+      <label>Mensstatus:</label>
+      <select id="mens">
+        <option>–</option>
+        <option>Mens</option>
+      </select><br>
+      <label>Sekret:</label>
+      <select id="mucus">
+        <option>–</option>
+        <option>Klart</option>
+        <option>Äggviteliknande</option>
+        <option>Krämig</option>
+      </select><br>
+      <label>LH-test:</label>
+      <select id="lh">
+        <option>–</option>
+        <option>Positivt</option>
+        <option>Negativt</option>
+      </select><br>
+      <div>
+        <span class="symbol-checkbox" title="Samlag">💞 <input type="checkbox" id="sex"></span>
+        <span class="symbol-checkbox" title="Bekräftad ägglossning">🌼 <input type="checkbox" id="ovulation"></span>
+      </div>
+      <label>Anteckning:</label><textarea rows="2" id="note"></textarea><br>
+
+      <button class="button" id="saveBtn">Spara</button>
+      <button class="button" id="exportBtn">Exportera data</button>
+      <button class="button" id="importBtn">Importera data</button>
+      <input type="file" id="importFile" accept="application/json" style="display:none">
     </div>
-    <div style="text-align:center;margin-top:1rem;">
-      <button class="button danger" id="clearBtn">Rensa data</button>
+
+    <div class="table-container">
+      <table id="dataTable">
+        <thead>
+          <tr>
+            <th>Datum</th><th>Tid</th><th>Faktisk</th><th>Korr</th>
+            <th>Mens</th><th>Sekret</th><th>LH</th><th>💞</th><th>🌼</th><th>Anteckning</th><th>✏️</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <div class="bottom-buttons">
+      <button class="button danger" id="clearBtn">Rensa all data</button>
     </div>
   </div>
 
   <!-- Graf -->
-  <div id="graf" class="tab-content"><canvas id="bbtChart"></canvas></div>
+  <div id="graf" class="tab-content">
+    <canvas id="bbtChart"></canvas>
+  </div>
 
-  <!-- LH-test -->
+  <!-- LH-test flik -->
   <div id="lh" class="tab-content">
-    <div style="display:flex;gap:.5rem;justify-content:space-between;">
-      <button class="button" id="lhPickBtn">Välj bild</button>
-      <input type="file" id="lhFile" accept="image/*" style="display:none">
-      <input type="date" id="lhDate">
+    <div class="button-row" style="display:flex;gap:.5rem;align-items:center;justify-content:space-between;margin-bottom:.6rem">
+      <div>
+        <button class="button" id="lhPickBtn">Välj bild</button>
+        <input type="file" id="lhFile" accept="image/*" style="display:none">
+      </div>
+      <input type="date" id="lhDate" style="width:auto">
     </div>
-    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:.5rem;">
-      <label class="lh-symbol-checkbox">🩷<br><input type="checkbox" class="lhSym" value="🩷"></label>
-      <label class="lh-symbol-checkbox">❤️<br><input type="checkbox" class="lhSym" value="❤️"></label>
-      <label class="lh-symbol-checkbox">💜<br><input type="checkbox" class="lhSym" value="💜"></label>
-      <label class="lh-symbol-checkbox">💙<br><input type="checkbox" class="lhSym" value="💙"></label>
-      <label class="lh-symbol-checkbox">💚<br><input type="checkbox" class="lhSym" value="💚"></label>
-      <label class="lh-symbol-checkbox">💛<br><input type="checkbox" class="lhSym" value="💛"></label>
+
+    <!-- Rad med valbara symboler -->
+    <div style="display:flex;flex-wrap:wrap;gap:10px;margin:.4rem 0 .6rem">
+      <label class="lh-symbol-checkbox" title="Nästan positiv">🩷<br><input type="checkbox" class="lhSym" value="🩷"></label>
+      <label class="lh-symbol-checkbox" title="LH-topp">❤️<br><input type="checkbox" class="lhSym" value="❤️"></label>
+      <label class="lh-symbol-checkbox" title="Hög">💜<br><input type="checkbox" class="lhSym" value="💜"></label>
+      <label class="lh-symbol-checkbox" title="Låg">💙<br><input type="checkbox" class="lhSym" value="💙"></label>
+      <label class="lh-symbol-checkbox" title="Negativ">💚<br><input type="checkbox" class="lhSym" value="💚"></label>
+      <label class="lh-symbol-checkbox" title="Oklart">💛<br><input type="checkbox" class="lhSym" value="💛"></label>
     </div>
-    <div style="display:flex;gap:.5rem;align-items:center;margin-top:.5rem;">
-      <textarea id="lhNote" placeholder="Anteckning" style="flex:1"></textarea>
+
+    <div class="button-row" style="display:flex;gap:.5rem;align-items:center">
+      <textarea id="lhNote" placeholder="Anteckning (valfritt)" style="flex:1"></textarea>
       <button class="button" id="lhSaveBtn">Spara</button>
     </div>
-    <div id="lhList" style="margin-top:10px;"></div>
+
+    <div id="lhList" style="margin-top:10px"></div>
   </div>
 
   <script>
-    let dataEntries = JSON.parse(localStorage.getItem('bbtData') || '[]');
-    let lhEntries = JSON.parse(localStorage.getItem('lhData') || '[]');
+    // ---------- LAGRING ----------
+    let dataEntries = JSON.parse(localStorage.getItem('bbtData') || '[]'); // BBT
+    let lhEntries   = JSON.parse(localStorage.getItem('lhData')  || '[]'); // LH
     let chart;
 
-    function openTab(id){
-      document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
-      document.querySelectorAll(".tab-content").forEach(c=>c.classList.remove("active"));
-      document.querySelector(`[onclick="openTab('${id}')"]`).classList.add("active");
-      document.getElementById(id).classList.add("active");
-      if(id==="graf")renderChart();
-      if(id==="lh")renderLHList();
+    // ---------- FLIKAR ----------
+    function openTab(tabId) {
+      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+      document.querySelector(`[onclick="openTab('${tabId}')"]`).classList.add("active");
+      document.getElementById(tabId).classList.add("active");
+      if (tabId === 'graf') renderChart();
+      if (tabId === 'lh')   renderLHList();
     }
 
-    function minutesFrom0400(t){if(!t)return 0;const [h,m]=t.split(':').map(Number);return (h*60+m)-240;}
-    function computeCorrected(){const a=parseFloat(actual.value);if(isNaN(a))return;const c=a+0.05*(minutesFrom0400(time.value||"04:00")/30);corrected.value=c.toFixed(2);}
-    actual.onblur=computeCorrected;time.onchange=()=>{if(actual.value)computeCorrected();};
-
-    function saveEntry(){
-      const e={date:date.value,time:time.value,actual:+actual.value||null,corrected:+corrected.value||null,mens:mens.value,mucus:mucus.value,lh:lh.value,sex:sex.checked,ovulation:ovulation.checked,note:note.value};
-      if(!e.date)return alert("Välj datum");
-      const i=dataEntries.findIndex(x=>x.date===e.date);
-      if(i>=0)dataEntries[i]=e;else dataEntries.push(e);
-      localStorage.setItem('bbtData',JSON.stringify(dataEntries));renderTable();
+    // ---------- AUTO-KORRIGERING ----------
+    function minutesFrom0400(timeStr) {
+      if (!timeStr) return 0;
+      const [hh, mm] = timeStr.split(':').map(Number);
+      const target   = 4*60; // 04:00
+      return (hh*60 + mm) - target;
     }
 
-    function renderTable(){
-      const tb=document.querySelector("#dataTable tbody");tb.innerHTML="";
-      dataEntries.sort((a,b)=>a.date.localeCompare(b.date));
-      for(const e of dataEntries){const tr=document.createElement("tr");
-        if(e.mens==="Mens")tr.classList.add("mens-row");
-        tr.innerHTML=`<td>${e.date}</td><td>${e.time||""}</td><td>${e.actual||""}</td><td>${e.corrected||""}</td>
-          <td>${e.mens||"–"}</td><td>${e.mucus||"–"}</td><td>${e.lh||"–"}</td>
-          <td>${e.sex?"💞":""}</td><td>${e.ovulation?"🌼":""}</td><td>${e.note||""}</td>`;
-        tb.appendChild(tr);
-      }
+    function computeCorrected() {
+      const a = parseFloat(actual.value);
+      if (isNaN(a)) return;
+      const mins = minutesFrom0400(time.value || "04:00");
+      const steps = mins / 30;                  // 30-minuterssteg
+      const delta = 0.05 * steps;               // 0,05°C per 30 min
+      const corr  = Math.round((a + delta) * 100) / 100;
+      corrected.value = isFinite(corr) ? corr.toFixed(2) : "";
     }
 
-    function clearData(){if(!confirm("Rensa all data?"))return;dataEntries=[];lhEntries=[];localStorage.clear();renderTable();renderLHList();if(chart)chart.destroy();}
+    actual.addEventListener('blur', computeCorrected);
+    time.addEventListener('change', () => {
+      // Uppdatera korrigerad om faktisk redan är ifylld
+      if (actual.value) computeCorrected();
+    });
 
-    function renderChart(){
-      if(chart)chart.destroy();
-      const ctx=document.getElementById('bbtChart');
-      dataEntries.sort((a,b)=>a.date.localeCompare(b.date));
-      const labels=dataEntries.map(e=>e.date);
-      const actual=dataEntries.map(e=>e.actual);
-      const corrected=dataEntries.map(e=>e.corrected);
-      const ov=dataEntries.findIndex(e=>e.ovulation);
-      const pre=(ov>0?actual.slice(0,ov):actual).filter(v=>v);
-      const avg=pre.length?pre.reduce((a,b)=>a+b)/pre.length:null;
-      const anns=[];
-      const firstNon=dataEntries.findIndex(e=>e.mens!=="Mens");
-      const end=(firstNon===-1)?dataEntries.length-0.5:firstNon-0.5;
-      if(firstNon!==0)anns.push({type:'box',xMin:0,xMax:end,backgroundColor:'rgba(255,230,230,.3)',borderWidth:0});
-      if(ov>-1)anns.push({type:'box',xMin:ov+0.5,xMax:labels.length-0.5,backgroundColor:'rgba(230,210,255,.25)',borderWidth:0});
-      const symbols=dataEntries.map(e=>{const s=[];if(e.sex)s.push("💞");if(e.ovulation)s.push("🌼");if(e.mucus==="Äggviteliknande")s.push("💧");return s;});
-      chart=new Chart(ctx,{type:'line',data:{labels,datasets:[
-        {label:"Faktisk",data:actual,borderColor:"#3b82f6",backgroundColor:"#3b82f6",tension:0.3},
-        {label:"Korrigerad",data:corrected,borderColor:"#ef4444",borderDash:[4,4],tension:0.3},
-        ...(avg?[{label:"Medel före ÄL",data:Array(labels.length).fill(avg),borderColor:"#888",borderDash:[5,5],pointRadius:0}]:[])
-      ]},options:{scales:{y:{min:35,max:38.5}},plugins:{legend:{labels:{color:'#000'}},annotation:{annotations:anns}},animation:false},
-      plugins:[{id:'symbols',afterDatasetsDraw(c){const ctx=c.ctx;ctx.font="10px sans-serif";ctx.textAlign="center";const m=c.getDatasetMeta(0);
-        c.data.labels.forEach((_,i)=>{const p=m.data[i];if(!p)return;const x=p.x,y=c.scales.y.bottom-18;if(symbols[i]?.length){symbols[i].forEach((s,j)=>ctx.fillText(s,x,y-(j*13)));}});}}]});
+    // ---------- SPARA / TABELL ----------
+    function saveEntry() {
+      const entry = {
+        date: date.value,
+        time: time.value,
+        actual: actual.value ? Number(actual.value) : null,
+        corrected: corrected.value ? Number(corrected.value) : null,
+        mens: mens.value,
+        mucus: mucus.value,
+        lh: lh.value,
+        sex: sex.checked,
+        ovulation: ovulation.checked,
+        note: note.value
+      };
+      if (!entry.date) { alert("Välj datum."); return; }
+      const i = dataEntries.findIndex(e => e.date === entry.date);
+      if (i >= 0) dataEntries[i] = entry; else dataEntries.push(entry);
+      localStorage.setItem('bbtData', JSON.stringify(dataEntries));
+      renderTable();
     }
 
-    function renderLHList(){
-      const list=document.getElementById('lhList');list.innerHTML="";
-      lhEntries.sort((a,b)=>a.date.localeCompare(b.date));
-      lhEntries.forEach((e,i)=>{
-        const d=document.createElement('div');d.className="lh-entry";
-        d.innerHTML=`<img class="lh-image" src="${e.dataUrl}" alt=""><div class="lh-info"><strong>${e.date}</strong><div class="lh-symbols">${(e.symbols||[]).join(" ")}</div><small>${e.note||""}</small></div><button class="button danger" onclick="delLH(${i})">Ta bort</button>`;
-        d.querySelector('img').onclick=()=>full(e.dataUrl);
-        list.appendChild(d);
+    function renderTable() {
+      const tbody = document.querySelector("#dataTable tbody");
+      tbody.innerHTML = "";
+      // sortera efter datum
+      dataEntries.sort((a,b)=> (a.date||"").localeCompare(b.date||""));
+      dataEntries.forEach((e, i) => {
+        const tr = document.createElement("tr");
+        if (e.mens === "Mens") tr.classList.add("mens-row");
+        tr.innerHTML = `
+          <td>${e.date||""}</td>
+          <td>${e.time||""}</td>
+          <td>${e.actual??""}</td>
+          <td>${e.corrected??""}</td>
+          <td>${e.mens||"–"}</td>
+          <td>${e.mucus||"–"}</td>
+          <td>${e.lh||"–"}</td>
+          <td>${e.sex ? "💞" : ""}</td>
+          <td>${e.ovulation ? "🌼" : ""}</td>
+          <td>${e.note||""}</td>
+          <td><button class="button" onclick="editEntry(${i})">✏️</button></td>
+        `;
+        tbody.appendChild(tr);
       });
     }
 
-    function full(src){const o=document.createElement('div');o.style="position:fixed;inset:0;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;z-index:99";
-      const i=document.createElement('img');i.src=src;i.style="max-width:90%;max-height:90%;border-radius:8px;background:#fff";o.appendChild(i);
-      o.onclick=()=>document.body.removeChild(o);document.body.appendChild(o);}
-    function delLH(i){lhEntries.splice(i,1);localStorage.setItem('lhData',JSON.stringify(lhEntries));renderLHList();}
+    function editEntry(i) {
+      const e = dataEntries[i];
+      date.value = e.date || "";
+      time.value = e.time || "";
+      actual.value = e.actual ?? "";
+      corrected.value = e.corrected ?? "";
+      mens.value = e.mens || "–";
+      mucus.value = e.mucus || "–";
+      lh.value = e.lh || "–";
+      sex.checked = !!e.sex;
+      ovulation.checked = !!e.ovulation;
+      note.value = e.note || "";
+    }
 
-    lhPickBtn.onclick=()=>lhFile.click();
-    lhSaveBtn.onclick=async()=>{
-      if(!lhFile.files[0])return alert("Välj bild");
-      if(!lhDate.value)return alert("Välj datum");
-      const s=[...document.querySelectorAll('.lhSym:checked')].map(x=>x.value);
-      const note=lhNote.value;const f=lhFile.files[0];
-      const r=new FileReader();r.onload=()=>{lhEntries.push({date:lhDate.value,symbols:s,note,dataUrl:r.result});
-        localStorage.setItem('lhData',JSON.stringify(lhEntries));
-        document.querySelectorAll('.lhSym').forEach(x=>x.checked=false);lhNote.value="";lhFile.value="";renderLHList();};
-      r.readAsDataURL(f);
-    };
+    function clearData() {
+      if (!confirm("Vill du verkligen rensa all data (BBT + LH)?")) return;
+      dataEntries = [];
+      lhEntries = [];
+      localStorage.removeItem('bbtData');
+      localStorage.removeItem('lhData');
+      renderTable();
+      renderLHList();
+      if (chart) chart.destroy();
+    }
 
-    exportBtn.onclick=()=>{
-      const blob=new Blob([JSON.stringify({bbtData:dataEntries,lhData:lhEntries},null,2)],{type:"application/json"});
-      const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download="BBT_Ida_data.json";a.click();
-    };
-    importBtn.onclick=()=>importFile.click();
-    importFile.onchange=e=>{
-      const f=e.target.files[0];if(!f)return;
-      const r=new FileReader();r.onload=()=>{const d=JSON.parse(r.result);
-        if(d.bbtData)dataEntries=d.bbtData;if(d.lhData)lhEntries=d.lhData;
-        localStorage.setItem('bbtData',JSON.stringify(dataEntries));
-        localStorage.setItem('lhData',JSON.stringify(lhEntries));
-        renderTable();renderLHList();};
-      r.readAsText(f);
-    };
-    clearBtn.onclick=clearData;
-    saveBtn.onclick=saveEntry;
+    // ---------- GRAF ----------
+    function renderChart() {
+      if (chart) chart.destroy();
+      const ctx = document.getElementById('bbtChart');
+
+      // sortera efter datum
+      dataEntries.sort((a,b)=> (a.date||"").localeCompare(b.date||""));
+
+      const labels = dataEntries.map(e => e.date);
+      const actualData = dataEntries.map(e => e.actual);
+      const correctedData = dataEntries.map(e => e.corrected);
+
+      const ovulationIndex = dataEntries.findIndex(e => e.ovulation);
+      const preOvData = (ovulationIndex > 0 ? actualData.slice(0, ovulationIndex) : actualData).filter(v => typeof v === 'number');
+      const avgPreOv = preOvData.length ? (preOvData.reduce((a,b)=>a+b,0)/preOvData.length) : null;
+
+      // Annotations
+      const annotations = [];
+
+      // Mensbakgrund — antas i början av cykeln sammanhängande "Mens"
+      const firstNonMens = dataEntries.findIndex(e => e.mens !== "Mens");
+      const mensEndIndex = (firstNonMens === -1) ? dataEntries.length - 0.5 : (firstNonMens - 0.5);
+      if (firstNonMens !== 0) {
+        annotations.push({
+          type: 'box',
+          xMin: 0,
+          xMax: mensEndIndex,
+          backgroundColor: 'rgba(255, 230, 230, 0.3)',
+          borderWidth: 0
+        });
+      }
+
+      // Lila lutealfas från ägglossning
+      if (ovulationIndex > -1) {
+        annotations.push({
+          type: 'box',
+          xMin: ovulationIndex + 0.5,
+          xMax: labels.length - 0.5,
+          backgroundColor: 'rgba(230, 210, 255, 0.25)',
+          borderWidth: 0
+        });
+      }
+
+      // Symboler ovanför x-axeln
+      const symbols = dataEntries.map(e => {
+        const s = [];
+        if (e.sex) s.push("💞");
+        if (e.ovulation) s.push("🌼");
+        if (e.mucus === "Äggviteliknande") s.push("💧");
+        return s;
+      });
+
+      chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: "Faktisk temperatur",
+              data: actualData,
+              borderColor: "#3b82f6",
+              backgroundColor: "#3b82f6",
+              spanGaps: true,
+              tension: 0.3
+            },
+            {
+              label: "Korrigerad temperatur",
+              data: correctedData,
+              borderColor: "#ef4444",
+              backgroundColor: "#ef4444",
+              borderDash: [4, 4],
+              spanGaps: true,
+              tension: 0.3
+            },
+            ...(avgPreOv ? [{
+              label: "Medel före ägglossning",
+              data: Array(labels.length).fill(avgPreOv),
+              borderColor: "#888",
+              borderDash: [5, 5],
+              pointRadius: 0,
+              fill: false
+            }] : [])
+          ]
+        },
+        options: {
+          scales: {
+            y: { min: 35, max: 38.5, title: { display: true, text: "Temperatur (°C)" } },
+            x: { ticks: { autoSkip: false, maxRotation: 0 } }
+          },
+          plugins: {
+            legend: { position: 'bottom', labels: { boxWidth: 12, color: '#000' } },
+            annotation: { annotations },
+            tooltip: { enabled: false }
+          },
+          animation: false
+        },
+        plugins: [{
+          id: 'symbols',
+          afterDatasetsDraw(chart) {
+            const ctx = chart.ctx;
+            ctx.font = "10px sans-serif";   // ~85% storlek
+            ctx.textAlign = "center";
+            const meta = chart.getDatasetMeta(0);
+            chart.data.labels.forEach((_, i) => {
+              const pt = meta.data[i];
+              if (!pt) return;
+              const x = pt.x;
+              const baseY = chart.scales.y.bottom - 18;
+              if (symbols[i]?.length) {
+                symbols[i].forEach((sym, idx) => {
+                  ctx.fillText(sym, x, baseY - (idx * 13));
+                });
+              }
+            });
+          }
+        }]
+      });
+    }
+
+    // ---------- IMPORT / EXPORT ----------
+    function exportAll() {
+      const payload = {
+        version: "1.0",
+        exported_at: new Date().toISOString(),
+        bbtData: dataEntries,
+        lhData: lhEntries
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], {type: "application/json"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const d = new Date();
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth()+1).padStart(2,'0');
+      const dd = String(d.getDate()).padStart(2,'0');
+      a.href = url;
+      a.download = `BBT_Ida_cykel_${yyyy}-${mm}-${dd}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function importAllFromFile(file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const obj = JSON.parse(reader.result);
+          if (obj.bbtData) dataEntries = obj.bbtData;
+          if (obj.lhData)  lhEntries   = obj.lhData;
+          localStorage.setItem('bbtData', JSON.stringify(dataEntries));
+          localStorage.setItem('lhData',  JSON.stringify(lhEntries));
+          renderTable();
+          renderLHList();
+          if (chart) renderChart();
+          alert("Data importerad!");
+        } catch(e) {
+          alert("Kunde inte läsa filen (ogiltig JSON).");
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // ---------- LH-FLIKEN ----------
+    function renderLHList() {
+      // sortera efter datum
+      lhEntries.sort((a,b)=> (a.date||"").localeCompare(b.date||""));
+      const list = document.getElementById('lhList');
+      list.innerHTML = "";
+      lhEntries.forEach((e, i) => {
+        const row = document.createElement('div');
+        row.className = "lh-entry";
+        row.innerHTML = `
+          <img class="lh-image" src="${e.dataUrl}" alt="LH-bild">
+          <div class="lh-info">
+            <strong>${e.date || ""}</strong><br>
+            <div class="lh-symbols">${(e.symbols||[]).join(" ")}</div>
+            <small>${e.note || ""}</small>
+          </div>
+          <button class="button danger" onclick="deleteLH(${i})">Ta bort</button>
+        `;
+        // klick = fullskärm
+        row.querySelector('img').addEventListener('click', () => openFullscreen(e.dataUrl));
+        list.appendChild(row);
+      });
+    }
+
+    function deleteLH(i) {
+      lhEntries.splice(i,1);
+      localStorage.setItem('lhData', JSON.stringify(lhEntries));
+      renderLHList();
+    }
+
+    function openFullscreen(src) {
+      const overlay = document.createElement('div');
+      overlay.style = "position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:9999";
+      const img = document.createElement('img');
+      img.src = src;
+      img.style = "max-width:90%;max-height:90%;border-radius:8px;background:#fff";
+      overlay.appendChild(img);
+      overlay.addEventListener('click', () => document.body.removeChild(overlay));
+      document.body.appendChild(overlay);
+    }
+
+    // ---------- EVENTBINDNING ----------
+    document.getElementById('saveBtn').addEventListener('click', saveEntry);
+    document.getElementById('clearBtn').addEventListener('click', clearData);
+    document.getElementById('exportBtn').addEventListener('click', exportAll);
+    document.getElementById('importBtn').addEventListener('click', () => importFile.click());
+    const importFile = document.getElementById('importFile');
+    importFile.addEventListener('change', (e) => {
+      if (e.target.files?.[0]) importAllFromFile(e.target.files[0]);
+      e.target.value = "";
+    });
+
+    // LH: välj bild
+    document.getElementById('lhPickBtn').addEventListener('click', () => lhFile.click());
+    const lhFile = document.getElementById('lhFile');
+    lhFile.addEventListener('change', async (e) => {
+      const f = e.target.files?.[0];
+      if (!f) return;
+      // spara temporärt på input för nästa "Spara"
+      lhFile.currentBlob = f;
+    });
+
+    // LH: spara post
+    document.getElementById('lhSaveBtn').addEventListener('click', async () => {
+      if (!lhFile.currentBlob) { alert("Välj en bild först."); return; }
+      const dateVal = document.getElementById('lhDate').value;
+      if (!dateVal) { alert("Välj datum för LH-testet."); return; }
+
+      const syms = Array.from(document.querySelectorAll('.lhSym:checked')).map(x=>x.value);
+      const noteVal = document.getElementById('lhNote').value;
+
+      const dataUrl = await blobToDataURL(lhFile.currentBlob);
+      const entry = { date: dateVal, symbols: syms, note: noteVal, dataUrl };
+      lhEntries.push(entry);
+      localStorage.setItem('lhData', JSON.stringify(lhEntries));
+
+      // nollställ val
+      document.querySelectorAll('.lhSym').forEach(x=>x.checked=false);
+      document.getElementById('lhNote').value = "";
+      lhFile.value = "";
+      lhFile.currentBlob = null;
+
+      renderLHList();
+    });
+
+    function blobToDataURL(blob) {
+      return new Promise((resolve,reject)=>{
+        const r = new FileReader();
+        r.onload = () => resolve(r.result);
+        r.onerror = reject;
+        r.readAsDataURL(blob);
+      });
+    }
+
+    // Init
     renderTable();
   </script>
 </body>
