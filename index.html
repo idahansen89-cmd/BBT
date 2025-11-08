@@ -554,4 +554,18 @@ document.addEventListener('DOMContentLoaded', () => {
   renderTable();
 });
 </script>
+  <script>
+  // Enkel flikväxling – funkar självständigt
+  function openTab(id){
+    // 1) avmarkera alla flikknappar och flikinnehåll
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    // 2) markera vald knapp + innehåll
+    const btn = document.querySelector(`[onclick="openTab('${id}')"]`);
+    if (btn) btn.classList.add('active');
+    const panel = document.getElementById(id);
+    if (panel) panel.classList.add('active');
+  }
+</script>
+</html>
 </html>
