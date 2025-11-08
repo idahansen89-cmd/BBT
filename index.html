@@ -241,34 +241,142 @@ function renderChart(){
   const mensMask = bbtData.map(d=>d.mens==='Mens'||d.mens==='Spotting');
   const sekretIdx = bbtData.map((d,i)=> d.sekret==='Klart' ? i : null).filter(i=>i!==null);
 
-  // Prognos (diskret): trend + snitt på senaste 3 korr
+  // Prognos: genomsnitt + trend av senaste 3 korr
   let forecast = null;
   const last3 = korr.filter(x=>x!=null).slice(-3);
   if (last3.length >= 2) {
     const avg = last3.reduce((a,b)=>a+b,0)/last3.length;
-    const slope = last3[last3.length-1] - last3[0]; // enkel trend
-    const adjust = Math.max(-0.05, Math.min(0.05, slope/last3.length)); // mjuk justering
+    const slope = last3[last3.length-1] - last3[0];
+    const adjust = Math.max(-0.05, Math.min(0.05, slope/last3.length));
     forecast = +(avg + adjust).toFixed(2);
   }
 
+  // --- Mensbakgrund (mjuk rosa toning) ---
   const mensBG = {
-    id:'mensBG',
-    beforeDatasetsDraw(c){
-      const {ctx, chartArea:{left,right,top,bottom}, scales:{x}} = c;
-      if(!labels.length) return;
-      const w=(right-left)/labels.length;
+    id: 'mensBG',
+    beforeDatasetsDraw(chart) {
+      const { ctx, chartArea: { left, right, top, bottom }, scales: { x } } = chart;
+      if (!labels.length) return;
+      const barWidth = (right - left) / labels.length;
       ctx.save();
-      for(let i=0;i<labels.length;i++){
-        if(mensMask[i]){
+      for (let i = 0; i < labels.length; i++) {
+        if (mensMask[i]) {
           const xc = x.getPixelForValue(i);
-          ctx.fillStyle = '#ffe6e680';
-          ctx.fillRect(xc-w/2, top, w, bottom-top);
+          const grad = ctx.createLinearGradient(0, top, 0, bottom);
+          grad.addColorStop(0, '#ffd6dfcc');   // ljusare rosa upptill
+          grad.addColorStop(1, '#ffeef3aa');   // transparent nedtill
+          ctx.fillStyle = grad;
+          ctx.fillRect(xc - barWidth / 2, top, barWidth, bottom - top);
         }
       }
       ctx.restore();
     }
   };
 
+  // --- Själva grafen ---
+  chart = new Chart(ctx, {
+    type: 'line',
+    data:{
+      labels:[...labels, forecast!==null ? 'Prognos' : ''],
+      datasets:[
+        {label:'Faktisk', data:[...faktisk, null], borderColor:'#007aff', backgroundColor:'#007aff', tension:0.3, fill:false, pointStyle:'circle'},
+        {label:'Korrigerad', data:[...korr, null], borderColor:'#e74c3c', backgroundColor:'#e74c3c', borderDash:[4,4], tension:0.3, fill:false, pointStyle:'triangle'},
+        {label:'Klart sekret', data:sekretIdx.map(i=>({x:i,y:35.1})), showLine:false, pointRadius:5, pointBackgroundColor:'#6fd3ff'},
+        {label:'Prognos', data:[...Array(labels.length).fill(null), forecast], borderColor:'#999', borderDash:[2,2], pointRadius:4, pointBackgroundColor:'#999'}
+      ]
+    },
+    options:{
+      layout:{padding:{left:30,right:10,top:10,bottom:10}},
+      plugins:{
+        legend:{
+          position:'bottom',
+          labels:{font:{size:12},color:'#444'}
+        }
+      },
+      scales:{
+        y:{
+          min:35.0,
+          max:38.5,
+          title:{
+            display:true,
+            text:'Temperatur (°C)',
+            color:'#333',
+            font:{size:13,weight:'600'}
+          },
+          grid:{
+            color:'#f2f2f2',
+            lineWidth:0.6,
+            drawTicks:true,
+            drawBorder:true
+          },
+          border:{
+            display:true,
+            color:'#ccc',
+            width:0.8
+          },
+          ticks:{
+            stepSize:0.05,
+            color:'#555',
+            font:{size:11}
+          }
+        },
+        x:{
+          ticks:{
+            autoSkip:false,
+            maxRotation:45,
+            minRotation:45,
+            color:'#444',
+            font:{size:11}
+          },
+          grid:{color:'#f8f8f8'},
+          border:{display:true,color:'#ccc',width:0.8}
+        }
+      },
+      aspectRatio:1.6
+    },
+    plugins:[
+      mensBG,
+      {
+        // 💗 bakgrundsgradient för hela grafytan
+        id: 'backgroundGradient',
+        beforeDraw(chart) {
+          const { ctx, chartArea } = chart;
+          if (!chartArea) return;
+          const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+          gradient.addColorStop(0, '#ffe6eb');   // ljus rosa nederst
+          gradient.addColorStop(1, '#ffffff');   // vitt upptill
+          ctx.save();
+          ctx.fillStyle = gradient;
+          ctx.fillRect(chartArea.left, chartArea.top, chartArea.width, chartArea.height);
+          ctx.restore();
+        }
+      },
+      {
+        // 💬 DPO-etiketter
+        id: 'dpoLabels',
+        afterDatasetsDraw(chart){
+          const {ctx} = chart;
+          ctx.save();
+          ctx.font = '10px sans-serif';
+          ctx.fillStyle = '#999';
+          chart.getDatasetMeta(0).data.forEach((pt,i)=>{
+            const dpo = dpoLabels[i];
+            if(dpo!==null && pt && isFinite(pt.x) && isFinite(pt.y)){
+              ctx.beginPath();
+              ctx.arc(pt.x, pt.y-12, 10, 0, 2*Math.PI);
+              ctx.fillStyle='#f4f4f4';
+              ctx.fill();
+              ctx.fillStyle='#555';
+              ctx.textAlign='center';
+              ctx.fillText(String(dpo), pt.x, pt.y-9);
+            }
+          });
+          ctx.restore();
+        }
+      }
+    ]
+  });
+}
   chart = new Chart(ctx, {
     type:'line',
     data:{
