@@ -637,36 +637,112 @@ function renderChart(){
     el.time.addEventListener('change', ()=>{ if(el.actual.value) computeCorrectedFormInputs(); });
     el.saveBtn.addEventListener('click', saveEntry);
 
-    // --- LH: välj fil-knappen ---
-el.lhPickBtn.addEventListener('click', ()=> el.lhFile.click());
+   // --- LH: välj bild ---
+el.lhPickBtn.addEventListener('click', () => {
+  // säkert klick för iPhone/Safari
+  el.lhFile.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+});
 
-// --- LH: spara bild + metadata ---
-el.lhSaveBtn.addEventListener('click', async ()=>{
-  try {
-    const file = el.lhFile.files?.[0];
-    if (!file) { alert('Välj bild först.'); return; }
-    if (!el.lhDate.value) { alert('Välj datum.'); return; }
+// --- LH: skapa / uppdatera förhandsvisning ---
+function updateLHPreview(imageDataURL = null) {
+  // ta bort eventuell tidigare förhandsvisning
+  let wrap = document.getElementById('lhPreviewWrap');
+  if (wrap) wrap.remove();
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      const dataUrl = reader.result;
-      const symbols = el.lhSymChecks().map(x => x.value);
-      const note = el.lhNote.value || '';
+  // om ingen bilddata finns än, hämta från input
+  const file = el.lhFile.files && el.lhFile.files[0];
+  if (!file && !imageDataURL) return;
 
-      lhEntries.push({
-        date: el.lhDate.value,
-        symbols,
-        note,
-        dataUrl
-      });
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    const dataUrl = imageDataURL || ev.target.result;
 
-      localStorage.setItem('lhData', JSON.stringify(lhEntries));
+    wrap = document.createElement('div');
+    wrap.id = 'lhPreviewWrap';
+    wrap.style = 'text-align:center;margin:.6rem auto;border:1px solid #ddd;border-radius:10px;padding:.5rem;max-width:230px;background:#fafafa;';
 
-      // Nollställ formuläret
-      el.lhNote.value = '';
-      el.lhFile.value = '';
-      document.querySelectorAll('.lhSym').forEach(cb => cb.checked = false);
+    const img = document.createElement('img');
+    img.src = dataUrl;
+    img.style = 'display:block;max-width:200px;max-height:140px;margin:auto;border-radius:8px;';
 
+    const info = document.createElement('div');
+    info.id = 'lhPreviewInfo';
+    info.style = 'font-size:.85rem;color:#444;margin-top:.3rem;';
+
+    wrap.appendChild(img);
+    wrap.appendChild(info);
+    el.lhSaveBtn.parentNode.insertBefore(wrap, el.lhSaveBtn);
+
+    refreshPreviewInfo();
+  };
+
+  if (file) reader.readAsDataURL(file);
+  else if (imageDataURL) reader.onload(); // om data redan finns
+}
+
+// --- uppdatera texten under bilden (datum, symboler, anteckning) ---
+function refreshPreviewInfo() {
+  const info = document.getElementById('lhPreviewInfo');
+  if (!info) return;
+  const date = el.lhDate.value ? el.lhDate.value : '(Datum ej valt)';
+  const syms = el.lhSymChecks().map(x => x.value).join(' ') || '–';
+  const note = el.lhNote.value ? `"${el.lhNote.value}"` : '';
+  info.innerHTML = `
+    <div><strong>${date}</strong></div>
+    <div style="font-size:1.2rem;margin:.2rem 0;">${syms}</div>
+    <div>${note}</div>
+  `;
+}
+
+// --- visa förhandsvisning när bild väljs ---
+el.lhFile.addEventListener('change', () => updateLHPreview());
+
+// --- automatiskt uppdatera info i förhandsvisningen ---
+['change', 'input'].forEach(evt => {
+  el.lhDate.addEventListener(evt, refreshPreviewInfo);
+  el.lhNote.addEventListener(evt, refreshPreviewInfo);
+});
+document.querySelectorAll('.lhSym').forEach(cb => cb.addEventListener('change', refreshPreviewInfo));
+
+// --- LH: spara bild + metadata (mobilkompatibel) ---
+el.lhSaveBtn.addEventListener('click', () => {
+  const file = el.lhFile.files && el.lhFile.files[0];
+  if (!file) { alert('Välj bild först.'); return; }
+  if (!el.lhDate.value) { alert('Välj datum.'); return; }
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const dataUrl = e.target.result;
+    const symbols = el.lhSymChecks().map(x => x.value);
+    const note = el.lhNote.value || '';
+
+    lhEntries.push({
+      date: el.lhDate.value,
+      symbols,
+      note,
+      dataUrl
+    });
+
+    localStorage.setItem('lhData', JSON.stringify(lhEntries));
+    renderLHList();
+
+    // nollställ formuläret + ta bort förhandsvisning
+    el.lhNote.value = '';
+    el.lhFile.value = '';
+    const prev = document.getElementById('lhPreviewWrap');
+    if (prev) prev.remove();
+    document.querySelectorAll('.lhSym').forEach(cb => cb.checked = false);
+
+    alert('✅ Bild sparad!');
+  };
+
+  reader.onerror = (err) => {
+    console.error(err);
+    alert('Kunde inte läsa in bilden.');
+  };
+
+  reader.readAsDataURL(file);
+});
       renderLHList();
             alert('Bilden har sparats!');
     };
