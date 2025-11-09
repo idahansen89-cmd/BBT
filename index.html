@@ -683,6 +683,7 @@ el.lhSaveBtn.addEventListener('click', async ()=>{
     renderTable();
     renderLHList();
   });
+    
     /* ===== Felsökningsruta (visar JavaScript-fel direkt på sidan) ===== */
 window.onerror = function (msg, url, line, col, error) {
   const box = document.createElement('div');
@@ -703,6 +704,7 @@ window.onerror = function (msg, url, line, col, error) {
   console.error(msg, url, line, col, error);
   return false;
 };
+    
   </script>
 </body>
 </html>
