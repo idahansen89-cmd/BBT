@@ -928,7 +928,21 @@ function renderChart() {
       backgroundColor: "rgba(244,230,255,0.7)",
       borderWidth: 0
     });
-
+    
+  // --- Vertikal linje vid ägglossning (grå) ---
+  if (ovIndex >= 0)
+    anns.push({
+      type: "line",
+      xMin: ovIndex,
+      xMax: ovIndex,
+      borderColor: "rgba(120,120,120,0.6)",
+      borderWidth: 1,
+      borderDash: [3, 3],
+      label: {
+        enabled: false
+      }
+    });
+    
   chart = new Chart(el.chartCanvas, {
     type: "line",
     data: {
