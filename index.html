@@ -220,6 +220,7 @@ canvas#bbtChart {
   </div>
 
   <script>
+    alert("✅ Scriptet startar korrekt!");
   document.addEventListener('DOMContentLoaded', () => {
     /* ===== Tabs ===== */
    document.querySelectorAll('.tab').forEach(btn=>{
@@ -683,28 +684,6 @@ el.lhSaveBtn.addEventListener('click', async ()=>{
     renderTable();
     renderLHList();
   });
-    
-    /* ===== Felsökningsruta (visar JavaScript-fel direkt på sidan) ===== */
-window.onerror = function (msg, url, line, col, error) {
-  const box = document.createElement('div');
-  box.style = `
-    position:fixed;
-    top:0;left:0;right:0;
-    background:#ffe5ec;
-    color:#900;
-    font-family:monospace;
-    font-size:13px;
-    padding:6px 10px;
-    border-bottom:1px solid #f99;
-    z-index:999999;
-    white-space:pre-wrap;
-  `;
-  box.textContent = '⚠️ Fel: ' + msg + '\\nRad: ' + line + ', Kolumn: ' + col;
-  document.body.appendChild(box);
-  console.error(msg, url, line, col, error);
-  return false;
-};
-    
-  </script>
+</script>
 </body>
 </html>
