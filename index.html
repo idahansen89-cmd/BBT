@@ -636,29 +636,40 @@ function renderChart(){
     el.time.addEventListener('change', ()=>{ if(el.actual.value) computeCorrectedFormInputs(); });
     el.saveBtn.addEventListener('click', saveEntry);
 
-    el.lhPickBtn.addEventListener('click', ()=> el.lhFile.click());
-    el.lhSaveBtn.addEventListener('click', async ()=>{
-  try {
-    const file = el.lhFile.files[0];
-    if(!file) return alert('Välj bild först.');
-    if(!el.lhDate.value) return alert('Välj datum.');
+    // --- LH: välj fil-knappen ---
+el.lhPickBtn.addEventListener('click', ()=> el.lhFile.click());
 
-    // Läs in bild som base64
+// --- LH: spara bild + metadata ---
+el.lhSaveBtn.addEventListener('click', async ()=>{
+  try {
+    const file = el.lhFile.files?.[0];
+    if (!file) { alert('Välj bild först.'); return; }
+    if (!el.lhDate.value) { alert('Välj datum.'); return; }
+
     const reader = new FileReader();
-    reader.onload = ()=>{
+    reader.onload = () => {
       const dataUrl = reader.result;
-      const symbols = el.lhSymChecks().map(x=>x.value);
-      const note = el.lhNote.value;
-      lhEntries.push({date: el.lhDate.value, symbols, note, dataUrl});
+      const symbols = el.lhSymChecks().map(x => x.value);
+      const note = el.lhNote.value || '';
+
+      lhEntries.push({
+        date: el.lhDate.value,
+        symbols,
+        note,
+        dataUrl
+      });
 
       localStorage.setItem('lhData', JSON.stringify(lhEntries));
-      el.lhNote.value='';
-      el.lhFile.value='';
-      document.querySelectorAll('.lhSym').forEach(cb=>cb.checked=false);
+
+      // Nollställ formuläret
+      el.lhNote.value = '';
+      el.lhFile.value = '';
+      document.querySelectorAll('.lhSym').forEach(cb => cb.checked = false);
+
       renderLHList();
       alert('Bilden har sparats!');
     };
-    reader.onerror = ()=>alert('Kunde inte läsa in bilden.');
+    reader.onerror = () => alert('Kunde inte läsa in bilden.');
     reader.readAsDataURL(file);
   } catch (err) {
     console.error(err);
