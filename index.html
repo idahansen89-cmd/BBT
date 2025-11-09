@@ -644,106 +644,105 @@ function renderChart(){
     });
 
     // --- LH: skapa / uppdatera förhandsvisning ---
-    function updateLHPreview(imageDataURL = null) {
-      // ta bort eventuell tidigare förhandsvisning
-      let wrap = document.getElementById('lhPreviewWrap');
-      if (wrap) wrap.remove();
+function updateLHPreview(imageDataURL = null) {
+  // ta bort eventuell tidigare förhandsvisning
+  let wrap = document.getElementById('lhPreviewWrap');
+  if (wrap) wrap.remove();
 
-      // om ingen bilddata finns än, hämta från input
-      const file = el.lhFile.files && el.lhFile.files[0];
-      if (!file && !imageDataURL) return;
+  const file = el.lhFile.files && el.lhFile.files[0];
+  if (!file && !imageDataURL) return;
 
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        const dataUrl = imageDataURL || ev.target.result;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    const dataUrl = imageDataURL || ev.target.result;
 
-        wrap = document.createElement('div');
-        wrap.id = 'lhPreviewWrap';
-        wrap.style = 'text-align:center;margin:.6rem auto;border:1px solid #ddd;border-radius:10px;padding:.5rem;max-width:230px;background:#fafafa;';
+    wrap = document.createElement('div');
+    wrap.id = 'lhPreviewWrap';
+    wrap.style = `
+      display:flex;
+      align-items:center;
+      justify-content:flex-start;
+      gap:.6rem;
+      margin:.4rem 0;
+      background:#fafafa;
+      border:1px solid #ddd;
+      border-radius:8px;
+      padding:.4rem;
+    `;
 
-        const img = document.createElement('img');
-        img.src = dataUrl;
-        img.style = 'display:block;max-width:200px;max-height:140px;margin:auto;border-radius:8px;';
+    const img = document.createElement('img');
+    img.src = dataUrl;
+    img.style = 'width:80px;height:60px;object-fit:cover;border-radius:6px;';
 
-        const info = document.createElement('div');
-        info.id = 'lhPreviewInfo';
-        info.style = 'font-size:.85rem;color:#444;margin-top:.3rem;';
+    const info = document.createElement('div');
+    info.id = 'lhPreviewInfo';
+    info.style = 'font-size:.8rem;color:#444;line-height:1.2;';
 
-        wrap.appendChild(img);
-        wrap.appendChild(info);
-        el.lhSaveBtn.parentNode.insertBefore(wrap, el.lhSaveBtn);
+    wrap.appendChild(img);
+    wrap.appendChild(info);
 
-        refreshPreviewInfo();
-      };
+    // placera direkt ovanför spara-knappen, utan att skjuta layouten
+    el.lhSaveBtn.parentNode.insertBefore(wrap, el.lhSaveBtn);
 
-      if (file) reader.readAsDataURL(file);
-      else if (imageDataURL) reader.onload(); // om data redan finns
-    }
+    refreshPreviewInfo();
+  };
 
-    // --- uppdatera texten under bilden (datum, symboler, anteckning) ---
-    function refreshPreviewInfo() {
-      const info = document.getElementById('lhPreviewInfo');
-      if (!info) return;
-      const date = el.lhDate.value ? el.lhDate.value : '(Datum ej valt)';
-      const syms = el.lhSymChecks().map(x => x.value).join(' ') || '–';
-      const note = el.lhNote.value ? `"${el.lhNote.value}"` : '';
-      info.innerHTML = `
-        <div><strong>${date}</strong></div>
-        <div style="font-size:1.2rem;margin:.2rem 0;">${syms}</div>
-        <div>${note}</div>
-      `;
-    }
+  reader.readAsDataURL(file);
+}
 
-    // --- visa förhandsvisning när bild väljs ---
-    el.lhFile.addEventListener('change', () => updateLHPreview());
+// --- uppdatera texten under bilden (datum, symboler, anteckning) ---
+function refreshPreviewInfo() {
+  const info = document.getElementById('lhPreviewInfo');
+  if (!info) return;
+  const date = el.lhDate.value ? el.lhDate.value : '(Datum ej valt)';
+  const syms = el.lhSymChecks().map(x => x.value).join(' ') || '–';
+  const note = el.lhNote.value ? `"${el.lhNote.value}"` : '';
+  info.innerHTML = `
+    <div><strong>${date}</strong></div>
+    <div style="font-size:1rem;margin:.1rem 0;">${syms}</div>
+    <div>${note}</div>
+  `;
+}
 
-    // --- automatiskt uppdatera info i förhandsvisningen ---
-    ['change', 'input'].forEach(evt => {
-      el.lhDate.addEventListener(evt, refreshPreviewInfo);
-      el.lhNote.addEventListener(evt, refreshPreviewInfo);
-    });
-    document.querySelectorAll('.lhSym').forEach(cb => cb.addEventListener('change', refreshPreviewInfo));
+// --- LH: spara bild + metadata ---
+el.lhSaveBtn.addEventListener('click', () => {
+  const file = el.lhFile.files && el.lhFile.files[0];
+  if (!file) { alert('Välj bild först.'); return; }
+  if (!el.lhDate.value) { alert('Välj datum.'); return; }
 
-    // --- LH: spara bild + metadata ---
-    el.lhSaveBtn.addEventListener('click', () => {
-      const file = el.lhFile.files && el.lhFile.files[0];
-      if (!file) { alert('Välj bild först.'); return; }
-      if (!el.lhDate.value) { alert('Välj datum.'); return; }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const dataUrl = e.target.result;
+    const symbols = el.lhSymChecks().map(x => x.value);
+    const note = el.lhNote.value || '';
 
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const dataUrl = e.target.result;
-        const symbols = el.lhSymChecks().map(x => x.value);
-        const note = el.lhNote.value || '';
-
-        lhEntries.push({
-          date: el.lhDate.value,
-          symbols,
-          note,
-          dataUrl
-        });
-
-        localStorage.setItem('lhData', JSON.stringify(lhEntries));
-        renderLHList();
-
-        // nollställ formuläret + ta bort förhandsvisning
-        el.lhNote.value = '';
-        el.lhFile.value = '';
-        const prev = document.getElementById('lhPreviewWrap');
-        if (prev) prev.remove();
-        document.querySelectorAll('.lhSym').forEach(cb => cb.checked = false);
-
-        alert('✅ Bild sparad!');
-      };
-
-      reader.onerror = (err) => {
-        console.error(err);
-        alert('Kunde inte läsa in bilden.');
-      };
-
-      reader.readAsDataURL(file);
+    lhEntries.push({
+      date: el.lhDate.value,
+      symbols,
+      note,
+      dataUrl
     });
 
+    localStorage.setItem('lhData', JSON.stringify(lhEntries));
+    renderLHList();
+
+    // nollställ formuläret + ta bort förhandsvisning
+    el.lhNote.value = '';
+    el.lhFile.value = '';
+    const prev = document.getElementById('lhPreviewWrap');
+    if (prev) prev.remove();
+    document.querySelectorAll('.lhSym').forEach(cb => cb.checked = false);
+
+    alert('✅ Bild sparad!');
+  };
+
+  reader.onerror = (err) => {
+    console.error(err);
+    alert('Kunde inte läsa in bilden.');
+  };
+
+  reader.readAsDataURL(file);
+});
     /* ===== Init ===== */
     renderTable();
     renderLHList();
