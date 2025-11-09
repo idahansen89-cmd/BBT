@@ -286,6 +286,102 @@
 tbody tr.mens-row {
   background-color: #ffe8ee !important;
 }
+/* === Symbolrad (händelser) === */
+.symbols-row {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 1.2rem;
+  margin: 1rem 0 0.8rem;
+  flex-wrap: wrap;
+}
+
+.symbol {
+  text-align: center;
+  font-size: 1.6rem;
+  line-height: 1.1;
+}
+
+.symbol input[type="checkbox"] {
+  display: block;
+  margin: 0.25rem auto 0;
+  transform: scale(1.3);
+}
+
+/* === Tabellens stil === */
+.table-wrap {
+  overflow-x: auto;
+  margin-top: 0.8rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 0.9rem;
+}
+
+th, td {
+  padding: 0.5rem 0.3rem;
+  border: 1px solid #ddd;
+  text-align: center;
+  vertical-align: middle;
+}
+
+th {
+  background: #fff0f5;
+  font-weight: 700;
+  color: #333;
+  white-space: nowrap;
+}
+
+/* Jämna rubriker */
+th:nth-child(1) { width: 20%; }
+th:nth-child(2) { width: 14%; }
+th:nth-child(3), th:nth-child(4) { width: 13%; }
+th:nth-child(5) { width: 20%; } /* Händelser */
+th:nth-child(6) { width: 15%; }
+th:nth-child(7) { width: 5%; }
+
+/* Händelsekolumnen (ikoner) */
+[data-field="events"] {
+  font-size: 1.3rem;
+  letter-spacing: 2px;
+}
+
+/* Mens-bakgrund */
+tbody tr.mens-row {
+  background-color: #ffe8ee !important;
+}
+
+/* Knappar i tabellen */
+td button {
+  margin: 0 2px;
+  border-radius: 6px;
+  background: #f4b6c2;
+  border: none;
+  color: #222;
+  font-size: 0.8rem;
+  padding: 0.3rem 0.6rem;
+  cursor: pointer;
+}
+td button:hover {
+  background: #e599ab;
+}
+
+/* Mobilanpassning */
+@media (max-width: 600px) {
+  th, td {
+    font-size: 0.8rem;
+    padding: 0.35rem 0.25rem;
+  }
+  .symbol {
+    font-size: 1.4rem;
+  }
+  .symbol input[type="checkbox"] {
+    transform: scale(1.2);
+  }
+}
 </style>
 </head>
 <body>
