@@ -638,15 +638,33 @@ function renderChart(){
 
     el.lhPickBtn.addEventListener('click', ()=> el.lhFile.click());
     el.lhSaveBtn.addEventListener('click', async ()=>{
-      if(!el.lhFile.files[0]) return alert('Välj bild.');
-      if(!el.lhDate.value)    return alert('Välj datum.');
+  try {
+    const file = el.lhFile.files[0];
+    if(!file) return alert('Välj bild först.');
+    if(!el.lhDate.value) return alert('Välj datum.');
+
+    // Läs in bild som base64
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      const dataUrl = reader.result;
       const symbols = el.lhSymChecks().map(x=>x.value);
       const note = el.lhNote.value;
-      const dataUrl = await blobToDataURL(el.lhFile.files[0]);
       lhEntries.push({date: el.lhDate.value, symbols, note, dataUrl});
+
       localStorage.setItem('lhData', JSON.stringify(lhEntries));
+      el.lhNote.value='';
+      el.lhFile.value='';
       document.querySelectorAll('.lhSym').forEach(cb=>cb.checked=false);
-      el.lhNote.value=''; el.lhFile.value='';
+      renderLHList();
+      alert('Bilden har sparats!');
+    };
+    reader.onerror = ()=>alert('Kunde inte läsa in bilden.');
+    reader.readAsDataURL(file);
+  } catch (err) {
+    console.error(err);
+    alert('Ett oväntat fel uppstod.');
+  }
+});
       renderLHList();
     });
 
