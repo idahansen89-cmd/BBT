@@ -708,40 +708,51 @@ function refreshPreviewInfo() {
 }
 
 // --- LH: spara bild + metadata (iPhone-säker) ---
-el.lhSaveBtn.addEventListener('click', async () => {
-  try {
-    const file = el.lhFile.files && el.lhFile.files[0];
-    if (!file) { alert('Välj bild först.'); return; }
-    if (!el.lhDate.value) { alert('Välj datum.'); return; }
+el.lhSaveBtn.addEventListener('click', () => {
+  const file = el.lhFile.files && el.lhFile.files[0];
+  if (!file) { alert('📸 Välj en bild först.'); return; }
+  if (!el.lhDate.value) { alert('📅 Välj datum.'); return; }
 
-    const reader = new FileReader();
+  const reader = new FileReader();
 
-    reader.onload = (e) => {
-      const dataUrl = e.target.result;
-      const symbols = el.lhSymChecks().map(x => x.value);
-      const note = el.lhNote.value || '';
+  reader.onload = (e) => {
+    const dataUrl = e.target.result;
+    const symbols = el.lhSymChecks().map(x => x.value);
+    const note = el.lhNote.value || '';
 
-      // ta bort ev. gammal post med samma datum
-      lhEntries = lhEntries.filter(x => x.date !== el.lhDate.value);
-      lhEntries.push({ date: el.lhDate.value, symbols, note, dataUrl });
+    // ✅ Skapa posten
+    lhEntries.push({
+      date: el.lhDate.value,
+      symbols,
+      note,
+      dataUrl
+    });
 
-      localStorage.setItem('lhData', JSON.stringify(lhEntries));
-      renderLHList();
+    // ✅ Spara till localStorage
+    localStorage.setItem('lhData', JSON.stringify(lhEntries));
 
-      el.lhNote.value = '';
-      el.lhFile.value = '';
-      const prev = document.getElementById('lhPreviewWrap');
-      if (prev) prev.remove();
-      document.querySelectorAll('.lhSym').forEach(cb => cb.checked = false);
+    // ✅ Uppdatera listan direkt
+    renderLHList();
 
-      alert('✅ Bild sparad!');
-    };
+    // ✅ Nollställ formulär
+    el.lhNote.value = '';
+    el.lhFile.value = '';
+    document.querySelectorAll('.lhSym').forEach(cb => cb.checked = false);
 
-    reader.onerror = (err) => {
-      console.error('Läsfel:', err);
-      alert('Kunde inte läsa in bilden.');
-    };
+    // ✅ Ta bort ev. förhandsvisning
+    const prev = document.getElementById('lhPreviewWrap');
+    if (prev) prev.remove();
 
+    alert('✅ Bilden sparades!');
+  };
+
+  reader.onerror = (err) => {
+    console.error('Filfel:', err);
+    alert('🚫 Kunde inte läsa in bilden.');
+  };
+
+  reader.readAsDataURL(file);
+});
     // körs med liten delay för Safari-stabilitet
     setTimeout(() => reader.readAsDataURL(file), 0);
   } catch (err) {
