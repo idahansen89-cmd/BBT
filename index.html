@@ -632,23 +632,32 @@ function renderChart(){
       }, {passive:true});
     }
 
-    /* ===== Events ===== */
-    el.actual.addEventListener('blur', computeCorrectedFormInputs);
-    el.time.addEventListener('change', ()=>{ if(el.actual.value) computeCorrectedFormInputs(); });
-    el.lhPickBtn.addEventListener('click', () => {
-  // Safari behöver en "äkta" användarinteraktion
+   /* ===== Events ===== */
+el.actual.addEventListener('blur', computeCorrectedFormInputs);
+el.time.addEventListener('change', ()=>{ if(el.actual.value) computeCorrectedFormInputs(); });
+el.saveBtn.addEventListener('click', saveEntry);
+
+/* ===== Flikar ===== */
+document.querySelectorAll('.tab').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const id = btn.dataset.tab;
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(id).classList.add('active');
+    if(id==='graf') renderChart();
+    if(id==='lh') renderLHList();
+  });
+});
+
+/* ===== LH: välj bild ===== */
+el.lhPickBtn.addEventListener('click', () => {
+  // Safari kräver äkta användarinteraktion
   el.lhFile.dispatchEvent(new MouseEvent('click', { bubbles: true }));
 });
 
-    // --- LH: välj bild ---
-    el.lhPickBtn.addEventListener('click', () => {
-      // säkert klick för iPhone/Safari
-      el.lhFile.dispatchEvent(new MouseEvent('click', { bubbles: true }));
-    });
-
-    // --- LH: skapa / uppdatera förhandsvisning ---
-function updateLHPreview(imageDataURL = null) {
-  // ta bort eventuell tidigare förhandsvisning
+/* ===== LH: förhandsvisning ===== */
+function updateLHPreview(imageDataURL = null){
   let wrap = document.getElementById('lhPreviewWrap');
   if (wrap) wrap.remove();
 
@@ -656,113 +665,83 @@ function updateLHPreview(imageDataURL = null) {
   if (!file && !imageDataURL) return;
 
   const reader = new FileReader();
-  reader.onload = (ev) => {
+  reader.onload = (ev)=>{
     const dataUrl = imageDataURL || ev.target.result;
-
     wrap = document.createElement('div');
     wrap.id = 'lhPreviewWrap';
-    wrap.style = `
-      display:flex;
-      align-items:center;
-      justify-content:flex-start;
-      gap:.6rem;
-      margin:.4rem 0;
-      background:#fafafa;
-      border:1px solid #ddd;
-      border-radius:8px;
-      padding:.4rem;
-    `;
-
+    wrap.style = 'display:flex;align-items:center;gap:.5rem;margin:.4rem 0;';
     const img = document.createElement('img');
     img.src = dataUrl;
-    img.style = 'width:80px;height:60px;object-fit:cover;border-radius:6px;';
-
+    img.style = 'width:70px;height:50px;object-fit:cover;border-radius:6px;';
     const info = document.createElement('div');
     info.id = 'lhPreviewInfo';
-    info.style = 'font-size:.8rem;color:#444;line-height:1.2;';
-
+    info.style = 'font-size:.8rem;color:#444;';
     wrap.appendChild(img);
     wrap.appendChild(info);
-
-    // placera direkt ovanför spara-knappen, utan att skjuta layouten
-    el.lhSaveBtn.parentNode.insertBefore(wrap, el.lhSaveBtn);
-
+    const toolbar = document.querySelector('#lh .lh-toolbar');
+    toolbar.after(wrap);
     refreshPreviewInfo();
   };
-
-  reader.readAsDataURL(file);
+  if (file) reader.readAsDataURL(file);
 }
 
-// --- uppdatera texten under bilden (datum, symboler, anteckning) ---
-function refreshPreviewInfo() {
+/* ===== LH: uppdatera förhandsinfo ===== */
+function refreshPreviewInfo(){
   const info = document.getElementById('lhPreviewInfo');
-  if (!info) return;
-  const date = el.lhDate.value ? el.lhDate.value : '(Datum ej valt)';
-  const syms = el.lhSymChecks().map(x => x.value).join(' ') || '–';
+  if(!info) return;
+  const date = el.lhDate.value || '(Datum ej valt)';
+  const syms = el.lhSymChecks().map(x=>x.value).join(' ') || '–';
   const note = el.lhNote.value ? `"${el.lhNote.value}"` : '';
-  info.innerHTML = `
-    <div><strong>${date}</strong></div>
-    <div style="font-size:1rem;margin:.1rem 0;">${syms}</div>
-    <div>${note}</div>
-  `;
+  info.innerHTML = `<div><strong>${date}</strong></div>
+                    <div style="font-size:1rem;margin:.1rem 0;">${syms}</div>
+                    <div>${note}</div>`;
 }
+el.lhFile.addEventListener('change', () => updateLHPreview());
+['change','input'].forEach(evt=>{
+  el.lhDate.addEventListener(evt, refreshPreviewInfo);
+  el.lhNote.addEventListener(evt, refreshPreviewInfo);
+});
+document.querySelectorAll('.lhSym').forEach(cb=>cb.addEventListener('change', refreshPreviewInfo));
 
-// --- LH: spara bild + metadata (iPhone-säker) ---
+/* ===== LH: spara bild ===== */
 el.lhSaveBtn.addEventListener('click', () => {
   const file = el.lhFile.files && el.lhFile.files[0];
   if (!file) { alert('📸 Välj en bild först.'); return; }
   if (!el.lhDate.value) { alert('📅 Välj datum.'); return; }
 
   const reader = new FileReader();
-
   reader.onload = (e) => {
     const dataUrl = e.target.result;
     const symbols = el.lhSymChecks().map(x => x.value);
     const note = el.lhNote.value || '';
 
-    // ✅ Skapa posten
     lhEntries.push({
       date: el.lhDate.value,
       symbols,
       note,
       dataUrl
     });
-
-    // ✅ Spara till localStorage
     localStorage.setItem('lhData', JSON.stringify(lhEntries));
-
-    // ✅ Uppdatera listan direkt
     renderLHList();
 
-    // ✅ Nollställ formulär
     el.lhNote.value = '';
     el.lhFile.value = '';
     document.querySelectorAll('.lhSym').forEach(cb => cb.checked = false);
-
-    // ✅ Ta bort ev. förhandsvisning
     const prev = document.getElementById('lhPreviewWrap');
     if (prev) prev.remove();
 
     alert('✅ Bilden sparades!');
   };
-
   reader.onerror = (err) => {
-    console.error('Filfel:', err);
+    console.error(err);
     alert('🚫 Kunde inte läsa in bilden.');
   };
-
   reader.readAsDataURL(file);
 });
-    // körs med liten delay för Safari-stabilitet
-    setTimeout(() => reader.readAsDataURL(file), 0);
-  } catch (err) {
-    console.error('Oväntat fel:', err);
-    alert('Ett oväntat fel uppstod.');
-  }
-});
-    /* ===== Init ===== */
-    renderLHList();
-    renderTable();
+
+/* ===== Init ===== */
+renderTable();
+renderLHList();
   });
 </script>
 </body>
