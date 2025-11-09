@@ -875,8 +875,8 @@ function renderChart() {
 
   // --- Mensfas (rosa) ---
   const mensIndices = dataEntries
-    .map((e, i) => e.symMens ? i : null)
-    .filter(i => i !== null);
+  .map((e, i) => (e.symMens || e.mens === "Mens") ? i : null)
+  .filter(i => i !== null);
 
   if (mensIndices.length > 0) {
     let start = mensIndices[0];
