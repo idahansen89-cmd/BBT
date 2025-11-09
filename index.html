@@ -704,44 +704,47 @@ function refreshPreviewInfo() {
   `;
 }
 
-// --- LH: spara bild + metadata ---
-el.lhSaveBtn.addEventListener('click', () => {
-  const file = el.lhFile.files && el.lhFile.files[0];
-  if (!file) { alert('Välj bild först.'); return; }
-  if (!el.lhDate.value) { alert('Välj datum.'); return; }
+// --- LH: spara bild + metadata (iPhone-säker) ---
+el.lhSaveBtn.addEventListener('click', async () => {
+  try {
+    const file = el.lhFile.files && el.lhFile.files[0];
+    if (!file) { alert('Välj bild först.'); return; }
+    if (!el.lhDate.value) { alert('Välj datum.'); return; }
 
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    const dataUrl = e.target.result;
-    const symbols = el.lhSymChecks().map(x => x.value);
-    const note = el.lhNote.value || '';
+    const reader = new FileReader();
 
-    lhEntries.push({
-      date: el.lhDate.value,
-      symbols,
-      note,
-      dataUrl
-    });
+    reader.onload = (e) => {
+      const dataUrl = e.target.result;
+      const symbols = el.lhSymChecks().map(x => x.value);
+      const note = el.lhNote.value || '';
 
-    localStorage.setItem('lhData', JSON.stringify(lhEntries));
-    renderLHList();
+      // ta bort ev. gammal post med samma datum
+      lhEntries = lhEntries.filter(x => x.date !== el.lhDate.value);
+      lhEntries.push({ date: el.lhDate.value, symbols, note, dataUrl });
 
-    // nollställ formuläret + ta bort förhandsvisning
-    el.lhNote.value = '';
-    el.lhFile.value = '';
-    const prev = document.getElementById('lhPreviewWrap');
-    if (prev) prev.remove();
-    document.querySelectorAll('.lhSym').forEach(cb => cb.checked = false);
+      localStorage.setItem('lhData', JSON.stringify(lhEntries));
+      renderLHList();
 
-    alert('✅ Bild sparad!');
-  };
+      el.lhNote.value = '';
+      el.lhFile.value = '';
+      const prev = document.getElementById('lhPreviewWrap');
+      if (prev) prev.remove();
+      document.querySelectorAll('.lhSym').forEach(cb => cb.checked = false);
 
-  reader.onerror = (err) => {
-    console.error(err);
-    alert('Kunde inte läsa in bilden.');
-  };
+      alert('✅ Bild sparad!');
+    };
 
-  reader.readAsDataURL(file);
+    reader.onerror = (err) => {
+      console.error('Läsfel:', err);
+      alert('Kunde inte läsa in bilden.');
+    };
+
+    // körs med liten delay för Safari-stabilitet
+    setTimeout(() => reader.readAsDataURL(file), 0);
+  } catch (err) {
+    console.error('Oväntat fel:', err);
+    alert('Ett oväntat fel uppstod.');
+  }
 });
     /* ===== Init ===== */
     renderTable();
