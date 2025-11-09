@@ -635,7 +635,10 @@ function renderChart(){
     /* ===== Events ===== */
     el.actual.addEventListener('blur', computeCorrectedFormInputs);
     el.time.addEventListener('change', ()=>{ if(el.actual.value) computeCorrectedFormInputs(); });
-    el.saveBtn.addEventListener('click', saveEntry);
+    el.lhPickBtn.addEventListener('click', () => {
+  // Safari behöver en "äkta" användarinteraktion
+  el.lhFile.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+});
 
     // --- LH: välj bild ---
     el.lhPickBtn.addEventListener('click', () => {
