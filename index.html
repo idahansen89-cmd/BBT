@@ -768,13 +768,18 @@ function renderTable() {
       </td>
     `;
 
-    // Radera posten
-    tr.querySelector(".small-del").addEventListener("click", () => {
-      if (!confirm(`Ta bort posten ${e.date}?`)) return;
+    // Radera posten (säker hantering)
+const delBtn = tr.querySelector(".small-del");
+if (delBtn) {
+  delBtn.addEventListener("click", (ev) => {
+    ev.stopPropagation(); // förhindra klick som påverkar raden
+    if (confirm(`Ta bort posten den ${e.date}?`)) {
       dataEntries.splice(idx, 1);
       localStorage.setItem("bbtData", JSON.stringify(dataEntries));
       renderTable();
-    });
+    }
+  });
+}
 
     // Redigera posten
     tr.querySelector(".small-edit").addEventListener("click", () => {
