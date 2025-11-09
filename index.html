@@ -507,24 +507,26 @@ tbody tr.mens-row {
       if (corr !== null) el.corrected.value = corr.toFixed(2);
     }
 
-  /* ===== Spara & tabell med radradering ===== */
+ /* ===== Spara & tabell med nya symboler ===== */
 function saveEntry() {
   const e = {
     date: el.date.value,
     time: el.time.value,
     actual: el.actual.value ? Number(el.actual.value) : null,
     corrected: el.corrected.value ? Number(el.corrected.value) : null,
-    mucus: el.mucus.value,
-    note: el.note.value,
-    // symboler
-    mens: el.mens.checked || false,
-    sex: el.sex.checked || false,
-    ovulation: el.ovulation.checked || false,
-    lhPos: el.lhPos.checked || false,
-    lhNeg: el.lhNeg.checked || false
+
+    // symboler istället för dropdowns
+    mens: el.mensSym?.checked || false,
+    sex: el.sex?.checked || false,
+    ovulation: el.ovulation?.checked || false,
+    mucus: el.mucusSym?.checked || false,
+    lhPlus: el.lhPlus?.checked || false,
+    lhMinus: el.lhMinus?.checked || false,
+
+    note: el.note.value || ""
   };
 
-  if (!e.date) return alert("Välj datum.");
+  if (!e.date) return alert("Välj datum först.");
 
   const i = dataEntries.findIndex(x => x.date === e.date);
   if (i >= 0) dataEntries[i] = e;
@@ -532,79 +534,66 @@ function saveEntry() {
 
   localStorage.setItem("bbtData", JSON.stringify(dataEntries));
   renderTable();
-
-  // nollställ formuläret
-  el.note.value = "";
-  ["mens", "sex", "ovulation", "lhPos", "lhNeg"].forEach(id => el[id].checked = false);
-  alert("✅ Sparat!");
+  alert("✅ Data sparad!");
 }
 
+/* ===== Tabellrendering med nya symboler ===== */
 function renderTable() {
   el.dataTableBody.innerHTML = "";
   dataEntries.sort((a, b) => a.date.localeCompare(b.date));
 
   dataEntries.forEach((e, idx) => {
     const tr = document.createElement("tr");
+
+    // Ljusrosa bakgrund för mens
     if (e.mens) tr.classList.add("mens-row");
 
+    // Händelser (alla symboler)
+    let events = "";
+    if (e.mens) events += "🩸 ";
+    if (e.sex) events += "💞 ";
+    if (e.ovulation) events += "🌼 ";
+    if (e.mucus) events += "💧 ";
+    if (e.lhPlus) events += "➕ ";
+    if (e.lhMinus) events += "➖ ";
+
     tr.innerHTML = `
-      <td data-field="date">${e.date || ''}</td>
-      <td data-field="time" contenteditable="true">${e.time || ''}</td>
-      <td data-field="actual" contenteditable="true">${e.actual ?? ''}</td>
-      <td data-field="corrected">${e.corrected ?? ''}</td>
-      <td data-field="mucus" contenteditable="true">${e.mucus || '–'}</td>
-      <td data-field="events">${e.mens ? "🩸" : ""}${e.sex ? "💞" : ""}${e.ovulation ? "🌼" : ""}</td>
-      <td data-field="lh">${e.lhPos ? "➕" : e.lhNeg ? "➖" : ""}</td>
-      <td data-field="note" contenteditable="true">${e.note || ''}</td>
+      <td>${formatDate(e.date)}</td>
+      <td>${formatTime(e.time)}</td>
+      <td>${e.actual ?? ""}</td>
+      <td>${e.corrected ?? ""}</td>
+      <td>${events.trim() || "–"}</td>
+      <td>${e.note || ""}</td>
       <td>
-        <button class="button" style="padding:0.3rem 0.5rem;font-size:0.8rem;" data-edit="${idx}">✏️</button>
-        <button class="button danger" style="padding:0.3rem 0.5rem;font-size:0.8rem;" data-del="${idx}">🗑️</button>
+        <button class="table-btn small-edit">✏️</button>
+        <button class="table-btn small-del">🗑️</button>
       </td>
     `;
 
-    // cellredigering
-    tr.querySelectorAll("[contenteditable=true]").forEach(td => {
-      td.addEventListener("blur", () => {
-        const field = td.dataset.field;
-        const val = td.textContent.trim();
-        if (field === "actual") {
-          e.actual = Number(val) || null;
-          e.corrected = computeCorrectedFrom(e.actual, e.time);
-          td.parentElement.querySelector("[data-field='corrected']").textContent = e.corrected?.toFixed(2) || '';
-        } else if (field === "time") {
-          e.time = val;
-          e.corrected = computeCorrectedFrom(e.actual, e.time);
-          td.parentElement.querySelector("[data-field='corrected']").textContent = e.corrected?.toFixed(2) || '';
-        } else if (field === "mucus") e.mucus = val;
-        else if (field === "note") e.note = val;
-
-        localStorage.setItem("bbtData", JSON.stringify(dataEntries));
-      });
+    // Radera posten
+    tr.querySelector(".small-del").addEventListener("click", () => {
+      if (!confirm(`Ta bort posten ${e.date}?`)) return;
+      dataEntries.splice(idx, 1);
+      localStorage.setItem("bbtData", JSON.stringify(dataEntries));
+      renderTable();
     });
 
-    // radera rad
-    tr.querySelector("[data-del]").addEventListener("click", () => {
-      if (confirm(`Ta bort posten ${e.date}?`)) {
-        dataEntries.splice(idx, 1);
-        localStorage.setItem("bbtData", JSON.stringify(dataEntries));
-        renderTable();
-      }
-    });
-
-    // redigera rad
-    tr.querySelector("[data-edit]").addEventListener("click", () => {
+    // Redigera posten (ladda in i formuläret)
+    tr.querySelector(".small-edit").addEventListener("click", () => {
       el.date.value = e.date;
       el.time.value = e.time;
       el.actual.value = e.actual ?? "";
       el.corrected.value = e.corrected ?? "";
-      el.mucus.value = e.mucus;
+
+      el.mensSym.checked = e.mens || false;
+      el.sex.checked = e.sex || false;
+      el.ovulation.checked = e.ovulation || false;
+      el.mucusSym.checked = e.mucus || false;
+      el.lhPlus.checked = e.lhPlus || false;
+      el.lhMinus.checked = e.lhMinus || false;
+
       el.note.value = e.note;
-      el.mens.checked = !!e.mens;
-      el.sex.checked = !!e.sex;
-      el.ovulation.checked = !!e.ovulation;
-      el.lhPos.checked = !!e.lhPos;
-      el.lhNeg.checked = !!e.lhNeg;
-      alert("Posten har laddats in i formuläret. Gör ändringar och tryck Spara.");
+      alert("Posten laddades för redigering.");
     });
 
     el.dataTableBody.appendChild(tr);
