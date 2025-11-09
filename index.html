@@ -222,17 +222,17 @@ canvas#bbtChart {
   <script>
   document.addEventListener('DOMContentLoaded', () => {
     /* ===== Tabs ===== */
-    document.querySelectorAll('.tab').forEach(btn=>{
-      btn.addEventListener('click', ()=>{
-        const id = btn.dataset.tab;
-        document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
-        btn.classList.add('active');
-        document.getElementById(id).classList.add('active');
-        if(id==='graf') renderChart();
-        if(id==='lh') renderLHList();
-      });
-    });
+   document.querySelectorAll('.tab').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const id = btn.dataset.tab;
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(id).classList.add('active');
+    if(id==='graf') renderChart();
+    if(id==='lh') renderLHList();
+  });
+});
 
     /* ===== Elements ===== */
     const el = {
