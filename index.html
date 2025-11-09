@@ -853,74 +853,113 @@ function formatTime(t) {
       renderLHList();
     }
 
-    /* ===== Graf ===== */
-    function renderChart(){
-      if(chart) chart.destroy();
+    /* ===== Graf med bakgrundsfärger för faser ===== */
+function renderChart() {
+  if (chart) chart.destroy();
 
-      dataEntries.sort((a,b)=>a.date.localeCompare(b.date));
+  // sortera data
+  dataEntries.sort((a, b) => a.date.localeCompare(b.date));
 
-      const labels = dataEntries.map(e=>{
-        if(!e.date) return "";
-        const [y,m,d] = e.date.split("-");
-        return `${d}-${m}`;
-      });
+  const labels = dataEntries.map(e => {
+    if (!e.date) return "";
+    const [y, m, d] = e.date.split("-");
+    return `${d}-${m}`;
+  });
 
-      const actual    = dataEntries.map(e=>e.actual);
-      const corrected = dataEntries.map(e=>e.corrected);
+  const actual = dataEntries.map(e => e.actual);
+  const corrected = dataEntries.map(e => e.corrected);
 
-      const ovIndex = dataEntries.findIndex(e=>e.ovulation);
-      const preVals = (ovIndex>0 ? actual.slice(0, ovIndex) : actual).filter(v=>typeof v==='number');
-      const avg = preVals.length ? preVals.reduce((a,b)=>a+b,0)/preVals.length : null;
+  // hitta index för ägglossning och mens
+  const ovIndex = dataEntries.findIndex(e => e.ovulation);
+  const firstNonMens = dataEntries.findIndex(e => e.mens !== "Mens");
+  const mensEnd = (firstNonMens === -1) ? labels.length - 1 : firstNonMens - 1;
 
-      const anns = [];
-      const firstNonMens = dataEntries.findIndex(e=>e.mens!=='Mens');
-      const mensEndX = (firstNonMens===-1) ? labels.length-0.5 : firstNonMens-0.5;
-      if(firstNonMens!==0) anns.push({type:'box', xMin:0, xMax:mensEndX, backgroundColor:'rgba(255,230,236,.5)', borderWidth:0});
-      if(ovIndex>-1) anns.push({type:'box', xMin:ovIndex+0.5, xMax:labels.length-0.5, backgroundColor:'rgba(242,230,255,.5)', borderWidth:0});
+  // annotationer för bakgrundsfärger
+  const anns = [];
 
-      const symbols = dataEntries.map(e=>{
-        const s=[];
-        if(e.sex) s.push('💞');
-        if(e.ovulation) s.push('🌼');
-        if(e.mucus==='Äggviteliknande') s.push('💧');
-        return s;
-      });
+  // Mensfas (rosa)
+  if (mensEnd >= 0)
+    anns.push({
+      type: "box",
+      xMin: 0,
+      xMax: mensEnd + 0.5,
+      backgroundColor: "rgba(255,232,238,0.7)",
+      borderWidth: 0
+    });
 
-      chart = new Chart(el.chartCanvas, {
-        type:'line',
-        data:{
-          labels,
-          datasets:[
-            { label:'Faktisk temperatur', data:actual, borderColor:'#3b82f6', backgroundColor:'#3b82f6', pointRadius:3, tension:0.28, spanGaps:true },
-            { label:'Korrigerad temperatur', data:corrected, borderColor:'#ef4444', backgroundColor:'#ef4444', borderDash:[4,4], pointRadius:2, tension:0.28, spanGaps:true },
-            ...(avg ? [{ label:'Medel före ägglossning', data:Array(labels.length).fill(avg), borderColor:'#888', borderDash:[6,4], pointRadius:0 }] : [])
-          ]
+  // Ägglossningsdag (gul)
+  if (ovIndex >= 0)
+    anns.push({
+      type: "box",
+      xMin: ovIndex - 0.5,
+      xMax: ovIndex + 0.5,
+      backgroundColor: "rgba(255,249,217,0.7)",
+      borderWidth: 0
+    });
+
+  // Lutealfas (lila)
+  if (ovIndex >= 0 && ovIndex < labels.length - 1)
+    anns.push({
+      type: "box",
+      xMin: ovIndex + 0.5,
+      xMax: labels.length - 0.5,
+      backgroundColor: "rgba(244,230,255,0.7)",
+      borderWidth: 0
+    });
+
+  chart = new Chart(el.chartCanvas, {
+    type: "line",
+    data: {
+      labels,
+      datasets: [
+        {
+          label: "Faktisk temperatur",
+          data: actual,
+          borderColor: "#3b82f6",
+          backgroundColor: "#3b82f6",
+          pointRadius: 3,
+          tension: 0.25,
+          spanGaps: true
         },
-        options:{
-          responsive:true,
-          maintainAspectRatio:false,
-          scales:{
-            y:{ min:34.9, max:38.6, ticks:{ stepSize:0.1, color:'#000' }, title:{ display:true, text:'Temperatur (°C)' } },
-            x:{ ticks:{ color:'#000', autoSkip:true, maxTicksLimit:10, maxRotation:0 } }
-          },
-          plugins:{ legend:{ position:'bottom', labels:{ color:'#000' } }, annotation:{ annotations:anns } },
-          animation:false
+        {
+          label: "Korrigerad temperatur",
+          data: corrected,
+          borderColor: "#ef4444",
+          backgroundColor: "#ef4444",
+          borderDash: [4, 4],
+          pointRadius: 2,
+          tension: 0.25,
+          spanGaps: true
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        y: {
+          min: 34.9,
+          max: 38.6,
+          ticks: { stepSize: 0.1, color: "#000" },
+          title: { display: true, text: "Temperatur (°C)" }
         },
-        plugins:[{
-          id:'symbols',
-          afterDatasetsDraw(c){
-            const ctx=c.ctx; ctx.font='10px sans-serif'; ctx.textAlign='center';
-            const meta=c.getDatasetMeta(0);
-            c.data.labels.forEach((_,i)=>{
-              const p=meta.data[i]; if(!p) return;
-              const x=p.x, y=c.scales.y.bottom-18;
-              if(symbols[i]?.length) symbols[i].forEach((sm,j)=>ctx.fillText(sm,x,y-j*13));
-            });
+        x: {
+          ticks: {
+            color: "#000",
+            autoSkip: true,
+            maxTicksLimit: 10,
+            maxRotation: 0
           }
-        }]
-      });
+        }
+      },
+      plugins: {
+        legend: { position: "bottom", labels: { color: "#000" } },
+        annotation: { annotations: anns }
+      },
+      animation: false
     }
-
+  });
+}
     /* ===== Export / Import ===== */
     el.exportBtn.addEventListener('click', ()=>{
       const blob = new Blob([JSON.stringify({ bbtData:dataEntries, lhDataByDate:lhByDate }, null, 2)], {type:'application/json'});
