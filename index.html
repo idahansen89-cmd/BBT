@@ -278,6 +278,14 @@
       text-overflow: ellipsis;
     }
   }
+  [data-field="events"], [data-field="lh"] {
+  font-size: 1.2rem;
+  letter-spacing: 2px;
+}
+
+tbody tr.mens-row {
+  background-color: #ffe8ee !important;
+}
 </style>
 </head>
 <body>
@@ -307,35 +315,15 @@
       <label for="corrected">Korrigerad temp (°C):</label>
       <input type="number" step="0.01" id="corrected" placeholder="Beräknas automatiskt">
     </div>
-    <div class="form-row">
-      <label for="mens">Mensstatus:</label>
-      <select id="mens">
-        <option>–</option>
-        <option>Mens</option>
-      </select>
-    </div>
-    <div class="form-row">
-      <label for="mucus">Sekret:</label>
-      <select id="mucus">
-        <option>–</option>
-        <option>Klart</option>
-        <option>Äggviteliknande</option>
-        <option>Krämig</option>
-      </select>
-    </div>
-    <div class="form-row">
-      <label for="lhSel">LH-test:</label>
-      <select id="lhSel">
-        <option>–</option>
-        <option>Positivt</option>
-        <option>Negativt</option>
-      </select>
-    </div>
-
-    <div class="inline-symbols">
-      <span class="symbol" title="Samlag">💞 <input type="checkbox" id="sex"></span>
-      <span class="symbol" title="Bekräftad ägglossning">🌼 <input type="checkbox" id="ovulation"></span>
-    </div>
+ <!-- === Händelsesymboler === -->
+<div class="inline-symbols">
+  <label>Händelser:</label>
+  <div class="symbol">🩸 <input type="checkbox" id="mens" /></div>
+  <div class="symbol">💞 <input type="checkbox" id="sex" /></div>
+  <div class="symbol">🌼 <input type="checkbox" id="ovulation" /></div>
+  <div class="symbol">➕ <input type="checkbox" id="lhPos" /></div>
+  <div class="symbol">➖ <input type="checkbox" id="lhNeg" /></div>
+</div>
 
     <div class="form-row" style="align-items:flex-start">
       <label for="note" style="margin-top:.2rem">Anteckning:</label>
@@ -526,74 +514,97 @@ function saveEntry() {
     time: el.time.value,
     actual: el.actual.value ? Number(el.actual.value) : null,
     corrected: el.corrected.value ? Number(el.corrected.value) : null,
-    mens: el.mens.value,
     mucus: el.mucus.value,
-    lh: el.lhSel.value,
-    sex: el.sex?.checked || false,
-    ovulation: el.ovulation?.checked || false,
-    note: el.note.value
+    note: el.note.value,
+    // symboler
+    mens: el.mens.checked || false,
+    sex: el.sex.checked || false,
+    ovulation: el.ovulation.checked || false,
+    lhPos: el.lhPos.checked || false,
+    lhNeg: el.lhNeg.checked || false
   };
-  if (!e.date) return alert("Välj datum först.");
+
+  if (!e.date) return alert("Välj datum.");
+
   const i = dataEntries.findIndex(x => x.date === e.date);
-  if (i >= 0) dataEntries[i] = e; else dataEntries.push(e);
+  if (i >= 0) dataEntries[i] = e;
+  else dataEntries.push(e);
+
   localStorage.setItem("bbtData", JSON.stringify(dataEntries));
   renderTable();
-  alert("✅ Data sparad!");
+
+  // nollställ formuläret
+  el.note.value = "";
+  ["mens", "sex", "ovulation", "lhPos", "lhNeg"].forEach(id => el[id].checked = false);
+  alert("✅ Sparat!");
 }
 
-/* ===== Tabellrendering ny stil (inkl. sekret) ===== */
 function renderTable() {
   el.dataTableBody.innerHTML = "";
   dataEntries.sort((a, b) => a.date.localeCompare(b.date));
 
   dataEntries.forEach((e, idx) => {
     const tr = document.createElement("tr");
+    if (e.mens) tr.classList.add("mens-row");
 
-    // Ljusrosa bakgrund för mens
-    if (e.mens === "Mens") tr.style.backgroundColor = "#ffeaf0";
-
-    // Händelser: kombinera 💞, 🌼, 🩸
-    let events = "";
-    if (e.sex) events += "💞 ";
-    if (e.ovulation) events += "🌼 ";
-    if (e.mens === "Mens") events += "🩸";
-
-    // Radernas innehåll
     tr.innerHTML = `
-      <td>${formatDate(e.date)}</td>
-      <td>${formatTime(e.time)}</td>
-      <td>${e.actual || ""}</td>
-      <td>${e.corrected || ""}</td>
-      <td>${e.mucus || "–"}</td>
-      <td>${events.trim() || "–"}</td>
-      <td>${e.note || ""}</td>
+      <td data-field="date">${e.date || ''}</td>
+      <td data-field="time" contenteditable="true">${e.time || ''}</td>
+      <td data-field="actual" contenteditable="true">${e.actual ?? ''}</td>
+      <td data-field="corrected">${e.corrected ?? ''}</td>
+      <td data-field="mucus" contenteditable="true">${e.mucus || '–'}</td>
+      <td data-field="events">${e.mens ? "🩸" : ""}${e.sex ? "💞" : ""}${e.ovulation ? "🌼" : ""}</td>
+      <td data-field="lh">${e.lhPos ? "➕" : e.lhNeg ? "➖" : ""}</td>
+      <td data-field="note" contenteditable="true">${e.note || ''}</td>
       <td>
-        <button class="table-btn small-edit">✏️</button>
-        <button class="table-btn small-del">🗑️</button>
+        <button class="button" style="padding:0.3rem 0.5rem;font-size:0.8rem;" data-edit="${idx}">✏️</button>
+        <button class="button danger" style="padding:0.3rem 0.5rem;font-size:0.8rem;" data-del="${idx}">🗑️</button>
       </td>
     `;
 
-    // Ta bort posten
-    tr.querySelector(".small-del").addEventListener("click", () => {
-      if (!confirm(`Ta bort posten ${e.date}?`)) return;
-      dataEntries.splice(idx, 1);
-      localStorage.setItem("bbtData", JSON.stringify(dataEntries));
-      renderTable();
+    // cellredigering
+    tr.querySelectorAll("[contenteditable=true]").forEach(td => {
+      td.addEventListener("blur", () => {
+        const field = td.dataset.field;
+        const val = td.textContent.trim();
+        if (field === "actual") {
+          e.actual = Number(val) || null;
+          e.corrected = computeCorrectedFrom(e.actual, e.time);
+          td.parentElement.querySelector("[data-field='corrected']").textContent = e.corrected?.toFixed(2) || '';
+        } else if (field === "time") {
+          e.time = val;
+          e.corrected = computeCorrectedFrom(e.actual, e.time);
+          td.parentElement.querySelector("[data-field='corrected']").textContent = e.corrected?.toFixed(2) || '';
+        } else if (field === "mucus") e.mucus = val;
+        else if (field === "note") e.note = val;
+
+        localStorage.setItem("bbtData", JSON.stringify(dataEntries));
+      });
     });
 
-    // Redigera posten
-    tr.querySelector(".small-edit").addEventListener("click", () => {
+    // radera rad
+    tr.querySelector("[data-del]").addEventListener("click", () => {
+      if (confirm(`Ta bort posten ${e.date}?`)) {
+        dataEntries.splice(idx, 1);
+        localStorage.setItem("bbtData", JSON.stringify(dataEntries));
+        renderTable();
+      }
+    });
+
+    // redigera rad
+    tr.querySelector("[data-edit]").addEventListener("click", () => {
       el.date.value = e.date;
       el.time.value = e.time;
-      el.actual.value = e.actual;
-      el.corrected.value = e.corrected;
-      el.mens.value = e.mens;
+      el.actual.value = e.actual ?? "";
+      el.corrected.value = e.corrected ?? "";
       el.mucus.value = e.mucus;
-      el.lhSel.value = e.lh;
-      el.sex.checked = e.sex || false;
-      el.ovulation.checked = e.ovulation || false;
       el.note.value = e.note;
-      alert("Posten laddades för redigering.");
+      el.mens.checked = !!e.mens;
+      el.sex.checked = !!e.sex;
+      el.ovulation.checked = !!e.ovulation;
+      el.lhPos.checked = !!e.lhPos;
+      el.lhNeg.checked = !!e.lhNeg;
+      alert("Posten har laddats in i formuläret. Gör ändringar och tryck Spara.");
     });
 
     el.dataTableBody.appendChild(tr);
