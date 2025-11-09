@@ -262,23 +262,26 @@
     let chart;
 
     /* ===== Helpers ===== */
-    const minutesFrom0400 = (t) => {
-      if(!t) return 0;
-      const [h,m] = t.split(':').map(Number);
-      return (h*60 + m) - 240; // 04:00 = 240 min
-    };
-    function computeCorrectedFrom(a, timeStr){
-      if (Number.isNaN(a)) return null;
-      const mins = minutesFrom0400(timeStr || '04:00');
-      const corr = a + 0.05 * (mins/30);
-      return Number(corr.toFixed(2));
-    }
-    function computeCorrectedFormInputs(){
-      const a = parseFloat(el.actual.value);
-      if (Number.isNaN(a)) return;
-      const corr = computeCorrectedFrom(a, el.time.value);
-      if (corr!==null) el.corrected.value = corr.toFixed(2);
-    }
+const minutesFrom0400 = (t) => {
+  if (!t) return 0;
+  const [h, m] = t.split(':').map(Number);
+  return (h * 60 + m) - 240; // skillnad i minuter från kl. 04:00
+};
+
+function computeCorrectedFrom(a, timeStr) {
+  if (Number.isNaN(a)) return null;
+  const mins = minutesFrom0400(timeStr || '04:00');
+  // Rätt korrigering: minus efter 04:00, plus före 04:00
+  const corr = a - 0.05 * (mins / 30);
+  return Number(corr.toFixed(2));
+}
+
+function computeCorrectedFormInputs() {
+  const a = parseFloat(el.actual.value);
+  if (Number.isNaN(a)) return;
+  const corr = computeCorrectedFrom(a, el.time.value);
+  if (corr !== null) el.corrected.value = corr.toFixed(2);
+}
 
     function saveEntry(){
       const e = {
