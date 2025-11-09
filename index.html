@@ -873,14 +873,22 @@ function renderChart() {
   const ovIndex = dataEntries.findIndex(e => e.ovulation);
   const anns = [];
 
-  // --- Mensfas (rosa) ---
-  const mensIndices = dataEntries
+ // Mensfas (rosa)
+const mensIndices = dataEntries
   .map((e, i) => (e.symMens || e.mens === "Mens") ? i : null)
   .filter(i => i !== null);
 
-  if (mensIndices.length > 0) {
-    let start = mensIndices[0];
-    let end = start;
+if (mensIndices.length > 0) {
+  const start = mensIndices[0] - 0.5;
+  const end = mensIndices[mensIndices.length - 1] + 0.5;
+  anns.push({
+    type: "box",
+    xMin: start,
+    xMax: end,
+    backgroundColor: "rgba(255,232,238,0.6)",
+    borderWidth: 0
+  });
+}
 
     // Slå ihop sammanhängande mensdagar
     for (let i = 1; i < mensIndices.length; i++) {
