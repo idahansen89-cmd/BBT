@@ -90,6 +90,14 @@ th, td {
 .table-btn:hover {
   background: #e599ab;
 }
+td button {
+  margin: 0 2px;
+  border-radius: 6px;
+}
+
+.mens-row {
+  background-color: #ffe6ec;
+}
    </style>
 </head>
 <body>
@@ -347,7 +355,7 @@ function saveEntry() {
   alert("✅ Data sparad!");
 }
 
-/* ===== Tabellrendering med radera-knapp ===== */
+/* ===== Tabellrendering med redigera- och radera-knappar ===== */
 function renderTable() {
   el.dataTableBody.innerHTML = "";
   dataEntries.sort((a, b) => a.date.localeCompare(b.date));
@@ -355,69 +363,79 @@ function renderTable() {
   dataEntries.forEach((e, idx) => {
     const tr = document.createElement("tr");
     if (e.mens === "Mens") tr.classList.add("mens-row");
+
     tr.innerHTML = `
-      <td data-field="date">${e.date || ""}</td>
-      <td data-field="time" contenteditable="true">${e.time || ""}</td>
-      <td data-field="actual" contenteditable="true">${e.actual ?? ""}</td>
-      <td data-field="corrected">${e.corrected ?? ""}</td>
-      <td data-field="mens" contenteditable="true">${e.mens || "–"}</td>
-      <td data-field="mucus" contenteditable="true">${e.mucus || "–"}</td>
-      <td data-field="lh" contenteditable="true">${e.lh || "–"}</td>
-      <td data-field="sex" contenteditable="true">${e.sex ? "💞" : ""}</td>
-      <td data-field="ovulation" contenteditable="true">${e.ovulation ? "🌼" : ""}</td>
-      <td data-field="note" contenteditable="true">${e.note || ""}</td>
-      <td><button class="button danger small-del" title="Radera rad">🗑️</button></td>
+      <td data-field="date">${e.date || ''}</td>
+      <td data-field="time" contenteditable="true">${e.time || ''}</td>
+      <td data-field="actual" contenteditable="true">${e.actual ?? ''}</td>
+      <td data-field="corrected">${e.corrected ?? ''}</td>
+      <td data-field="mens" contenteditable="true">${e.mens || '–'}</td>
+      <td data-field="mucus" contenteditable="true">${e.mucus || '–'}</td>
+      <td data-field="lh" contenteditable="true">${e.lh || '–'}</td>
+      <td data-field="events" contenteditable="true">
+        ${e.sex ? '💞' : ''}${e.ovulation ? '🌼' : ''}
+      </td>
+      <td data-field="note" contenteditable="true">${e.note || ''}</td>
+      <td>
+        <button class="button" style="padding:0.3rem 0.5rem;font-size:0.8rem;" data-edit="${idx}">✏️</button>
+        <button class="button danger" style="padding:0.3rem 0.5rem;font-size:0.8rem;" data-del="${idx}">🗑️</button>
+      </td>
     `;
 
-    /* radera denna rad */
-    tr.querySelector(".small-del").addEventListener("click", () => {
-      if (!confirm(`Ta bort posten ${e.date}?`)) return;
-      dataEntries.splice(idx, 1);
-      localStorage.setItem("bbtData", JSON.stringify(dataEntries));
-      renderTable();
-    });
-
-    /* redigera direkt i cell */
-    tr.querySelectorAll("[contenteditable='true']").forEach(td => {
-      td.addEventListener("keydown", ev => {
-        if (ev.key === "Enter") { ev.preventDefault(); td.blur(); }
-      });
+    // Hantera cellredigering direkt
+    tr.querySelectorAll("[contenteditable=true]").forEach(td => {
       td.addEventListener("blur", () => {
-        const field = td.getAttribute("data-field");
-        let val = td.textContent.trim();
-        const row = dataEntries[idx];
+        const field = td.dataset.field;
+        const val = td.textContent.trim();
 
         if (field === "actual") {
-          const num = parseFloat(val.replace(",", "."));
-          row.actual = Number.isNaN(num) ? null : Number(num.toFixed(2));
-          row.corrected = row.actual !== null ? computeCorrectedFrom(row.actual, row.time) : null;
-          tr.querySelector("td[data-field='corrected']").textContent = row.corrected ?? "";
+          e.actual = Number(val) || null;
+          e.corrected = computeCorrectedFrom(e.actual, e.time);
+          td.parentElement.querySelector("[data-field='corrected']").textContent = e.corrected?.toFixed(2) || '';
         } else if (field === "time") {
-          row.time = val;
-          if (typeof row.actual === "number") {
-            row.corrected = computeCorrectedFrom(row.actual, row.time);
-            tr.querySelector("td[data-field='corrected']").textContent = row.corrected ?? "";
-          }
+          e.time = val;
+          e.corrected = computeCorrectedFrom(e.actual, e.time);
+          td.parentElement.querySelector("[data-field='corrected']").textContent = e.corrected?.toFixed(2) || '';
         } else if (field === "mens") {
-          row.mens = val === "" || val === "-" ? "–" : val;
-          if (row.mens === "Mens") tr.classList.add("mens-row"); else tr.classList.remove("mens-row");
+          e.mens = val;
         } else if (field === "mucus") {
-          row.mucus = val === "" || val === "-" ? "–" : val;
+          e.mucus = val;
         } else if (field === "lh") {
-          row.lh = val === "" || val === "-" ? "–" : val;
-        } else if (field === "sex") {
-          row.sex = val === "💞";
-          td.textContent = row.sex ? "💞" : "";
-        } else if (field === "ovulation") {
-          row.ovulation = val === "🌼";
-          td.textContent = row.ovulation ? "🌼" : "";
+          e.lh = val;
+        } else if (field === "events") {
+          e.sex = val.includes("💞");
+          e.ovulation = val.includes("🌼");
+          td.textContent = `${e.sex ? "💞" : ""}${e.ovulation ? "🌼" : ""}`;
         } else if (field === "note") {
-          row.note = val;
+          e.note = val;
         }
 
         localStorage.setItem("bbtData", JSON.stringify(dataEntries));
-        if (document.querySelector(".tab.active")?.dataset.tab === "graf") renderChart();
       });
+    });
+
+    // Radera raden
+    tr.querySelector("[data-del]").addEventListener("click", () => {
+      if (confirm(`Ta bort posten ${e.date}?`)) {
+        dataEntries.splice(idx, 1);
+        localStorage.setItem("bbtData", JSON.stringify(dataEntries));
+        renderTable();
+      }
+    });
+
+    // Redigera (ladda upp i formuläret)
+    tr.querySelector("[data-edit]").addEventListener("click", () => {
+      el.date.value = e.date;
+      el.time.value = e.time;
+      el.actual.value = e.actual ?? "";
+      el.corrected.value = e.corrected ?? "";
+      el.mens.value = e.mens;
+      el.mucus.value = e.mucus;
+      el.lhSel.value = e.lh;
+      el.sex.checked = !!e.sex;
+      el.ovulation.checked = !!e.ovulation;
+      el.note.value = e.note;
+      alert("Posten har laddats in i formuläret. Gör ändringar och tryck Spara.");
     });
 
     el.dataTableBody.appendChild(tr);
