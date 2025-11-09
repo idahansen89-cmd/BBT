@@ -668,7 +668,7 @@ el.lhSaveBtn.addEventListener('click', async ()=>{
       document.querySelectorAll('.lhSym').forEach(cb => cb.checked = false);
 
       renderLHList();
-      alert('Bilden har sparats!');
+            alert('Bilden har sparats!');
     };
     reader.onerror = () => alert('Kunde inte läsa in bilden.');
     reader.readAsDataURL(file);
@@ -677,11 +677,10 @@ el.lhSaveBtn.addEventListener('click', async ()=>{
     alert('Ett oväntat fel uppstod.');
   }
 });
-            renderLHList();
 
-    /* ===== Init ===== */
-    renderTable();
-    renderLHList();
+// ===== Init =====
+renderTable();
+renderLHList();
 });
 </script>
 </body>
