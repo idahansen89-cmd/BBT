@@ -574,7 +574,12 @@ td button:hover {
       sex: document.getElementById('sex'),
       ovulation: document.getElementById('ovulation'),
       note: document.getElementById('note'),
-
+symMens:  document.getElementById('symMens'),
+symSex:   document.getElementById('symSex'),
+symOv:    document.getElementById('symOv'),
+symMucus: document.getElementById('symMucus'),
+symLHpos: document.getElementById('symLHpos'),
+symLHneg: document.getElementById('symLHneg'),
       saveBtn: document.getElementById('saveBtn'),
       exportBtn: document.getElementById('exportBtn'),
       importBtn: document.getElementById('importBtn'),
@@ -622,7 +627,13 @@ td button:hover {
       }
       localStorage.setItem(newKey, JSON.stringify(obj));
     })();
-
+/* ===== LH positiv/negativ – endast ett alternativ åt gången ===== */
+el.symLHpos.addEventListener('change', () => {
+  if (el.symLHpos.checked) el.symLHneg.checked = false;
+});
+el.symLHneg.addEventListener('change', () => {
+  if (el.symLHneg.checked) el.symLHpos.checked = false;
+});
     let lhByDate = JSON.parse(localStorage.getItem('lhDataByDate') || '{}');
     let chart;
 
