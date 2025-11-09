@@ -411,14 +411,32 @@ td button:hover {
       <label for="corrected">Korrigerad temp (°C):</label>
       <input type="number" step="0.01" id="corrected" placeholder="Beräknas automatiskt">
     </div>
- <!-- === Händelsesymboler === -->
-<div class="inline-symbols">
-  <label>Händelser:</label>
-  <div class="symbol">🩸 <input type="checkbox" id="mens" /></div>
-  <div class="symbol">💞 <input type="checkbox" id="sex" /></div>
-  <div class="symbol">🌼 <input type="checkbox" id="ovulation" /></div>
-  <div class="symbol">➕ <input type="checkbox" id="lhPos" /></div>
-  <div class="symbol">➖ <input type="checkbox" id="lhNeg" /></div>
+ <!-- Händelser – symboler på en rad med kryss under -->
+<div class="symbols-row">
+  <div class="symbol-stack">
+    <div class="sym">🩸</div>
+    <input type="checkbox" id="symMens" />
+  </div>
+  <div class="symbol-stack">
+    <div class="sym">💞</div>
+    <input type="checkbox" id="symSex" />
+  </div>
+  <div class="symbol-stack">
+    <div class="sym">🌼</div>
+    <input type="checkbox" id="symOv" />
+  </div>
+  <div class="symbol-stack">
+    <div class="sym">💧</div>
+    <input type="checkbox" id="symMucus" />
+  </div>
+  <div class="symbol-stack">
+    <div class="sym">➕</div>
+    <input type="checkbox" id="symLHpos" />
+  </div>
+  <div class="symbol-stack">
+    <div class="sym">➖</div>
+    <input type="checkbox" id="symLHneg" />
+  </div>
 </div>
 
     <div class="form-row" style="align-items:flex-start">
