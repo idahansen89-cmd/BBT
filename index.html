@@ -396,7 +396,7 @@ function renderChart(){
 
   dataEntries.sort((a,b)=>a.date.localeCompare(b.date));
 
-  // Formatera datum till DD-MM
+  // Datumformat DD-MM
   const labels = dataEntries.map(e=>{
     if(!e.date) return "";
     const [y,m,d] = e.date.split("-");
@@ -411,7 +411,7 @@ function renderChart(){
   const preVals = (ovIndex>0 ? actual.slice(0, ovIndex) : actual).filter(v=>typeof v==='number');
   const avg = preVals.length ? preVals.reduce((a,b)=>a+b,0)/preVals.length : null;
 
-  // Bakgrund: mens & lutealfas
+  // Bakgrunder: mens + lutealfas
   const anns = [];
   const firstNonMens = dataEntries.findIndex(e=>e.mens!=='Mens');
   const mensEndX = (firstNonMens===-1) ? labels.length-0.5 : firstNonMens-0.5;
@@ -429,7 +429,11 @@ function renderChart(){
     return s;
   });
 
-  // Skapa graf
+  // Stabilisera canvasens storlek
+  el.chartCanvas.style.width = "100%";
+  el.chartCanvas.style.height = "500px";
+  el.chartCanvas.parentElement.style.overflowX = "auto";
+
   chart = new Chart(el.chartCanvas, {
     type:'line',
     data:{
@@ -498,20 +502,7 @@ function renderChart(){
       }
     }]
   });
-
-  // Fast storlek och horisontell scroll (grafen växer inte)
-  el.chartCanvas.parentElement.style.overflowX='auto';
-  el.chartCanvas.style.width='1200px';
-  el.chartCanvas.style.height='520px';
 }
-
-    /* ===== Export chart (PNG) ===== */
-    el.exportChartBtn.addEventListener('click', ()=>{
-      const link = document.createElement('a');
-      link.download = 'BBT_graf.png';
-      link.href = el.chartCanvas.toDataURL('image/png');
-      link.click();
-    });
 
     /* ===== Export / Import data ===== */
     el.exportBtn.addEventListener('click', ()=>{
