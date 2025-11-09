@@ -66,7 +66,6 @@
     .top-buttons{ display:flex; gap:.6rem; flex-wrap:wrap; margin-top:.3rem; margin-bottom:.4rem; }
 
     /* Chart */
-    #bbtChart{ width:100%; height:460px; }
     .chart-toolbar{ display:flex; justify-content:center; margin-top:.75rem; }
 
     /* LH tab */
@@ -86,6 +85,15 @@
       background:#fff;
     }
     .lh-info{ flex:1; }
+    #chartContainer {
+  display: block;
+  border: none;
+}
+canvas#bbtChart {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
   </style>
 </head>
 <body>
@@ -175,12 +183,14 @@
   </div>
 
   <!-- Graf -->
-  <div id="graf" class="tab-content">
-    <canvas id="bbtChart"></canvas>
-    <div class="chart-toolbar">
-      <button class="button" id="exportChartBtn">Exportera graf</button>
-    </div>
+<div id="graf" class="tab-content">
+  <div id="chartContainer" style="width:100%;max-width:1200px;height:520px;margin:auto;overflow:hidden;position:relative;">
+    <canvas id="bbtChart" width="1200" height="520"></canvas>
   </div>
+  <div class="chart-toolbar">
+    <button class="button" id="exportChartBtn">Exportera graf</button>
+  </div>
+</div>
 
   <!-- LH-test -->
   <div id="lh" class="tab-content">
