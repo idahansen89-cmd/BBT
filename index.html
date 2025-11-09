@@ -873,7 +873,7 @@ function renderChart() {
   const ovIndex = dataEntries.findIndex(e => e.ovulation);
   const anns = [];
 
- // Mensfas (rosa)
+// Mensfas (rosa)
 const mensIndices = dataEntries
   .map((e, i) => (e.symMens || e.mens === "Mens") ? i : null)
   .filter(i => i !== null);
@@ -889,33 +889,6 @@ if (mensIndices.length > 0) {
     borderWidth: 0
   });
 }
-
-    // Slå ihop sammanhängande mensdagar
-    for (let i = 1; i < mensIndices.length; i++) {
-      if (mensIndices[i] === end + 1) {
-        end = mensIndices[i];
-      } else {
-        anns.push({
-          type: "box",
-          xMin: start - 0.5,
-          xMax: end + 0.5,
-          backgroundColor: "rgba(255,232,238,0.7)",
-          borderWidth: 0
-        });
-        start = mensIndices[i];
-        end = start;
-      }
-    }
-
-    // sista blocket
-    anns.push({
-      type: "box",
-      xMin: start - 0.5,
-      xMax: end + 0.5,
-      backgroundColor: "rgba(255,232,238,0.7)",
-      borderWidth: 0
-    });
-  }
 
   // --- Ägglossning (gul) ---
   if (ovIndex >= 0)
