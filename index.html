@@ -389,20 +389,26 @@ function computeCorrectedFormInputs() {
       renderLHList();
     }
 
-/* ===== Chart ===== */
+/* ===== Chart (ultrastabil, ej responsiv) ===== */
 function renderChart(){
-  if(chart) chart.destroy();
+  if (chart) chart.destroy();
 
+  // FIXERA canvas-storlek i pixlar (inte via style)
+  // Detta hindrar all "växning".
+  el.chartCanvas.width = 1200;   // px
+  el.chartCanvas.height = 520;   // px
+
+  // sortera data
   dataEntries.sort((a,b)=>a.date.localeCompare(b.date));
 
-  // Datumformat DD-MM
+  // Etiketter i DD-MM
   const labels = dataEntries.map(e=>{
     if(!e.date) return "";
     const [y,m,d] = e.date.split("-");
     return `${d}-${m}`;
   });
 
-  const actual = dataEntries.map(e=>e.actual);
+  const actual    = dataEntries.map(e=>e.actual);
   const corrected = dataEntries.map(e=>e.corrected);
 
   // Medel före ägglossning (CD1 → ovulation)
@@ -410,7 +416,7 @@ function renderChart(){
   const preVals = (ovIndex>0 ? actual.slice(0, ovIndex) : actual).filter(v=>typeof v==='number');
   const avg = preVals.length ? preVals.reduce((a,b)=>a+b,0)/preVals.length : null;
 
-  // Bakgrunder: mens + lutealfas
+  // Bakgrundsmarkeringar
   const anns = [];
   const firstNonMens = dataEntries.findIndex(e=>e.mens!=='Mens');
   const mensEndX = (firstNonMens===-1) ? labels.length-0.5 : firstNonMens-0.5;
@@ -419,7 +425,7 @@ function renderChart(){
   if(ovIndex>-1)
     anns.push({type:'box', xMin:ovIndex+0.5, xMax:labels.length-0.5, backgroundColor:'rgba(242,230,255,.5)', borderWidth:0});
 
-  // Symboler vid x-axeln
+  // Symboler längs x-axeln
   const symbols = dataEntries.map(e=>{
     const s=[];
     if(e.sex) s.push('💞');
@@ -428,26 +434,18 @@ function renderChart(){
     return s;
   });
 
-  // Stabilisera canvasens storlek
-  el.chartCanvas.style.width = "100%";
-  el.chartCanvas.style.height = "500px";
-  el.chartCanvas.parentElement.style.overflowX = "auto";
-
-  chart = new Chart(el.chartCanvas, {
+  // Skapa grafen – OBS: responsive:false
+  chart = new Chart(el.chartCanvas.getContext('2d'), {
     type:'line',
     data:{
       labels,
       datasets:[
-        {
-          label:'Faktisk temperatur',
-          data:actual,
-          borderColor:'#3b82f6', backgroundColor:'#3b82f6',
+        { label:'Faktisk temperatur',
+          data:actual, borderColor:'#3b82f6', backgroundColor:'#3b82f6',
           pointRadius:3, tension:0.28, spanGaps:true
         },
-        {
-          label:'Korrigerad temperatur',
-          data:corrected,
-          borderColor:'#ef4444', backgroundColor:'#ef4444',
+        { label:'Korrigerad temperatur',
+          data:corrected, borderColor:'#ef4444', backgroundColor:'#ef4444',
           borderDash:[4,4], pointRadius:2, tension:0.28, spanGaps:true
         },
         ...(avg ? [{
@@ -458,30 +456,17 @@ function renderChart(){
       ]
     },
     options:{
-      responsive:true,
-      maintainAspectRatio:false,
+      responsive: false,              // <- NYCKELN: ingen auto-responsivitet
+      maintainAspectRatio: false,     // spelar ingen roll när responsive:false
       scales:{
-        y:{
-          min:34.9,
-          max:38.6,
-          ticks:{ stepSize:0.1, color:'#000' },
-          title:{ display:true, text:'Temperatur (°C)' }
-        },
-        x:{
-          ticks:{
-            autoSkip:true,
-            maxRotation:45,
-            color:'#000'
-          }
-        }
+        y:{ min:34.9, max:38.6, ticks:{ stepSize:0.1, color:'#000' },
+            title:{ display:true, text:'Temperatur (°C)' } },
+        x:{ ticks:{ autoSkip:true, maxRotation:45, color:'#000' } }
       },
       plugins:{
         legend:{ position:'bottom', labels:{ color:'#000' } },
-        annotation:{ annotations:anns },
-        zoom:{
-          zoom:{ wheel:{enabled:true}, pinch:{enabled:true}, mode:'x' },
-          pan:{ enabled:true, mode:'x' }
-        }
+        annotation:{ annotations: anns }
+        // Ingen zoom här – vi lägger tillbaka när allt är stabilt
       },
       animation:false
     },
