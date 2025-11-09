@@ -405,7 +405,38 @@ td button:hover {
 
 .symbol-stack input {
   margin-top: 0.25rem;
+}/* ===== Tabellrubriker och layout ===== */
+#dataTable th {
+  background-color: #ffe5ec;
+  color: #333;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: center;
+  padding: 0.4rem 0.3rem;
+  white-space: nowrap;
 }
+
+#dataTable td {
+  text-align: center;
+  padding: 0.35rem 0.3rem;
+  vertical-align: middle;
+  font-size: 0.85rem;
+}
+
+#dataTable th:nth-child(1),
+#dataTable td:nth-child(1) { width: 90px; }
+#dataTable th:nth-child(2),
+#dataTable td:nth-child(2) { width: 65px; }
+#dataTable th:nth-child(3),
+#dataTable th:nth-child(4),
+#dataTable td:nth-child(3),
+#dataTable td:nth-child(4) { width: 55px; }
+#dataTable th:nth-child(5),
+#dataTable td:nth-child(5) { width: 120px; }
+#dataTable th:nth-child(6),
+#dataTable td:nth-child(6) { width: 140px; }
+#dataTable th:nth-child(7),
+#dataTable td:nth-child(7) { width: 60px; }
 </style>
 </head>
 <body>
@@ -478,17 +509,16 @@ td button:hover {
     <div class="table-wrap">
    <table id="dataTable">
   <thead>
-    <tr>
-      <th>Datum</th>
-      <th>Tid</th>
-      <th>F °C</th>
-      <th>K °C</th>
-      <th>Sekret</th>
-      <th>Händelser</th>
-      <th>Anteckning</th>
-      <th></th> <!-- kolumn för ✏️ och 🗑️ -->
-    </tr>
-  </thead>
+  <tr>
+    <th>Datum</th>
+    <th>Tid</th>
+    <th>F °C</th>
+    <th>K °C</th>
+    <th>Händelser</th>
+    <th>Anteckning</th>
+    <th></th>
+  </tr>
+</thead>
   <tbody></tbody>
 </table>
     </div>
@@ -656,7 +686,7 @@ el.symLHneg.addEventListener('change', () => {
       if (corr !== null) el.corrected.value = corr.toFixed(2);
     }
 
- /* ===== Spara & tabell med nya symboler ===== */
+/* ===== Spara & tabell med nya symboler ===== */
 function saveEntry() {
   const e = {
     date: el.date.value,
@@ -664,29 +694,47 @@ function saveEntry() {
     actual: el.actual.value ? Number(el.actual.value) : null,
     corrected: el.corrected.value ? Number(el.corrected.value) : null,
 
-    // symboler istället för dropdowns
-    mens: el.mensSym?.checked || false,
-    sex: el.sex?.checked || false,
-    ovulation: el.ovulation?.checked || false,
-    mucus: el.mucusSym?.checked || false,
-    lhPlus: el.lhPlus?.checked || false,
-    lhMinus: el.lhMinus?.checked || false,
+    // Händelsesymboler (checkboxar)
+    mens: el.symMens.checked || false,
+    sex: el.symSex.checked || false,
+    ovulation: el.symOv.checked || false,
+    mucus: el.symMucus.checked || false,
+    lhPos: el.symLHpos.checked || false,
+    lhNeg: el.symLHneg.checked || false,
 
+    // Anteckning
     note: el.note.value || ""
   };
 
   if (!e.date) return alert("Välj datum först.");
 
+  // Om datumet redan finns, ersätt – annars lägg till nytt
   const i = dataEntries.findIndex(x => x.date === e.date);
   if (i >= 0) dataEntries[i] = e;
   else dataEntries.push(e);
 
+  // Spara till localStorage
   localStorage.setItem("bbtData", JSON.stringify(dataEntries));
+
+  // Töm fälten efter sparning
+  el.date.value = "";
+  el.time.value = "";
+  el.actual.value = "";
+  el.corrected.value = "";
+  el.note.value = "";
+
+  el.symMens.checked = false;
+  el.symSex.checked = false;
+  el.symOv.checked = false;
+  el.symMucus.checked = false;
+  el.symLHpos.checked = false;
+  el.symLHneg.checked = false;
+
   renderTable();
   alert("✅ Data sparad!");
 }
 
-/* ===== Tabellrendering med nya symboler ===== */
+/* ===== Tabellrendering ny stil med symboler ===== */
 function renderTable() {
   el.dataTableBody.innerHTML = "";
   dataEntries.sort((a, b) => a.date.localeCompare(b.date));
@@ -694,28 +742,29 @@ function renderTable() {
   dataEntries.forEach((e, idx) => {
     const tr = document.createElement("tr");
 
-    // Ljusrosa bakgrund för mens
-    if (e.mens) tr.classList.add("mens-row");
+    // Rosa bakgrund för mens
+    if (e.mens) tr.style.backgroundColor = "#ffe8ee";
 
-    // Händelser (alla symboler)
+    // Händelser — kombinera symbolerna
     let events = "";
     if (e.mens) events += "🩸 ";
     if (e.sex) events += "💞 ";
     if (e.ovulation) events += "🌼 ";
     if (e.mucus) events += "💧 ";
-    if (e.lhPlus) events += "➕ ";
-    if (e.lhMinus) events += "➖ ";
+    if (e.lhPos) events += "➕ ";
+    if (e.lhNeg) events += "➖ ";
 
+    // Radernas innehåll
     tr.innerHTML = `
-      <td>${formatDate(e.date)}</td>
-      <td>${formatTime(e.time)}</td>
+      <td>${e.date || ""}</td>
+      <td>${e.time || ""}</td>
       <td>${e.actual ?? ""}</td>
       <td>${e.corrected ?? ""}</td>
       <td>${events.trim() || "–"}</td>
       <td>${e.note || ""}</td>
       <td>
-        <button class="table-btn small-edit">✏️</button>
-        <button class="table-btn small-del">🗑️</button>
+        <button class="table-btn small-edit" title="Redigera">✏️</button>
+        <button class="table-btn small-del" title="Radera">🗑️</button>
       </td>
     `;
 
@@ -727,21 +776,21 @@ function renderTable() {
       renderTable();
     });
 
-    // Redigera posten (ladda in i formuläret)
+    // Redigera posten
     tr.querySelector(".small-edit").addEventListener("click", () => {
       el.date.value = e.date;
       el.time.value = e.time;
-      el.actual.value = e.actual ?? "";
-      el.corrected.value = e.corrected ?? "";
+      el.actual.value = e.actual || "";
+      el.corrected.value = e.corrected || "";
+      el.note.value = e.note || "";
 
-      el.mensSym.checked = e.mens || false;
-      el.sex.checked = e.sex || false;
-      el.ovulation.checked = e.ovulation || false;
-      el.mucusSym.checked = e.mucus || false;
-      el.lhPlus.checked = e.lhPlus || false;
-      el.lhMinus.checked = e.lhMinus || false;
+      el.symMens.checked = e.mens || false;
+      el.symSex.checked = e.sex || false;
+      el.symOv.checked = e.ovulation || false;
+      el.symMucus.checked = e.mucus || false;
+      el.symLHpos.checked = e.lhPos || false;
+      el.symLHneg.checked = e.lhNeg || false;
 
-      el.note.value = e.note;
       alert("Posten laddades för redigering.");
     });
 
