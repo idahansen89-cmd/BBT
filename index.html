@@ -436,7 +436,12 @@ td button:hover {
 #dataTable th:nth-child(6),
 #dataTable td:nth-child(6) { width: 140px; }
 #dataTable th:nth-child(7),
-#dataTable td:nth-child(7) { width: 60px; }
+#dataTable td:nth-child(7) { width: 100px; }
+
+/* Gul bakgrund för ägglossningsdagar */
+tbody tr.ovulation-row {
+  background-color: #fff9d9 !important;
+}
 </style>
 </head>
 <body>
@@ -745,6 +750,12 @@ function renderTable() {
     // Rosa bakgrund för mens
     if (e.mens) tr.style.backgroundColor = "#ffe8ee";
 
+    // Gul bakgrund för ägglossning
+    if (e.ovulation) tr.classList.add("ovulation-row");
+
+    // Om både mens och ägglossning är markerade → rosa prioriteras
+    if (e.mens && e.ovulation) tr.classList.remove("ovulation-row");
+    
     // Händelser — kombinera symbolerna
     let events = "";
     if (e.mens) events += "🩸 ";
@@ -768,12 +779,24 @@ function renderTable() {
       </td>
     `;
 
-    // Radera posten (säker hantering)
+    // Radera posten (med tydlig bekräftelse)
 const delBtn = tr.querySelector(".small-del");
 if (delBtn) {
   delBtn.addEventListener("click", (ev) => {
-    ev.stopPropagation(); // förhindra klick som påverkar raden
-    if (confirm(`Ta bort posten den ${e.date}?`)) {
+    ev.stopPropagation();
+
+    // sammanställ symboler för tydlig bekräftelse
+    let summary = "";
+    if (e.mens) summary += "🩸 ";
+    if (e.sex) summary += "💞 ";
+    if (e.ovulation) summary += "🌼 ";
+    if (e.mucus) summary += "💧 ";
+    if (e.lhPos) summary += "➕ ";
+    if (e.lhNeg) summary += "➖ ";
+    summary = summary.trim() || "–";
+
+    const confirmText = `Vill du ta bort posten den ${e.date}?\n\nHändelser: ${summary}`;
+    if (confirm(confirmText)) {
       dataEntries.splice(idx, 1);
       localStorage.setItem("bbtData", JSON.stringify(dataEntries));
       renderTable();
