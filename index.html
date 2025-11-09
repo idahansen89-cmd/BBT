@@ -869,25 +869,47 @@ function renderChart() {
   const actual = dataEntries.map(e => e.actual);
   const corrected = dataEntries.map(e => e.corrected);
 
-  // hitta index för ägglossning och mens
+  // === FASER ===
   const ovIndex = dataEntries.findIndex(e => e.ovulation);
-  const firstNonMens = dataEntries.findIndex(e => e.mens !== "Mens");
-  const mensEnd = (firstNonMens === -1) ? labels.length - 1 : firstNonMens - 1;
-
-  // annotationer för bakgrundsfärger
   const anns = [];
 
-  // Mensfas (rosa)
-  if (mensEnd >= 0)
+  // --- Mensfas (rosa) ---
+  const mensIndices = dataEntries
+    .map((e, i) => e.symMens ? i : null)
+    .filter(i => i !== null);
+
+  if (mensIndices.length > 0) {
+    let start = mensIndices[0];
+    let end = start;
+
+    // Slå ihop sammanhängande mensdagar
+    for (let i = 1; i < mensIndices.length; i++) {
+      if (mensIndices[i] === end + 1) {
+        end = mensIndices[i];
+      } else {
+        anns.push({
+          type: "box",
+          xMin: start - 0.5,
+          xMax: end + 0.5,
+          backgroundColor: "rgba(255,232,238,0.7)",
+          borderWidth: 0
+        });
+        start = mensIndices[i];
+        end = start;
+      }
+    }
+
+    // sista blocket
     anns.push({
       type: "box",
-      xMin: 0,
-      xMax: mensEnd + 0.5,
+      xMin: start - 0.5,
+      xMax: end + 0.5,
       backgroundColor: "rgba(255,232,238,0.7)",
       borderWidth: 0
     });
+  }
 
-  // Ägglossningsdag (gul)
+  // --- Ägglossning (gul) ---
   if (ovIndex >= 0)
     anns.push({
       type: "box",
@@ -897,12 +919,12 @@ function renderChart() {
       borderWidth: 0
     });
 
-  // Lutealfas (lila)
-  if (ovIndex >= 0 && ovIndex < labels.length - 1)
+  // --- Lutealfas (lila) ---
+  if (ovIndex >= 0 && ovIndex < dataEntries.length - 1)
     anns.push({
       type: "box",
       xMin: ovIndex + 0.5,
-      xMax: labels.length - 0.5,
+      xMax: dataEntries.length - 0.5,
       backgroundColor: "rgba(244,230,255,0.7)",
       borderWidth: 0
     });
