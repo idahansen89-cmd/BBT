@@ -7,7 +7,6 @@
   <link rel="icon" type="image/png" href="B29437FC-696F-4754-AAAB-A6ED096BC64C.png" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@2.2.1"></script>
- <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1"></script>
   <style>
     :root{
       --pink:#f4b6c2;
@@ -387,110 +386,101 @@ function computeCorrectedFormInputs() {
       localStorage.clear();
       if(chart) chart.destroy();
       renderTable();
-      // --- Graf ---
-async function renderChart() {
-  if (chart) chart.destroy();
+      renderLHList();
+    }
 
-  dataEntries.sort((a,b)=>a.date.localeCompare(b.date));
+    /* ===== Chart ===== */
+    function renderChart(){
+      if(chart) chart.destroy();
 
-  // Datumformat DD-MM
-  const labels = dataEntries.map(e => {
-    if (!e.date) return "";
-    const [y,m,d] = e.date.split("-");
-    return `${d}-${m}`;
-  });
+      dataEntries.sort((a,b)=>a.date.localeCompare(b.date));
+      const labels = dataEntries.map(e=>e.date);
+      const actual = dataEntries.map(e=>e.actual);
+      const corrected = dataEntries.map(e=>e.corrected);
 
-  const actual = dataEntries.map(e=>e.actual);
-  const corrected = dataEntries.map(e=>e.corrected);
+      // Medel före ägglossning (beräkna på BBT från CD1 → ovulation), rita över hela grafen
+      const ovIndex = dataEntries.findIndex(e=>e.ovulation);
+      const preVals = (ovIndex>0 ? actual.slice(0, ovIndex) : actual).filter(v=>typeof v==='number');
+      const avg = preVals.length ? preVals.reduce((a,b)=>a+b,0)/preVals.length : null;
 
-  // Medel före ägglossning
-  const ovIndex = dataEntries.findIndex(e=>e.ovulation);
-  const pre = (ovIndex>0 ? actual.slice(0, ovIndex) : actual).filter(v=>typeof v==='number');
-  const avg = pre.length ? pre.reduce((a,b)=>a+b,0)/pre.length : null;
+      // Mensbakgrund (från start till första icke-mens)
+      const firstNonMens = dataEntries.findIndex(e=>e.mens!=='Mens');
+      const mensEndX = (firstNonMens===-1) ? labels.length-0.5 : firstNonMens-0.5;
 
-  // Bakgrundsmarkeringar (mens & lutealfas)
-  const anns = [];
-  const firstNon = dataEntries.findIndex(e=>e.mens!=='Mens');
-  const end = (firstNon===-1) ? labels.length-0.5 : firstNon-0.5;
-  if (firstNon !== 0)
-    anns.push({type:'box', xMin:0, xMax:end, backgroundColor:'rgba(255,230,230,.3)', borderWidth:0});
-  if (ovIndex > -1)
-    anns.push({type:'box', xMin:ovIndex+0.5, xMax:labels.length-0.5, backgroundColor:'rgba(230,210,255,.25)', borderWidth:0});
-
-  // Symboler (sex, ägglossning, sekret)
-  const symbols = dataEntries.map(e=>{
-    const s=[];
-    if (e.sex) s.push('💞');
-    if (e.ovulation) s.push('🌼');
-    if (e.mucus==='Äggviteliknande') s.push('💧');
-    return s;
-  });
-
-  // Skapa grafen
-  chart = new Chart(el.chartCanvas, {
-    type:'line',
-    data:{
-      labels,
-      datasets:[
-        {label:'Faktisk temperatur', data:actual, borderColor:'#3b82f6', backgroundColor:'#3b82f6', tension:0.3, pointRadius:3, spanGaps:true},
-        {label:'Korrigerad temperatur', data:corrected, borderColor:'#ef4444', backgroundColor:'#ef4444', borderDash:[4,4], tension:0.3, pointRadius:2, spanGaps:true},
-        ...(avg ? [{label:'Medel före ägglossning', data:Array(labels.length).fill(avg), borderColor:'#888', borderDash:[5,5], pointRadius:0}] : [])
-      ]
-    },
-    options:{
-      responsive:true,
-      maintainAspectRatio:false,
-      scales:{
-        y:{
-          min:34.9,
-          max:38.6,
-          ticks:{stepSize:0.1, color:'#000'},
-          title:{display:true, text:'Temperatur (°C)'}
-        },
-        x:{
-          ticks:{
-            autoSkip:true,
-            maxRotation:45,
-            color:'#000'
-          }
-        }
-      },
-      plugins:{
-        legend:{position:'bottom', labels:{color:'#000'}},
-        annotation:{annotations:anns},
-        zoom:{
-          zoom:{
-            wheel:{enabled:true},
-            pinch:{enabled:true},
-            mode:'x'
-          },
-          pan:{enabled:true, mode:'x'}
-        }
-      },
-      animation:false
-    },
-    plugins:[{
-      id:'symbols',
-      afterDatasetsDraw(c) {
-        const ctx = c.ctx;
-        ctx.font = '10px sans-serif';
-        ctx.textAlign='center';
-        const meta = c.getDatasetMeta(0);
-        c.data.labels.forEach((_, i)=>{
-          const p = meta.data[i];
-          if (!p) return;
-          const x = p.x, y = c.scales.y.bottom - 18;
-          if (symbols[i]?.length) symbols[i].forEach((sm, j)=>ctx.fillText(sm, x, y - j*13));
-        });
+      const anns = [];
+      if(firstNonMens !== 0){
+        anns.push({type:'box', xMin:0, xMax:mensEndX, backgroundColor:'rgba(255,230,236,.5)', borderWidth:0});
       }
-    }]
-  });
+      // Lutealfas (från ovulation+0.5 → slut)
+      if(ovIndex > -1){
+        anns.push({type:'box', xMin:ovIndex+0.5, xMax:labels.length-0.5, backgroundColor:'rgba(242,230,255,.5)', borderWidth:0});
+      }
 
-  // Fast storlek + scroll
-  el.chartCanvas.parentElement.style.overflowX = 'auto';
-  el.chartCanvas.style.width = '1200px';
-  el.chartCanvas.style.height = '520px';
-}
+      // Symboler för x-axel
+      const symbols = dataEntries.map(e=>{
+        const s=[];
+        if(e.sex) s.push('💞');
+        if(e.ovulation) s.push('🌼');
+        if(e.mucus==='Äggviteliknande') s.push('💧');
+        return s;
+      });
+
+      chart = new Chart(el.chartCanvas, {
+        type:'line',
+        data:{
+          labels,
+          datasets:[
+            {
+              label:'Faktisk temperatur',
+              data: actual,
+              borderColor:'#3b82f6', backgroundColor:'#3b82f6',
+              pointRadius:3, tension:0.28, spanGaps:true
+            },
+            {
+              label:'Korrigerad temperatur',
+              data: corrected,
+              borderColor:'#ef4444', backgroundColor:'#ef4444',
+              borderDash:[4,4], pointRadius:2, tension:0.28, spanGaps:true
+            },
+            ...(avg ? [{
+              label:'Medel före ägglossning',
+              data: Array(labels.length).fill(avg),
+              borderColor:'#888', pointRadius:0, borderDash:[6,4]
+            }] : [])
+          ]
+        },
+        options:{
+          scales:{
+            y:{ min:35, max:38.5, title:{display:true, text:'Temperatur (°C)'} },
+            x:{ ticks:{ autoSkip:false, maxRotation:0 } }
+          },
+          plugins:{
+            legend:{ position:'bottom', labels:{ color:'#000' } },
+            annotation:{ annotations: anns }
+          },
+          animation:false
+        },
+        plugins:[{
+          // rita symboler längs x-axeln
+          id:'symbols',
+          afterDatasetsDraw(c){
+            const ctx = c.ctx;
+            ctx.font = '11px sans-serif';
+            ctx.textAlign='center';
+            const meta = c.getDatasetMeta(0);
+            c.data.labels.forEach((_, i)=>{
+              const p = meta.data[i];
+              if(!p) return;
+              const x = p.x, y = c.scales.y.bottom - 18;
+              if(symbols[i]?.length){
+                symbols[i].forEach((sm, j)=>ctx.fillText(sm, x, y - j*13));
+              }
+            });
+          }
+        }]
+      });
+    }
+
     /* ===== Export chart (PNG) ===== */
     el.exportChartBtn.addEventListener('click', ()=>{
       const link = document.createElement('a');
