@@ -891,6 +891,7 @@ if (mensIndices.length > 0) {
     xMax: end,
     backgroundColor: "rgba(255,230,236,0.55)", // lite mjukare nyans
     borderWidth: 0
+    drawTime: 'beforeDatasetsDraw'
   });
 }
 
@@ -902,6 +903,7 @@ if (mensIndices.length > 0) {
       xMax: ovIndex + 0.5,
       backgroundColor: "rgba(255,249,217,0.7)",
       borderWidth: 0
+      drawTime: 'beforeDatasetsDraw'
     });
 
   // --- Lutealfas (lila) ---
@@ -912,6 +914,7 @@ if (mensIndices.length > 0) {
       xMax: dataEntries.length - 0.5,
       backgroundColor: "rgba(244,230,255,0.7)",
       borderWidth: 0
+      drawTime: 'beforeDatasetsDraw'
     });
     
   // --- Vertikal linje vid ägglossning (grå) ---
