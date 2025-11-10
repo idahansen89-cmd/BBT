@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+weww<!DOCTYPE html>
 <html lang="sv">
 <head>
   <meta charset="UTF-8" />
@@ -931,6 +931,18 @@ if (mensIndices.length > 0) {
       }
     });
     
+    // --- Medellinje (före ägglossning) ---
+let meanBeforeOv = null;
+if (ovIndex > 0) {
+  const temps = dataEntries
+    .slice(0, ovIndex)
+    .map(e => e.actual)
+    .filter(v => v != null);
+  if (temps.length > 0) {
+    meanBeforeOv = temps.reduce((a, b) => a + b, 0) / temps.length;
+  }
+}
+    
   chart = new Chart(el.chartCanvas, {
     type: "line",
     data: {
@@ -953,6 +965,17 @@ if (mensIndices.length > 0) {
           borderDash: [4, 4],
           pointRadius: 2,
           tension: 0.25,
+          spanGaps: true
+        },
+        {
+          label: "Medel före ägglossning",
+          data: meanBeforeOv ? new Array(dataEntries.length).fill(meanBeforeOv).map((v, i) => i <= ovIndex ? v : null) : [],
+          borderColor: "rgba(120,120,120,0.6)",
+          borderDash: [5,5],
+          borderWidth: 1.2,
+          pointRadius: 0,
+          fill: false,
+          tension: 0,
           spanGaps: true
         }
       ]
