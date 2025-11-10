@@ -1,4 +1,4 @@
-weww<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="sv">
 <head>
   <meta charset="UTF-8" />
@@ -880,17 +880,13 @@ function renderChart() {
   const actual = dataEntries.map(e => e.actual);
   const corrected = dataEntries.map(e => e.corrected);
 
-  // === FASER ===
-  const ovIndex = dataEntries.findIndex(e => e.ovulation);
-  const anns = [];
+ // === FASER ===
+const ovIndex = dataEntries.findIndex(e => e.ovulation);
+const anns = [];
 
-// Mensfas (rosa)
+// 🌸 Mensfas (rosa)
 const mensIndices = dataEntries
-  .map((e, i) => {
-    // Fångar både gamla och nya format
-    if (e.symMens || e.mens === "Mens" || e.mens === true) return i;
-    return null;
-  })
+  .map((e, i) => (e.symMens || e.mens === "Mens" || e.mens === true ? i : null))
   .filter(i => i !== null);
 
 if (mensIndices.length > 0) {
@@ -900,47 +896,44 @@ if (mensIndices.length > 0) {
     type: "box",
     xMin: start,
     xMax: end,
-    backgroundColor: "rgba(255,230,236,0.55)",
+    backgroundColor: "rgba(244,182,194,0.55)", // rosa
     borderWidth: 0,
     drawTime: 'beforeDatasetsDraw'
   });
 }
 
-  // --- Ägglossning (gul) ---
-  if (ovIndex >= 0)
-    anns.push({
-      type: "box",
-      xMin: ovIndex - 0.5,
-      xMax: ovIndex + 0.5,
-      backgroundColor: "rgba(255,249,217,0.7)",
-      borderWidth: 0,
-      drawTime: 'beforeDatasetsDraw'
-    });
+// 🌼 Ägglossning (gul)
+if (ovIndex >= 0)
+  anns.push({
+    type: "box",
+    xMin: ovIndex - 0.5,
+    xMax: ovIndex + 0.5,
+    backgroundColor: "rgba(255,244,176,0.65)", // mild gul
+    borderWidth: 0,
+    drawTime: 'beforeDatasetsDraw'
+  });
 
-  // --- Lutealfas (lila) ---
-  if (ovIndex >= 0 && ovIndex < dataEntries.length - 1)
-    anns.push({
-      type: "box",
-      xMin: ovIndex + 0.5,
-      xMax: dataEntries.length - 0.5,
-      backgroundColor: "rgba(244,230,255,0.7)",
-      borderWidth: 0,
-      drawTime: 'beforeDatasetsDraw'
-    });
-    
-  // --- Vertikal linje vid ägglossning (grå) ---
-  if (ovIndex >= 0)
-    anns.push({
-      type: "line",
-      xMin: ovIndex,
-      xMax: ovIndex,
-      borderColor: "rgba(120,120,120,0.6)",
-      borderWidth: 1,
-      borderDash: [3, 3],
-      label: {
-        enabled: false
-      }
-    });
+// 💜 Lutealfas (lavendel)
+if (ovIndex >= 0 && ovIndex < dataEntries.length - 1)
+  anns.push({
+    type: "box",
+    xMin: ovIndex + 0.5,
+    xMax: dataEntries.length - 0.5,
+    backgroundColor: "rgba(224,195,252,0.6)", // mjuk lavendel
+    borderWidth: 0,
+    drawTime: 'beforeDatasetsDraw'
+  });
+
+// Vertikal linje vid ägglossning
+if (ovIndex >= 0)
+  anns.push({
+    type: "line",
+    xMin: ovIndex,
+    xMax: ovIndex,
+    borderColor: "rgba(120,120,120,0.6)",
+    borderWidth: 1,
+    borderDash: [3, 3]
+  });
     
    // --- Medellinje (före ägglossning, baserad på korrigerade temp) ---
 let meanBeforeOv = null;
