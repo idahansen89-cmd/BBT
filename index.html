@@ -1004,7 +1004,7 @@ const customShapesPlugin = {
 
         if (ds.pointStyle === 'heart') {
           // hjärtat behöver större skala → *10
-          drawHeart(ctx, x, y, size * 2, color);
+          drawHeart(ctx, x, y - size * 0.6, size * 2.8, color);;
         } else if (ds.pointStyle === 'star') {
           // stjärnan blir lagom med *2.5
           drawStar(ctx, x, y, size * 2.5, color);
