@@ -967,17 +967,17 @@ if (ovIndex > 0) {
           tension: 0.25,
           spanGaps: true
         },
-       {
+        {
           label: "Medel före ägglossning",
           data: meanBeforeOv ? new Array(dataEntries.length).fill(meanBeforeOv) : [],
-          borderColor: "rgba(120,120,120,0.7)",
-          borderDash: [5,5],
-          borderWidth: 1.5,
+          borderColor: "rgba(175, 140, 230, 0.9)", // mjuk lila ton
+          borderWidth: 2.5,                       // något tjockare
+          borderDash: [],                         // solid linje
           pointRadius: 0,
           fill: false,
           tension: 0,
           spanGaps: true,
-          order: 1 // gör att den hamnar mellan bakgrund och temperaturkurvor
+          order: 1
         }
       ]
     },
