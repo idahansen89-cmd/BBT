@@ -946,22 +946,53 @@ if (ovIndex > 0) {
     meanBeforeOv = temps.reduce((a, b) => a + b, 0) / temps.length;
   }
 }
-    
+    // 💗 Anpassad hjärtform för punkter
+const heart = {
+  draw(ctx, area) {
+    const {x, y} = area;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.scale(0.1, 0.1); // gör lagom storlek
+    ctx.beginPath();
+    ctx.moveTo(75, 40);
+    ctx.bezierCurveTo(75, 37, 70, 25, 50, 25);
+    ctx.bezierCurveTo(20, 25, 20, 62.5, 20, 62.5);
+    ctx.bezierCurveTo(20, 80, 40, 102, 75, 120);
+    ctx.bezierCurveTo(110, 102, 130, 80, 130, 62.5);
+    ctx.bezierCurveTo(130, 62.5, 130, 25, 100, 25);
+    ctx.bezierCurveTo(85, 25, 75, 37, 75, 40);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+  }
+};
+// registrera den nya hjärtformen i Chart.js
+Chart.register({
+  id: 'heartPoint',
+  beforeDraw(chart) {
+    chart.config.data.datasets.forEach(ds => {
+      if (ds.pointStyle === 'heart') ds.pointStyle = heart;
+    });
+  }
+});
+
   chart = new Chart(el.chartCanvas, {
     type: "line",
     data: {
       labels,
       datasets: [
-        {
+       {
           label: "Faktisk temperatur",
           data: actual,
-          borderColor: "rgba(140,170,255,0.95)",   // mjuk pastellblå
-          backgroundColor: "rgba(140,170,255,0.95)",
-          borderWidth: 2.4,
-          pointBackgroundColor: "rgba(140,170,255,1)",
-          pointRadius: 3.8,
+          borderColor: "rgba(140,170,255,0.9)",   // mjuk pastellblå
+          backgroundColor: "rgba(140,170,255,0.9)",
+          borderWidth: 1.6,                       // tunnare linje
           tension: 0.25,
           spanGaps: true,
+          pointRadius: 3,
+          pointStyle: "heart",                    // ❤️ <- egen form (kommer här nedan)
+          pointBackgroundColor: "rgba(140,170,255,0.6)",
+          pointBorderWidth: 0,
           order: 2
         },
         {
