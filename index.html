@@ -951,28 +951,33 @@ if (ovIndex > 0) {
         {
           label: "Faktisk temperatur",
           data: actual,
-          borderColor: "#3b82f6",
-          backgroundColor: "#3b82f6",
-          pointRadius: 3,
+          borderColor: "rgba(90,140,255,0.9)",   // mildare blå
+          backgroundColor: "rgba(90,140,255,0.9)",
+          borderWidth: 2,
+          pointBackgroundColor: "#5a8cff",
+          pointRadius: 3.5,
           tension: 0.25,
-          spanGaps: true
+          spanGaps: true,
+          order: 2
         },
         {
           label: "Korrigerad temperatur",
           data: corrected,
-          borderColor: "#ef4444",
-          backgroundColor: "#ef4444",
-          borderDash: [4, 4],
-          pointRadius: 2,
+          borderColor: "rgba(240,100,120,0.85)", // varm korallröd
+          backgroundColor: "rgba(240,100,120,0.85)",
+          borderDash: [4,3],
+          borderWidth: 1.8,
+          pointRadius: 2.5,
           tension: 0.25,
-          spanGaps: true
+          spanGaps: true,
+          order: 3
         },
         {
           label: "Medel före ägglossning",
           data: meanBeforeOv ? new Array(dataEntries.length).fill(meanBeforeOv) : [],
-          borderColor: "rgba(175, 140, 230, 0.9)", // mjuk lila ton
-          borderWidth: 2.5,                       // något tjockare
-          borderDash: [],                         // solid linje
+          borderColor: "rgba(175,140,230,0.9)",  // lila linje
+          borderWidth: 2.5,
+          borderDash: [],
           pointRadius: 0,
           fill: false,
           tension: 0,
