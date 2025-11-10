@@ -975,7 +975,9 @@ if (mensIndices.length > 0) {
       },
       plugins: {
         legend: { position: "bottom", labels: { color: "#000" } },
-        annotation: { annotations: anns }
+        annotation: { 
+          drawTime: 'beforeDatasetsDraw',
+          annotations: anns }
       },
       animation: false
     }
