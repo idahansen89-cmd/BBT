@@ -1085,77 +1085,56 @@ Chart.register(customShapesPlugin);
         }
       ]
     },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      
-      // 👇 plats i grafen för symbolfält
-      layout: { padding: { bottom: 26 } },
-
-      scales: {
-        y: {
-          min: 34.9,
-          max: 38.6,
-          ticks: { stepSize: 0.1, color: "#000" },
-          title: { display: true, text: "Temperatur (°C)" }
-        },
-          ySymbols: {
-          position: 'right',
-          display: false,     // osynlig axel
-          min: 35.8,          // placering nära x-axeln
-          max: 36.1,
-          grid: { display: false },
-          ticks: { display: false }
-        },
-        x: {
-          ticks: {
-            color: "#000",
-            autoSkip: true,
-            maxTicksLimit: 10,
-            maxRotation: 0
-          }
-        }
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    layout: { padding: { bottom: 26 } },
+    scales: {
+      y: {
+        min: 34.9,
+        max: 38.6,
+        ticks: { stepSize: 0.1, color: "#000" },
+        title: { display: true, text: "Temperatur (°C)" }
       },
-      plugins: {
-        legend: { position: "bottom", labels: { color: "#000" } },
-        annotation: { 
-          drawTime: 'beforeDatasetsDraw',
-          annotations: anns 
-        },
-  
-        // 👇 Ny inbäddad plugin för symbolfältet
-  customSymbols: {
-    id: 'customSymbols',
-    afterDraw(chart, args, options) {
-      const { ctx, chartArea: { bottom }, scales: { x } } = chart;
-      const y = bottom - 15; // avstånd ovanför x-axeln
+      x: {
+        ticks: {
+          color: "#000",
+          autoSkip: true,
+          maxTicksLimit: 10,
+          maxRotation: 0
+        }
+      }
+    },
+    plugins: {
+      legend: { position: "bottom", labels: { color: "#000" } },
+      annotation: { drawTime: 'beforeDatasetsDraw', annotations: anns }
+    },
+    animation: false
+  },
 
+  // 👇 FLYTTA HIT: Symbol-plugin som separat block utanför options
+  plugins: [{
+    id: 'customSymbols',
+    afterDraw(chart) {
+      const { ctx, chartArea: { bottom }, scales: { x } } = chart;
+      const y = bottom - 15;
       dataEntries.forEach((e, i) => {
         const xPos = x.getPixelForValue(i);
         let symbol = '';
-        let color = '';
-
-        if (e.sex) { symbol = '💞'; color = '#e696b4'; }
-        else if (e.ovulation) { symbol = '🌼'; color = '#f5c441'; }
-        else if (e.mucus) { symbol = '💧'; color = '#5fa1ff'; }
-
+        if (e.sex) symbol = '💞';
+        else if (e.ovulation) symbol = '🌼';
+        else if (e.mucus) symbol = '💧';
         if (symbol) {
           ctx.save();
           ctx.font = '18px Apple Color Emoji, Segoe UI Emoji';
           ctx.textAlign = 'center';
-          ctx.fillStyle = color;
           ctx.fillText(symbol, xPos, y);
           ctx.restore();
         }
       });
     }
-  }
-},
-
-  animation: false
-    }
-  });
-}
+  }]
+});
     /* ===== Export / Import ===== */
     el.exportBtn.addEventListener('click', ()=>{
       const blob = new Blob([JSON.stringify({ bbtData:dataEntries, lhDataByDate:lhByDate }, null, 2)], {type:'application/json'});
