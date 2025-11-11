@@ -880,6 +880,15 @@ function renderChart() {
   const actual = dataEntries.map(e => e.actual);
   const corrected = dataEntries.map(e => e.corrected);
 
+// Symboler per datum (ordning: 💞 samlag, 🌼 ägglossning, 💧 äggvitesekret)
+const symbolRows = dataEntries.map(e => {
+  const row = [];
+  if (e.sex)      row.push('💞');
+  if (e.ovulation) row.push('🌼');
+  if (e.mucus)    row.push('💧');
+  return row;
+});
+
  // === FASER ===
 const ovIndex = dataEntries.findIndex(e => e.ovulation);
 const anns = [];
