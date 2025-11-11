@@ -1034,37 +1034,39 @@ Chart.register(customShapesPlugin);
         {
           label: "Faktisk temperatur",
           data: actual,
-          borderColor: "rgba(140,170,255,0.95)",
-          backgroundColor: "rgba(140,170,255,0.95)",
+          borderColor: "rgba(90,140,255,0.9)",
+          backgroundColor: "rgba(90,140,255,0.9)",
           borderWidth: 1.6,
-          tension: 0.25,
+          tension: 0.3,
           spanGaps: true,
           order: 2,
-        
-          // ⭐ stjärnor
-          pointStyle: 'star',
-          pointRadius: 3,                 // styr storlek på stjärnan
-          pointBackgroundColor: 'transparent', // göm standardpunkten
-          pointBorderWidth: 0,
-          pointFill: "rgba(140,170,255,0.95)"  // färg för stjärnan (används av pluginet)
+
+          // 💗 Hjärt-punkter
+          pointStyle: 'heart',
+          pointRadius: 2.8,
+          pointHoverRadius: 3.4,
+          pointBackgroundColor: "#ff6f91",
+          pointBorderColor: "#fff",
+          pointBorderWidth: 0.8
         },
         {
           label: "Korrigerad temperatur",
           data: corrected,
-          borderColor: "rgba(240,100,120,0.9)",
-          backgroundColor: "rgba(240,100,120,0.9)",
-          borderDash: [4,3],
+          borderColor: "rgba(240,100,120,0.85)",
+          backgroundColor: "rgba(240,100,120,0.85)",
+          borderDash: [3, 2],
           borderWidth: 1.4,
-          tension: 0.25,
+          tension: 0.3,
           spanGaps: true,
           order: 3,
-        
-          // 💗 hjärtan
-          pointStyle: 'heart',
-          pointRadius: 3.2,                     // liten justering i storlek
-          pointBackgroundColor: 'transparent',
-          pointBorderWidth: 0,
-          pointFill: "rgba(240,100,120,0.9)"
+
+          // ⭐ Stjärn-punkter
+          pointStyle: 'star',
+          pointRadius: 3.2,
+          pointHoverRadius: 3.8,
+          pointBackgroundColor: "#ffcc70",
+          pointBorderColor: "#fff",
+          pointBorderWidth: 0.8
         },
         {
           label: "Medel före ägglossning",
