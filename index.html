@@ -1124,28 +1124,29 @@ Chart.register(customShapesPlugin);
         },
   
       // Symbolfält för händelser
-      afterDraw: (chart) => {
-    const {ctx, chartArea: {bottom}, scales: {x}} = chart;
-    const y = bottom - 15; // avstånd ovanför x-axeln
+      afterDatasetsDraw(chart, args, options) {
+  const {ctx, chartArea: {bottom}, scales: {x}} = chart;
+  const y = bottom - 15;
 
-    dataEntries.forEach((e, i) => {
-      const xPos = x.getPixelForValue(i);
-      let symbol = '';
-      let color = '';
+  dataEntries.forEach((e, i) => {
+    const xPos = x.getPixelForValue(i);
+    let symbol = '';
+    let color = '';
 
-      if (e.sex) { symbol = '💞'; color = '#e696b4'; }
-      else if (e.ovulation) { symbol = '🌼'; color = '#f5c441'; }
-      else if (e.mucus) { symbol = '💧'; color = '#5fa1ff'; }
+    if (e.sex) { symbol = '💞'; color = '#e696b4'; }
+    else if (e.ovulation) { symbol = '🌼'; color = '#f5c441'; }
+    else if (e.mucus) { symbol = '💧'; color = '#5fa1ff'; }
 
-      if (symbol) {
-        ctx.font = '16px Apple Color Emoji, Segoe UI Emoji';
-        ctx.textAlign = 'center';
-        ctx.fillStyle = color;
-        ctx.fillText(symbol, xPos, y);
-      }
-    });
-  }
-},
+    if (symbol) {
+      ctx.save();  // 👈 viktigt
+      ctx.font = '18px Apple Color Emoji, Segoe UI Emoji';
+      ctx.textAlign = 'center';
+      ctx.fillStyle = color;
+      ctx.fillText(symbol, xPos, y);
+      ctx.restore(); // 👈 viktigt
+    }
+  });
+}
       animation: false
     }
   });
