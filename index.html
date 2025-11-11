@@ -935,16 +935,27 @@ if (ovIndex >= 0)
     borderDash: [3, 3]
   });
     
-   // --- Medellinje (före ägglossning, baserad på korrigerade temp) ---
+// Medellinje som uppdateras löpande med alla korrigerade temp fram till ev. ägglossning
 let meanBeforeOv = null;
+let tempsBeforeOv;
+
+// Om ägglossning finns, använd data fram till den
 if (ovIndex > 0) {
-  const temps = dataEntries
+  tempsBeforeOv = dataEntries
     .slice(0, ovIndex)
     .map(e => e.corrected)
     .filter(v => v != null);
-  if (temps.length > 0) {
-    meanBeforeOv = temps.reduce((a, b) => a + b, 0) / temps.length;
-  }
+}
+// Om ägglossning ännu inte finns, använd all befintlig data hittills
+else {
+  tempsBeforeOv = dataEntries
+    .map(e => e.corrected)
+    .filter(v => v != null);
+}
+
+// Beräkna medel
+if (tempsBeforeOv && tempsBeforeOv.length > 0) {
+  meanBeforeOv = tempsBeforeOv.reduce((a, b) => a + b, 0) / tempsBeforeOv.length;
 }
     // 💗 Hjärtform
 function drawHeart(ctx, x, y, size, color) {
