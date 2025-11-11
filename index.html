@@ -1065,13 +1065,14 @@ Chart.register(customShapesPlugin);
         {
           label: "Medel före ägglossning",
           data: meanBeforeOv ? new Array(dataEntries.length).fill(meanBeforeOv) : [],
-          borderColor: "rgba(175,140,230,1)",
-          borderWidth: 3,
+          borderColor: "rgba(175,140,230,0.7)",  // mjukare lila ton
+          borderWidth: 1.8,                      // tunnare linje
+          borderDash: [4,3],                     // diskret prickad stil
           pointRadius: 0,
           fill: false,
           tension: 0,
           spanGaps: true,
-          order: 1
+          order: 1                               // ligger bakom datapunkterna
         }
       ]
     },
