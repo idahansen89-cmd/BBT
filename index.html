@@ -1082,21 +1082,6 @@ Chart.register(customShapesPlugin);
           tension: 0,
           spanGaps: true,
           order: 1
-        },
-        {
-          label: "Händelser",
-          data: dataEntries.map(e =>
-            e.sex ? 36.0 : e.ovulation ? 35.95 : e.mucus ? 35.9 : null
-          ),
-          pointStyle: dataEntries.map(e =>
-            e.sex ? "💞" : e.ovulation ? "🌼" : e.mucus ? "💧" : null
-          ),
-          borderColor: "transparent",
-          backgroundColor: "transparent",
-          pointRadius: 8,
-          showLine: false,
-          yAxisID: 'ySymbols',
-          order: 5
         }
       ]
     },
@@ -1137,6 +1122,29 @@ Chart.register(customShapesPlugin);
           drawTime: 'beforeDatasetsDraw',
           annotations: anns }
       },
+      // Symbolfält för händelser
+  afterDatasetsDraw: (chart) => {
+    const {ctx, chartArea: {bottom}, scales: {x}} = chart;
+    const y = bottom - 15; // avstånd ovanför x-axeln
+
+    dataEntries.forEach((e, i) => {
+      const xPos = x.getPixelForValue(i);
+      let symbol = '';
+      let color = '';
+
+      if (e.sex) { symbol = '💞'; color = '#e696b4'; }
+      else if (e.ovulation) { symbol = '🌼'; color = '#f5c441'; }
+      else if (e.mucus) { symbol = '💧'; color = '#5fa1ff'; }
+
+      if (symbol) {
+        ctx.font = '16px Apple Color Emoji, Segoe UI Emoji';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = color;
+        ctx.fillText(symbol, xPos, y);
+      }
+    });
+  }
+},
       animation: false
     }
   });
