@@ -1082,6 +1082,21 @@ Chart.register(customShapesPlugin);
           tension: 0,
           spanGaps: true,
           order: 1
+        },
+        {
+          label: "Händelser",
+          data: dataEntries.map(e =>
+            e.sex ? 36.0 : e.ovulation ? 35.95 : e.mucus ? 35.9 : null
+          ),
+          pointStyle: dataEntries.map(e =>
+            e.sex ? "💞" : e.ovulation ? "🌼" : e.mucus ? "💧" : null
+          ),
+          borderColor: "transparent",
+          backgroundColor: "transparent",
+          pointRadius: 8,
+          showLine: false,
+          yAxisID: 'ySymbols',
+          order: 5
         }
       ]
     },
@@ -1098,6 +1113,14 @@ Chart.register(customShapesPlugin);
           max: 38.6,
           ticks: { stepSize: 0.1, color: "#000" },
           title: { display: true, text: "Temperatur (°C)" }
+        },
+          ySymbols: {
+          position: 'right',
+          display: false,     // osynlig axel
+          min: 35.8,          // placering nära x-axeln
+          max: 36.1,
+          grid: { display: false },
+          ticks: { display: false }
         },
         x: {
           ticks: {
