@@ -1121,9 +1121,9 @@ Chart.register(customShapesPlugin);
         annotation: { 
           drawTime: 'beforeDatasetsDraw',
           annotations: anns }
-      },
+  
       // Symbolfält för händelser
-  afterDatasetsDraw: (chart) => {
+      afterDatasetsDraw: (chart) => {
     const {ctx, chartArea: {bottom}, scales: {x}} = chart;
     const y = bottom - 15; // avstånd ovanför x-axeln
 
