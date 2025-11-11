@@ -1144,10 +1144,12 @@ Chart.register(customShapesPlugin);
       ctx.fillStyle = color;
       ctx.fillText(symbol, xPos, y);
       ctx.restore(); // 👈 viktigt
+     }
+      });
     }
-  });
-},
-      animation: false
+  }, 
+
+  animation: false
     }
   });
 }
