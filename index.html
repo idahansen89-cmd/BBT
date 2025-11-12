@@ -1109,15 +1109,19 @@ chart = new Chart(el.chartCanvas, {
       const y = bottom - 15; // justera höjden om det behövs
       dataEntries.forEach((e, i) => {
         const xPos = x.getPixelForValue(i);
-        let symbol = '';
-        if (e.sex) symbol = '💞';
-        else if (e.ovulation) symbol = '🌼';
-        else if (e.mucus) symbol = '💧';
-        if (symbol) {
+        // 💞🌼💧 — visa flera symboler samtidigt om flera är markerade
+        const symbols = [];
+        if (e.sex) symbols.push('💞');
+        if (e.ovulation) symbols.push('🌼');
+        if (e.mucus) symbols.push('💧');
+        
+        if (symbols.length) {
           ctx.save();
           ctx.font = '18px Apple Color Emoji, Segoe UI Emoji';
           ctx.textAlign = 'center';
-          ctx.fillText(symbol, xPos, y);
+          symbols.forEach((sym, j) => {
+            ctx.fillText(sym, xPos, y - j * 18); // stapla symbolerna vertikalt
+          });
           ctx.restore();
         }
       });
