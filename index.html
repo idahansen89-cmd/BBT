@@ -1080,7 +1080,6 @@ chart = new Chart(el.chartCanvas, {
     layout: { padding: { bottom: 26 } },
     scales: {
 y: {
-  // Ger tydlig luft under symbolfältet
   min: Math.min(...corrected) - 0.25,
   max: Math.max(...corrected) + 0.15,
 
@@ -1090,7 +1089,7 @@ y: {
     precision: 2,
     padding: 8,
     callback: function(value, index, ticks) {
-      // Dölj nedersta etiketten (närmast x-axeln)
+      // Dölj nedersta etiketten nära x-axeln
       if (index === ticks.length - 1) return '';
       return value.toFixed(2);
     }
@@ -1099,12 +1098,15 @@ y: {
   grid: {
     drawBorder: true,
     lineWidth: 1,
-    color: (ctx) => {
-      // Dölj nedersta rutnätet (under symbolerna)
-      const lowest = Math.min(...corrected) - 0.25;
-      if (Math.abs(ctx.tick?.value - lowest) < 0.05) return 'transparent';
-      return "rgba(0,0,0,0.08)";
-    }
+    color: "rgba(0,0,0,0.08)",
+    // Dölj nedersta rutnätet helt
+    drawTicks: false,
+    z: 0,
+  },
+
+  // 👇 Lägg till detta för att maska bort nedersta etiketten och linjen visuellt
+  afterFit: (scale) => {
+    scale.bottom = scale.bottom + 16; // flyttar hela y-axeln upp lite
   },
 
   title: {
