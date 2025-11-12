@@ -1079,12 +1079,22 @@ chart = new Chart(el.chartCanvas, {
     maintainAspectRatio: false,
     layout: { padding: { bottom: 26 } },
     scales: {
-      y: {
-        min: 34.9,
-        max: 38.6,
-        ticks: { stepSize: 0.1, color: "#000" },
-        title: { display: true, text: "Temperatur (°C)" }
-      },
+   y: {
+  suggestedMin: Math.min(...corrected) - 0.1,
+  suggestedMax: Math.max(...corrected) + 0.1,
+  ticks: {
+    stepSize: 0.05,
+    color: "#000",
+    precision: 2   // håller decimalerna snygga
+  },
+  grid: {
+    color: "rgba(0,0,0,0.08)"  // diskret rutnät
+  },
+  title: {
+    display: true,
+    text: "°C"
+  }
+},
       x: {
         ticks: {
           color: "#000",
