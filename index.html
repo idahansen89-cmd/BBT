@@ -1080,33 +1080,38 @@ chart = new Chart(el.chartCanvas, {
     layout: { padding: { bottom: 26 } },
     scales: {
 y: {
-  min: Math.min(...corrected) - 0.05,
+  // Ger tydlig luft under symbolfältet
+  min: Math.min(...corrected) - 0.25,
   max: Math.max(...corrected) + 0.15,
+
   ticks: {
     stepSize: 0.05,
     color: "#000",
     precision: 2,
-    padding: 6, // lite mer luft
+    padding: 8,
     callback: function(value, index, ticks) {
-      // Dölj den nedersta etiketten nära x-axeln
+      // Dölj nedersta etiketten (närmast x-axeln)
       if (index === ticks.length - 1) return '';
       return value.toFixed(2);
     }
   },
+
   grid: {
-    color: (ctx) => {
-      // Dölj nedersta rutnätet under symbolfältet
-      if (ctx.tick?.value === Math.min(...corrected)) return 'transparent';
-      return "rgba(0,0,0,0.08)";
-    },
     drawBorder: true,
-    lineWidth: 1
+    lineWidth: 1,
+    color: (ctx) => {
+      // Dölj nedersta rutnätet (under symbolerna)
+      const lowest = Math.min(...corrected) - 0.25;
+      if (Math.abs(ctx.tick?.value - lowest) < 0.05) return 'transparent';
+      return "rgba(0,0,0,0.08)";
+    }
   },
+
   title: {
     display: true,
     text: "°C"
   }
-},
+}
       x: {
         ticks: {
           color: "#000",
