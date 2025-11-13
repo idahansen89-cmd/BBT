@@ -1080,19 +1080,20 @@ chart = new Chart(el.chartCanvas, {
     layout: { padding: { bottom: 26 } },
     scales: {
 y: {
-  // Filtrera bort null/NaN först
+  // ----- FELSÄKRA MIN/MAX -----
   min: (() => {
-    const vals = corrected.filter(v => v != null && !isNaN(v));
-    if (vals.length === 0) return 35.5;   // fallback
-    return Math.min(...vals) - 0.25;
+    const vals = corrected.filter(v => typeof v === "number" && !isNaN(v));
+    if (vals.length === 0) return 35.5;       // fallback om tomt
+    return Math.min(...vals) - 0.20;          // buffert
   })(),
 
   max: (() => {
-    const vals = corrected.filter(v => v != null && !isNaN(v));
-    if (vals.length === 0) return 37.5;   // fallback
-    return Math.max(...vals) + 0.15;
+    const vals = corrected.filter(v => typeof v === "number" && !isNaN(v));
+    if (vals.length === 0) return 37.3;       // fallback om tomt
+    return Math.max(...vals) + 0.15;          // buffert
   })(),
 
+  // ----- TICKS -----
   ticks: {
     stepSize: 0.01,
     precision: 2,
@@ -1116,6 +1117,7 @@ y: {
     }
   },
 
+  // ----- GRID -----
   grid: {
     color(ctx) {
       const v = Number(ctx.tick.value.toFixed(2));
