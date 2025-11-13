@@ -1080,42 +1080,50 @@ chart = new Chart(el.chartCanvas, {
     layout: { padding: { bottom: 26 } },
     scales: {
 y: {
-  // Filtrera bort null/undefined så att min/max fungerar
-  min: Math.min(...corrected.filter(v => v != null)) - 0.25,
-  max: Math.max(...corrected.filter(v => v != null)) + 0.15,
+  // Filtrera bort null/NaN först
+  min: (() => {
+    const vals = corrected.filter(v => v != null && !isNaN(v));
+    if (vals.length === 0) return 35.5;   // fallback
+    return Math.min(...vals) - 0.25;
+  })(),
+
+  max: (() => {
+    const vals = corrected.filter(v => v != null && !isNaN(v));
+    if (vals.length === 0) return 37.5;   // fallback
+    return Math.max(...vals) + 0.15;
+  })(),
 
   ticks: {
     stepSize: 0.01,
     precision: 2,
     padding: 6,
 
-    callback: function(value) {
-      const v = Number(value.toFixed(2));
-      return v.toFixed(2);  
+    callback(value) {
+      return value.toFixed(2);
     },
 
-    color: function(ctx) {
+    color(ctx) {
       const v = Number(ctx.tick.value.toFixed(2));
-      return (v % 0.10 === 0) ? '#000' : 'rgba(0,0,0,0.45)';
+      return (v % 0.10 === 0) ? "#000" : "rgba(0,0,0,0.45)";
     },
 
-    font: function(ctx) {
+    font(ctx) {
       const v = Number(ctx.tick.value.toFixed(2));
       return {
         size: (v % 0.10 === 0) ? 12 : 9,
-        weight: (v % 0.10 === 0) ? '600' : '400'
+        weight: (v % 0.10 === 0) ? "600" : "400"
       };
     }
   },
 
   grid: {
-    color: (ctx) => {
+    color(ctx) {
       const v = Number(ctx.tick.value.toFixed(2));
       return (v % 0.10 === 0)
-        ? 'rgba(0,0,0,0.12)'
-        : 'rgba(0,0,0,0.05)';
+        ? "rgba(0,0,0,0.12)"
+        : "rgba(0,0,0,0.05)";
     },
-    lineWidth: (ctx) => {
+    lineWidth(ctx) {
       const v = Number(ctx.tick.value.toFixed(2));
       return (v % 0.10 === 0) ? 1 : 0.5;
     }
