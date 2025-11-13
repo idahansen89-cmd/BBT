@@ -1084,40 +1084,69 @@ function renderChart() {
         maintainAspectRatio: false,
         layout: { padding: { bottom: 26 } },
         scales: {
-          y: {
-            min: Math.min(...corrected.filter(v => v != null)) - 0.25,
-            max: Math.max(...corrected.filter(v => v != null)) + 0.15,
-            ticks: {
-              stepSize: 0.01,
-              precision: 2,
-              padding: 6,
-              callback: v => v.toFixed(2),
-              color: ctx => {
-                const v = Number(ctx.tick.value.toFixed(2));
-                return (v * 100) % 10 === 0 ? '#000' : 'rgba(0,0,0,0.45)';
-              },
-              font: ctx => {
-                const v = Number(ctx.tick.value.toFixed(2));
-                return {
-                  size: (v * 100) % 10 === 0 ? 12 : 9,
-                  weight: (v * 100) % 10 === 0 ? "600" : "400"
-                };
-              }
-            },
-            grid: {
-              color: ctx => {
-                const v = Number(ctx.tick.value.toFixed(2));
-                return (v * 100) % 10 === 0
-                  ? "rgba(0,0,0,0.12)"
-                  : "rgba(0,0,0,0.05)";
-              },
-              lineWidth: ctx => {
-                const v = Number(ctx.tick.value.toFixed(2));
-                return (v * 100) % 10 === 0 ? 1 : 0.5;
-              }
-            },
-            title: { display: true, text: "°C" }
-          },
+       y: {
+  min: Math.min(...corrected.filter(v => v != null)) - 0.25,
+  max: Math.max(...corrected.filter(v => v != null)) + 0.15,
+
+  ticks: {
+    stepSize: 0.01,
+    precision: 2,
+    padding: 6,
+
+    callback: function(v) {
+      if (v == null || isNaN(v)) return "";
+      return Number(v).toFixed(2);
+    },
+
+    color: function(ctx) {
+      const t = ctx.tick;
+      if (!t || t.value == null) return 'rgba(0,0,0,0.45)';
+
+      const v = Number(t.value);
+      return (Math.round(v * 100) % 10 === 0)
+        ? '#000'
+        : 'rgba(0,0,0,0.45)';
+    },
+
+    font: function(ctx) {
+      const t = ctx.tick;
+      if (!t || t.value == null)
+        return { size: 9, weight: '400' };
+
+      const v = Number(t.value);
+      const isMajor = (Math.round(v * 100) % 10 === 0);
+
+      return {
+        size: isMajor ? 12 : 9,
+        weight: isMajor ? '600' : '400'
+      };
+    }
+  },
+
+  grid: {
+    color: function(ctx) {
+      const t = ctx.tick;
+      if (!t || t.value == null) return 'rgba(0,0,0,0.05)';
+
+      const v = Number(t.value);
+      return (Math.round(v * 100) % 10 === 0)
+        ? 'rgba(0,0,0,0.12)'
+        : 'rgba(0,0,0,0.05)';
+    },
+
+    lineWidth: function(ctx) {
+      const t = ctx.tick;
+      if (!t || t.value == null) return 0.5;
+
+      const v = Number(t.value);
+      return (Math.round(v * 100) % 10 === 0)
+        ? 1
+        : 0.5;
+    }
+  },
+
+  title: { display: true, text: "°C" }
+},
           x: {
             ticks: {
               color: "#000",
