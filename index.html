@@ -1080,46 +1080,47 @@ chart = new Chart(el.chartCanvas, {
     layout: { padding: { bottom: 26 } },
     scales: {
 y: {
-  min: Math.min(...corrected) - 0.25,
-  max: Math.max(...corrected) + 0.15,
+  // Filtrera bort null/undefined så att min/max fungerar
+  min: Math.min(...corrected.filter(v => v != null)) - 0.25,
+  max: Math.max(...corrected.filter(v => v != null)) + 0.15,
+
   ticks: {
-    stepSize: 0.01,       // visning med 0.01-precision
+    stepSize: 0.01,
     precision: 2,
     padding: 6,
-    callback: function(value, index, ticks) {
-      // markera var 0.10
+
+    callback: function(value) {
       const v = Number(value.toFixed(2));
-      if (v % 0.10 === 0) {
-        return value.toFixed(2);   // större etikett (vanlig)
-      } else {
-        return value.toFixed(2);   // visas lika men vi färgar senare
-      }
+      return v.toFixed(2);  
     },
+
     color: function(ctx) {
       const v = Number(ctx.tick.value.toFixed(2));
-      // 🔹 Större mörk text var 0.10, ljusare för mellanvärden
-      return (v % 0.10 === 0) ? '#000' : 'rgba(0,0,0,0.5)';
+      return (v % 0.10 === 0) ? '#000' : 'rgba(0,0,0,0.45)';
     },
+
     font: function(ctx) {
       const v = Number(ctx.tick.value.toFixed(2));
-      // 🔹 Större text var 0.10, lite mindre mellan
       return {
-        size: (v % 0.10 === 0) ? 12 : 10,
+        size: (v % 0.10 === 0) ? 12 : 9,
         weight: (v % 0.10 === 0) ? '600' : '400'
       };
     }
   },
+
   grid: {
     color: (ctx) => {
       const v = Number(ctx.tick.value.toFixed(2));
-      // 🔹 Tjockare linje var 0.10, tunnare mellan
-      return (v % 0.10 === 0) ? 'rgba(0,0,0,0.12)' : 'rgba(0,0,0,0.05)';
+      return (v % 0.10 === 0)
+        ? 'rgba(0,0,0,0.12)'
+        : 'rgba(0,0,0,0.05)';
     },
     lineWidth: (ctx) => {
       const v = Number(ctx.tick.value.toFixed(2));
       return (v % 0.10 === 0) ? 1 : 0.5;
     }
   },
+
   title: {
     display: true,
     text: "°C"
