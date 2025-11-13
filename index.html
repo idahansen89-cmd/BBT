@@ -940,29 +940,20 @@ function renderChart() {
 
           // --- Grönt spann före ägglossning (medel F/K) ---
           {
-            label:
-              bandMinArr.length && bandMaxArr.length
-                ? "Medelspann före ägglossning"
-                : "",
-            data: bandMinArr,
-            borderColor: "rgba(155,185,150,0)",
-            backgroundColor: "rgba(155,185,150,0.32)",
-            pointRadius: 0,
+            label: "Medelspann före ägglossning",
+            data: meanMinBeforeOv ? new Array(dataEntries.length).fill(meanMinBeforeOv) : [],
             borderWidth: 0,
-            fill: false,
-            tension: 0,
-            spanGaps: true
+            pointRadius: 0,
+            fill: "+1",  
+            backgroundColor: "rgba(180, 210, 170, 0.25)" // mjuk pastellgrön
           },
           {
-            label: "",
-            data: bandMaxArr,
-            borderColor: "rgba(155,185,150,0)",
-            backgroundColor: "rgba(155,185,150,0.32)",
-            pointRadius: 0,
+            label: "",   // inga dubbla texter i legenden
+            data: meanMaxBeforeOv ? new Array(dataEntries.length).fill(meanMaxBeforeOv) : [],
             borderWidth: 0,
-            fill: bandMinArr.length ? "-1" : false, // fyll mellan dessa två
-            tension: 0,
-            spanGaps: true
+            pointRadius: 0,
+            fill: false,
+            backgroundColor: "rgba(180, 210, 170, 0.25)"
           }
         ]
       },
