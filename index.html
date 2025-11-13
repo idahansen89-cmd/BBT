@@ -910,6 +910,10 @@ function renderChart() {
       bandMin != null ? new Array(dataEntries.length).fill(bandMin) : [];
     const bandMaxArr =
       bandMax != null ? new Array(dataEntries.length).fill(bandMax) : [];
+    // Medellinje – korrigerad temperatur fram till ägglossning
+    let tempsBeforeOv;
+    ...
+    let meanBeforeOv = null;
 
     chart = new Chart(el.chartCanvas, {
       type: "line",
