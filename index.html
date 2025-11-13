@@ -885,68 +885,6 @@ if (tempsActualBeforeOv.length > 0 || tempsCorrectedBeforeOv.length > 0) {
   meanMinBeforeOv = Math.min(...allTemps);
   meanMaxBeforeOv = Math.max(...allTemps);
 }
-    // === MEDEL-SPANN FÖRE ÄGGLOSSNING (F & K) ===
-
-    // --- Faktisk före ov ---
-    let tempsActualBeforeOv;
-    if (ovIndex > 0) {
-      tempsActualBeforeOv = dataEntries
-        .slice(0, ovIndex)
-        .map(e => e.actual)
-        .filter(v => v != null);
-    } else {
-      tempsActualBeforeOv = dataEntries
-        .map(e => e.actual)
-        .filter(v => v != null);
-    }
-
-    let meanActualBeforeOv = null;
-    if (tempsActualBeforeOv.length > 0) {
-      meanActualBeforeOv =
-        tempsActualBeforeOv.reduce((a, b) => a + b, 0) /
-        tempsActualBeforeOv.length;
-    }
-
-    // --- Korrigerad före ov ---
-    let tempsBeforeOv;
-    if (ovIndex > 0) {
-      tempsBeforeOv = dataEntries
-        .slice(0, ovIndex)
-        .map(e => e.corrected)
-        .filter(v => v != null);
-    } else {
-      tempsBeforeOv = dataEntries
-        .map(e => e.corrected)
-        .filter(v => v != null);
-    }
-
-    let meanBeforeOv = null;
-    if (tempsBeforeOv.length > 0) {
-      meanBeforeOv =
-        tempsBeforeOv.reduce((a, b) => a + b, 0) / tempsBeforeOv.length;
-    }
-
-    // --- Bestäm under- & övre kant på spannet ---
-    let bandMin = null;
-    let bandMax = null;
-
-    if (meanActualBeforeOv != null && meanBeforeOv != null) {
-      bandMin = Math.min(meanActualBeforeOv, meanBeforeOv);
-      bandMax = Math.max(meanActualBeforeOv, meanBeforeOv);
-    } else if (meanActualBeforeOv != null) {
-      bandMin = bandMax = meanActualBeforeOv;
-    } else if (meanBeforeOv != null) {
-      bandMin = bandMax = meanBeforeOv;
-    }
-
-    const bandMinArr =
-      bandMin != null ? new Array(dataEntries.length).fill(bandMin) : [];
-    const bandMaxArr =
-      bandMax != null ? new Array(dataEntries.length).fill(bandMax) : [];
-    // Medellinje – korrigerad temperatur fram till ägglossning
-    let tempsBeforeOv;
-    ...
-    let meanBeforeOv = null;
 
     chart = new Chart(el.chartCanvas, {
       type: "line",
