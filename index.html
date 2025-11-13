@@ -1082,33 +1082,44 @@ chart = new Chart(el.chartCanvas, {
 y: {
   min: Math.min(...corrected) - 0.25,
   max: Math.max(...corrected) + 0.15,
-
   ticks: {
-    stepSize: 0.05,
-    color: "#000",
+    stepSize: 0.01,       // visning med 0.01-precision
     precision: 2,
-    padding: 8,
+    padding: 6,
     callback: function(value, index, ticks) {
-      // Dölj nedersta etiketten nära x-axeln
-      if (index === ticks.length - 1) return '';
-      return value.toFixed(2);
+      // markera var 0.10
+      const v = Number(value.toFixed(2));
+      if (v % 0.10 === 0) {
+        return value.toFixed(2);   // större etikett (vanlig)
+      } else {
+        return value.toFixed(2);   // visas lika men vi färgar senare
+      }
+    },
+    color: function(ctx) {
+      const v = Number(ctx.tick.value.toFixed(2));
+      // 🔹 Större mörk text var 0.10, ljusare för mellanvärden
+      return (v % 0.10 === 0) ? '#000' : 'rgba(0,0,0,0.5)';
+    },
+    font: function(ctx) {
+      const v = Number(ctx.tick.value.toFixed(2));
+      // 🔹 Större text var 0.10, lite mindre mellan
+      return {
+        size: (v % 0.10 === 0) ? 12 : 10,
+        weight: (v % 0.10 === 0) ? '600' : '400'
+      };
     }
   },
-
   grid: {
-    drawBorder: true,
-    lineWidth: 1,
-    color: "rgba(0,0,0,0.08)",
-    // Dölj nedersta rutnätet helt
-    drawTicks: false,
-    z: 0,
+    color: (ctx) => {
+      const v = Number(ctx.tick.value.toFixed(2));
+      // 🔹 Tjockare linje var 0.10, tunnare mellan
+      return (v % 0.10 === 0) ? 'rgba(0,0,0,0.12)' : 'rgba(0,0,0,0.05)';
+    },
+    lineWidth: (ctx) => {
+      const v = Number(ctx.tick.value.toFixed(2));
+      return (v % 0.10 === 0) ? 1 : 0.5;
+    }
   },
-
-  // 👇 Lägg till detta för att maska bort nedersta etiketten och linjen visuellt
-  afterFit: (scale) => {
-    scale.bottom = scale.bottom + 16; // flyttar hela y-axeln upp lite
-  },
-
   title: {
     display: true,
     text: "°C"
