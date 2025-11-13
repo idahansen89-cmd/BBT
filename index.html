@@ -1168,23 +1168,25 @@ y: {
         if (e.ovulation) symbols.push('🌼');
         if (e.mucus) symbols.push('💧');
         
-        if (symbols.length) {
-          ctx.save();
-          ctx.font = '18px Apple Color Emoji, Segoe UI Emoji';
-          ctx.textAlign = 'center';
-          symbols.forEach((sym, j) => {
-            ctx.fillText(sym, xPos, y - j * 18); // stapla symbolerna vertikalt
-          });
-          ctx.restore();
-        }
-      });
-    }
+      if (symbols.length) {
+        ctx.save();
+        ctx.font = '18px Apple Color Emoji, Segoe UI Emoji';
+        ctx.textAlign = 'center';
+        symbols.forEach((sym, j) => {
+          ctx.fillText(sym, xPos, y - j * 18); // stapla symbolerna vertikalt
+        });
+        ctx.restore();
+      }
+    });
+  }
+}]  // 👈 stänger plugins-arrayen
+);   // 👈 stänger new Chart(...)
+
 } catch (err) {
   console.error("❌ Fel i renderChart:", err);
   alert("Grafen kunde inte ritas:\n" + err.message);
 }
-}
-// ← avslut på renderChart()
+} // ← avslut på renderChart()
     /* ===== Export / Import ===== */
     el.exportBtn.addEventListener('click', ()=>{
       const blob = new Blob([JSON.stringify({ bbtData:dataEntries, lhDataByDate:lhByDate }, null, 2)], {type:'application/json'});
