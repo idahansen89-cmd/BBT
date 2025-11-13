@@ -289,170 +289,115 @@
       text-overflow: ellipsis;
     }
   }
+
   [data-field="events"], [data-field="lh"] {
-  font-size: 1.2rem;
-  letter-spacing: 2px;
-}
-
-tbody tr.mens-row {
-  background-color: #ffe8ee !important;
-}
-/* === Symbolrad (händelser) === */
-.symbols-row {
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-  gap: 1.2rem;
-  margin: 1rem 0 0.8rem;
-  flex-wrap: wrap;
-}
-
-.symbol {
-  text-align: center;
-  font-size: 1.6rem;
-  line-height: 1.1;
-}
-
-.symbol input[type="checkbox"] {
-  display: block;
-  margin: 0.25rem auto 0;
-  transform: scale(1.3);
-}
-
-/* === Tabellens stil === */
-.table-wrap {
-  overflow-x: auto;
-  margin-top: 0.8rem;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed;
-  font-size: 0.9rem;
-}
-
-th, td {
-  padding: 0.5rem 0.3rem;
-  border: 1px solid #ddd;
-  text-align: center;
-  vertical-align: middle;
-}
-
-th {
-  background: #fff0f5;
-  font-weight: 700;
-  color: #333;
-  white-space: nowrap;
-}
-
-/* Jämna rubriker */
-th:nth-child(1) { width: 20%; }
-th:nth-child(2) { width: 14%; }
-th:nth-child(3), th:nth-child(4) { width: 13%; }
-th:nth-child(5) { width: 20%; } /* Händelser */
-th:nth-child(6) { width: 15%; }
-th:nth-child(7) { width: 5%; }
-
-/* Händelsekolumnen (ikoner) */
-[data-field="events"] {
-  font-size: 1.3rem;
-  letter-spacing: 2px;
-}
-
-/* Mens-bakgrund */
-tbody tr.mens-row {
-  background-color: #ffe8ee !important;
-}
-
-/* Knappar i tabellen */
-td button {
-  margin: 0 2px;
-  border-radius: 6px;
-  background: #f4b6c2;
-  border: none;
-  color: #222;
-  font-size: 0.8rem;
-  padding: 0.3rem 0.6rem;
-  cursor: pointer;
-}
-td button:hover {
-  background: #e599ab;
-}
-
-/* Mobilanpassning */
-@media (max-width: 600px) {
-  th, td {
-    font-size: 0.8rem;
-    padding: 0.35rem 0.25rem;
+    font-size: 1.2rem;
+    letter-spacing: 2px;
   }
+
+  tbody tr.mens-row {
+    background-color: #ffe8ee !important;
+  }
+
+  /* === Symbolrad (händelser) === */
+  .symbols-row {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 1.2rem;
+    margin: 1rem 0 0.8rem;
+    flex-wrap: wrap;
+  }
+
   .symbol {
-    font-size: 1.4rem;
+    text-align: center;
+    font-size: 1.6rem;
+    line-height: 1.1;
   }
+
   .symbol input[type="checkbox"] {
-    transform: scale(1.2);
+    display: block;
+    margin: 0.25rem auto 0;
+    transform: scale(1.3);
   }
-}
-/* ===== Symbolrad med händelser ===== */
-.symbols-row {
-  display: flex;
-  justify-content: center;
-  gap: 14px;
-  align-items: flex-start;
-  margin: 0.5rem 0 0.25rem;
-}
 
-.symbol-stack {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 36px;
-}
+  /* Knappar i tabellen */
+  td button {
+    margin: 0 2px;
+    border-radius: 6px;
+    background: #f4b6c2;
+    border: none;
+    color: #222;
+    font-size: 0.8rem;
+    padding: 0.3rem 0.6rem;
+    cursor: pointer;
+  }
+  td button:hover {
+    background: #e599ab;
+  }
 
-.symbol-stack .sym {
-  font-size: 1.6rem;
-  line-height: 1;
-}
+  /* ===== Symbolrad med händelser ===== */
+  .symbols-row {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    align-items: flex-start;
+    margin: 0.5rem 0 0.25rem;
+  }
 
-.symbol-stack input {
-  margin-top: 0.25rem;
-}/* ===== Tabellrubriker och layout ===== */
-#dataTable th {
-  background-color: #ffe5ec;
-  color: #333;
-  font-size: 0.9rem;
-  font-weight: 600;
-  text-align: center;
-  padding: 0.4rem 0.3rem;
-  white-space: nowrap;
-}
+  .symbol-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 36px;
+  }
 
-#dataTable td {
-  text-align: center;
-  padding: 0.35rem 0.3rem;
-  vertical-align: middle;
-  font-size: 0.85rem;
-}
+  .symbol-stack .sym {
+    font-size: 1.6rem;
+    line-height: 1;
+  }
 
-#dataTable th:nth-child(1),
-#dataTable td:nth-child(1) { width: 90px; }
-#dataTable th:nth-child(2),
-#dataTable td:nth-child(2) { width: 65px; }
-#dataTable th:nth-child(3),
-#dataTable th:nth-child(4),
-#dataTable td:nth-child(3),
-#dataTable td:nth-child(4) { width: 55px; }
-#dataTable th:nth-child(5),
-#dataTable td:nth-child(5) { width: 120px; }
-#dataTable th:nth-child(6),
-#dataTable td:nth-child(6) { width: 140px; }
-#dataTable th:nth-child(7),
-#dataTable td:nth-child(7) { width: 100px; }
+  .symbol-stack input {
+    margin-top: 0.25rem;
+  }
 
-/* Gul bakgrund för ägglossningsdagar */
-tbody tr.ovulation-row {
-  background-color: #fff9d9 !important;
-}
+  /* ===== Tabellrubriker och layout ===== */
+  #dataTable th {
+    background-color: #ffe5ec;
+    color: #333;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-align: center;
+    padding: 0.4rem 0.3rem;
+    white-space: nowrap;
+  }
+
+  #dataTable td {
+    text-align: center;
+    padding: 0.35rem 0.3rem;
+    vertical-align: middle;
+    font-size: 0.85rem;
+  }
+
+  #dataTable th:nth-child(1),
+  #dataTable td:nth-child(1) { width: 90px; }
+  #dataTable th:nth-child(2),
+  #dataTable td:nth-child(2) { width: 65px; }
+  #dataTable th:nth-child(3),
+  #dataTable th:nth-child(4),
+  #dataTable td:nth-child(3),
+  #dataTable td:nth-child(4) { width: 55px; }
+  #dataTable th:nth-child(5),
+  #dataTable td:nth-child(5) { width: 120px; }
+  #dataTable th:nth-child(6),
+  #dataTable td:nth-child(6) { width: 140px; }
+  #dataTable th:nth-child(7),
+  #dataTable td:nth-child(7) { width: 100px; }
+
+  /* Gul bakgrund för ägglossningsdagar */
+  tbody tr.ovulation-row {
+    background-color: #fff9d9 !important;
+  }
 </style>
 </head>
 <body>
@@ -482,33 +427,34 @@ tbody tr.ovulation-row {
       <label for="corrected">Korrigerad temp (°C):</label>
       <input type="number" step="0.01" id="corrected" placeholder="Beräknas automatiskt">
     </div>
- <!-- Händelser – symboler på en rad med kryss under -->
-<div class="symbols-row">
-  <div class="symbol-stack">
-    <div class="sym">🩸</div>
-    <input type="checkbox" id="symMens" />
-  </div>
-  <div class="symbol-stack">
-    <div class="sym">💞</div>
-    <input type="checkbox" id="symSex" />
-  </div>
-  <div class="symbol-stack">
-    <div class="sym">🌼</div>
-    <input type="checkbox" id="symOv" />
-  </div>
-  <div class="symbol-stack">
-    <div class="sym">💧</div>
-    <input type="checkbox" id="symMucus" />
-  </div>
-  <div class="symbol-stack">
-    <div class="sym">➕</div>
-    <input type="checkbox" id="symLHpos" />
-  </div>
-  <div class="symbol-stack">
-    <div class="sym">➖</div>
-    <input type="checkbox" id="symLHneg" />
-  </div>
-</div>
+
+    <!-- Händelser – symboler på en rad med kryss under -->
+    <div class="symbols-row">
+      <div class="symbol-stack">
+        <div class="sym">🩸</div>
+        <input type="checkbox" id="symMens" />
+      </div>
+      <div class="symbol-stack">
+        <div class="sym">💞</div>
+        <input type="checkbox" id="symSex" />
+      </div>
+      <div class="symbol-stack">
+        <div class="sym">🌼</div>
+        <input type="checkbox" id="symOv" />
+      </div>
+      <div class="symbol-stack">
+        <div class="sym">💧</div>
+        <input type="checkbox" id="symMucus" />
+      </div>
+      <div class="symbol-stack">
+        <div class="sym">➕</div>
+        <input type="checkbox" id="symLHpos" />
+      </div>
+      <div class="symbol-stack">
+        <div class="sym">➖</div>
+        <input type="checkbox" id="symLHneg" />
+      </div>
+    </div>
 
     <div class="form-row" style="align-items:flex-start">
       <label for="note" style="margin-top:.2rem">Anteckning:</label>
@@ -523,20 +469,20 @@ tbody tr.ovulation-row {
     </div>
 
     <div class="table-wrap">
-   <table id="dataTable">
-  <thead>
-  <tr>
-    <th>Datum</th>
-    <th>Tid</th>
-    <th>F °C</th>
-    <th>K °C</th>
-    <th>Händelser</th>
-    <th>Anteckning</th>
-    <th></th>
-  </tr>
-</thead>
-  <tbody></tbody>
-</table>
+      <table id="dataTable">
+        <thead>
+          <tr>
+            <th>Datum</th>
+            <th>Tid</th>
+            <th>F °C</th>
+            <th>K °C</th>
+            <th>Händelser</th>
+            <th>Anteckning</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
     </div>
 
     <div style="text-align:center; margin-top:1rem;">
@@ -572,7 +518,7 @@ tbody tr.ovulation-row {
       <label class="lh-symbol-checkbox" title="Negativ">💚<small>–</small><br><input type="checkbox" class="lhSym" value="💚"></label>
       <label class="lh-symbol-checkbox" title="Oklart">💛<small>?</small><br><input type="checkbox" class="lhSym" value="💛"></label>
 
-      <!-- FM/EM, indraget så de hamnar under datumfältet men i samma radhöjd -->
+      <!-- FM/EM -->
       <span class="lh-fm-em">
         <label class="lh-symbol-checkbox" title="FM (förmiddag)">☀️<small>FM</small><br><input type="checkbox" id="lhFm"></label>
         <label class="lh-symbol-checkbox" title="EM (eftermiddag/kväll)">🌙<small>EM</small><br><input type="checkbox" id="lhEm"></label>
@@ -614,18 +560,15 @@ tbody tr.ovulation-row {
       time: document.getElementById('time'),
       actual: document.getElementById('actual'),
       corrected: document.getElementById('corrected'),
-      mens: document.getElementById('mens'),
-      mucus: document.getElementById('mucus'),
-      lhSel: document.getElementById('lhSel'),
-      sex: document.getElementById('sex'),
-      ovulation: document.getElementById('ovulation'),
       note: document.getElementById('note'),
-symMens:  document.getElementById('symMens'),
-symSex:   document.getElementById('symSex'),
-symOv:    document.getElementById('symOv'),
-symMucus: document.getElementById('symMucus'),
-symLHpos: document.getElementById('symLHpos'),
-symLHneg: document.getElementById('symLHneg'),
+
+      symMens:  document.getElementById('symMens'),
+      symSex:   document.getElementById('symSex'),
+      symOv:    document.getElementById('symOv'),
+      symMucus: document.getElementById('symMucus'),
+      symLHpos: document.getElementById('symLHpos'),
+      symLHneg: document.getElementById('symLHneg'),
+
       saveBtn: document.getElementById('saveBtn'),
       exportBtn: document.getElementById('exportBtn'),
       importBtn: document.getElementById('importBtn'),
@@ -654,7 +597,6 @@ symLHneg: document.getElementById('symLHneg'),
     let dataEntries = JSON.parse(localStorage.getItem('bbtData') || '[]');
 
     // Ny LH-datastruktur: objekt med datum -> lista av poster
-    // Migrera ev. gammal 'lhData' (array) -> ny 'lhDataByDate' (objekt)
     (function migrateLH(){
       const newKey = 'lhDataByDate';
       const oldArr = JSON.parse(localStorage.getItem('lhData') || 'null');
@@ -673,13 +615,15 @@ symLHneg: document.getElementById('symLHneg'),
       }
       localStorage.setItem(newKey, JSON.stringify(obj));
     })();
-/* ===== LH positiv/negativ – endast ett alternativ åt gången ===== */
-el.symLHpos.addEventListener('change', () => {
-  if (el.symLHpos.checked) el.symLHneg.checked = false;
-});
-el.symLHneg.addEventListener('change', () => {
-  if (el.symLHneg.checked) el.symLHpos.checked = false;
-});
+
+    /* ===== LH positiv/negativ – endast ett alternativ åt gången ===== */
+    el.symLHpos.addEventListener('change', () => {
+      if (el.symLHpos.checked) el.symLHneg.checked = false;
+    });
+    el.symLHneg.addEventListener('change', () => {
+      if (el.symLHneg.checked) el.symLHpos.checked = false;
+    });
+
     let lhByDate = JSON.parse(localStorage.getItem('lhDataByDate') || '{}');
     let chart;
 
@@ -702,155 +646,125 @@ el.symLHneg.addEventListener('change', () => {
       if (corr !== null) el.corrected.value = corr.toFixed(2);
     }
 
-/* ===== Spara & tabell med nya symboler ===== */
-function saveEntry() {
-  const e = {
-    date: el.date.value,
-    time: el.time.value,
-    actual: el.actual.value ? Number(el.actual.value) : null,
-    corrected: el.corrected.value ? Number(el.corrected.value) : null,
+    /* ===== Spara & tabell med nya symboler ===== */
+    function saveEntry() {
+      const e = {
+        date: el.date.value,
+        time: el.time.value,
+        actual: el.actual.value ? Number(el.actual.value) : null,
+        corrected: el.corrected.value ? Number(el.corrected.value) : null,
 
-    // Händelsesymboler (checkboxar)
-    mens: el.symMens.checked || false,
-    sex: el.symSex.checked || false,
-    ovulation: el.symOv.checked || false,
-    mucus: el.symMucus.checked || false,
-    lhPos: el.symLHpos.checked || false,
-    lhNeg: el.symLHneg.checked || false,
+        mens: el.symMens.checked || false,
+        sex: el.symSex.checked || false,
+        ovulation: el.symOv.checked || false,
+        mucus: el.symMucus.checked || false,
+        lhPos: el.symLHpos.checked || false,
+        lhNeg: el.symLHneg.checked || false,
 
-    // Anteckning
-    note: el.note.value || ""
-  };
+        note: el.note.value || ""
+      };
 
-  if (!e.date) return alert("Välj datum först.");
+      if (!e.date) return alert("Välj datum först.");
 
-  // Om datumet redan finns, ersätt – annars lägg till nytt
-  const i = dataEntries.findIndex(x => x.date === e.date);
-  if (i >= 0) dataEntries[i] = e;
-  else dataEntries.push(e);
+      const i = dataEntries.findIndex(x => x.date === e.date);
+      if (i >= 0) dataEntries[i] = e;
+      else dataEntries.push(e);
 
-  // Spara till localStorage
-  localStorage.setItem("bbtData", JSON.stringify(dataEntries));
-
-  // Töm fälten efter sparning
-  el.date.value = "";
-  el.time.value = "";
-  el.actual.value = "";
-  el.corrected.value = "";
-  el.note.value = "";
-
-  el.symMens.checked = false;
-  el.symSex.checked = false;
-  el.symOv.checked = false;
-  el.symMucus.checked = false;
-  el.symLHpos.checked = false;
-  el.symLHneg.checked = false;
-
-  renderTable();
-  alert("✅ Data sparad!");
-}
-
-/* ===== Tabellrendering ny stil med symboler ===== */
-function renderTable() {
-  el.dataTableBody.innerHTML = "";
-  dataEntries.sort((a, b) => a.date.localeCompare(b.date));
-
-  dataEntries.forEach((e, idx) => {
-    const tr = document.createElement("tr");
-
-    // Rosa bakgrund för mens
-    if (e.mens) tr.style.backgroundColor = "#ffe8ee";
-
-    // Gul bakgrund för ägglossning
-    if (e.ovulation) tr.classList.add("ovulation-row");
-
-    // Om både mens och ägglossning är markerade → rosa prioriteras
-    if (e.mens && e.ovulation) tr.classList.remove("ovulation-row");
-    
-    // Händelser — kombinera symbolerna
-    let events = "";
-    if (e.mens) events += "🩸 ";
-    if (e.sex) events += "💞 ";
-    if (e.ovulation) events += "🌼 ";
-    if (e.mucus) events += "💧 ";
-    if (e.lhPos) events += "➕ ";
-    if (e.lhNeg) events += "➖ ";
-
-    // Radernas innehåll
-    tr.innerHTML = `
-      <td>${e.date || ""}</td>
-      <td>${e.time || ""}</td>
-      <td>${e.actual ?? ""}</td>
-      <td>${e.corrected ?? ""}</td>
-      <td>${events.trim() || "–"}</td>
-      <td>${e.note || ""}</td>
-      <td>
-        <button class="table-btn small-edit" title="Redigera">✏️</button>
-        <button class="table-btn small-del" title="Radera">🗑️</button>
-      </td>
-    `;
-
-    // Radera posten (med tydlig bekräftelse)
-const delBtn = tr.querySelector(".small-del");
-if (delBtn) {
-  delBtn.addEventListener("click", (ev) => {
-    ev.stopPropagation();
-
-    // sammanställ symboler för tydlig bekräftelse
-    let summary = "";
-    if (e.mens) summary += "🩸 ";
-    if (e.sex) summary += "💞 ";
-    if (e.ovulation) summary += "🌼 ";
-    if (e.mucus) summary += "💧 ";
-    if (e.lhPos) summary += "➕ ";
-    if (e.lhNeg) summary += "➖ ";
-    summary = summary.trim() || "–";
-
-    const confirmText = `Vill du ta bort posten den ${e.date}?\n\nHändelser: ${summary}`;
-    if (confirm(confirmText)) {
-      dataEntries.splice(idx, 1);
       localStorage.setItem("bbtData", JSON.stringify(dataEntries));
+
+      el.date.value = "";
+      el.time.value = "";
+      el.actual.value = "";
+      el.corrected.value = "";
+      el.note.value = "";
+
+      el.symMens.checked = false;
+      el.symSex.checked = false;
+      el.symOv.checked = false;
+      el.symMucus.checked = false;
+      el.symLHpos.checked = false;
+      el.symLHneg.checked = false;
+
       renderTable();
+      alert("✅ Data sparad!");
     }
-  });
-}
 
-    // Redigera posten
-    tr.querySelector(".small-edit").addEventListener("click", () => {
-      el.date.value = e.date;
-      el.time.value = e.time;
-      el.actual.value = e.actual || "";
-      el.corrected.value = e.corrected || "";
-      el.note.value = e.note || "";
+    /* ===== Tabellrendering ===== */
+    function renderTable() {
+      el.dataTableBody.innerHTML = "";
+      dataEntries.sort((a, b) => a.date.localeCompare(b.date));
 
-      el.symMens.checked = e.mens || false;
-      el.symSex.checked = e.sex || false;
-      el.symOv.checked = e.ovulation || false;
-      el.symMucus.checked = e.mucus || false;
-      el.symLHpos.checked = e.lhPos || false;
-      el.symLHneg.checked = e.lhNeg || false;
+      dataEntries.forEach((e, idx) => {
+        const tr = document.createElement("tr");
 
-      alert("Posten laddades för redigering.");
-    });
+        if (e.mens) tr.style.backgroundColor = "#ffe8ee";
+        if (e.ovulation) tr.classList.add("ovulation-row");
+        if (e.mens && e.ovulation) tr.classList.remove("ovulation-row");
 
-    el.dataTableBody.appendChild(tr);
-  });
-}
+        let events = "";
+        if (e.mens) events += "🩸 ";
+        if (e.sex) events += "💞 ";
+        if (e.ovulation) events += "🌼 ";
+        if (e.mucus) events += "💧 ";
+        if (e.lhPos) events += "➕ ";
+        if (e.lhNeg) events += "➖ ";
 
-/* Hjälpfunktioner för snyggare datum/tid */
-function formatDate(d) {
-  if (!d) return "";
-  const dateObj = new Date(d);
-  const day = dateObj.getDate();
-  const monthNames = ["jan", "feb", "mar", "apr", "maj", "jun", "jul", "aug", "sep", "okt", "nov", "dec"];
-  return `${day} ${monthNames[dateObj.getMonth()]}`;
-}
+        tr.innerHTML = `
+          <td>${e.date || ""}</td>
+          <td>${e.time || ""}</td>
+          <td>${e.actual ?? ""}</td>
+          <td>${e.corrected ?? ""}</td>
+          <td>${events.trim() || "–"}</td>
+          <td>${e.note || ""}</td>
+          <td>
+            <button class="table-btn small-edit" title="Redigera">✏️</button>
+            <button class="table-btn small-del" title="Radera">🗑️</button>
+          </td>
+        `;
 
-function formatTime(t) {
-  if (!t) return "";
-  const [h, m] = t.split(":");
-  return `${h.padStart(2, "0")}:${m.padStart(2, "0")}`;
-}
+        const delBtn = tr.querySelector(".small-del");
+        if (delBtn) {
+          delBtn.addEventListener("click", (ev) => {
+            ev.stopPropagation();
+
+            let summary = "";
+            if (e.mens) summary += "🩸 ";
+            if (e.sex) summary += "💞 ";
+            if (e.ovulation) summary += "🌼 ";
+            if (e.mucus) summary += "💧 ";
+            if (e.lhPos) summary += "➕ ";
+            if (e.lhNeg) summary += "➖ ";
+            summary = summary.trim() || "–";
+
+            const confirmText = `Vill du ta bort posten den ${e.date}?\n\nHändelser: ${summary}`;
+            if (confirm(confirmText)) {
+              dataEntries.splice(idx, 1);
+              localStorage.setItem("bbtData", JSON.stringify(dataEntries));
+              renderTable();
+            }
+          });
+        }
+
+        tr.querySelector(".small-edit").addEventListener("click", () => {
+          el.date.value = e.date;
+          el.time.value = e.time;
+          el.actual.value = e.actual || "";
+          el.corrected.value = e.corrected || "";
+          el.note.value = e.note || "";
+
+          el.symMens.checked = e.mens || false;
+          el.symSex.checked = e.sex || false;
+          el.symOv.checked = e.ovulation || false;
+          el.symMucus.checked = e.mucus || false;
+          el.symLHpos.checked = e.lhPos || false;
+          el.symLHneg.checked = e.lhNeg || false;
+
+          alert("Posten laddades för redigering.");
+        });
+
+        el.dataTableBody.appendChild(tr);
+      });
+    }
 
     function clearData(){
       if(!confirm('Vill du verkligen rensa all data?')) return;
@@ -864,338 +778,247 @@ function formatTime(t) {
       renderLHList();
     }
 
-/* ===== Graf med bakgrundsfärger för faser ===== */
-function renderChart() {
-  console.log("▶ renderChart startar…");
-  try {
+    /* ===== Graf med bakgrundsfärger för faser ===== */
+    function renderChart() {
+      console.log("▶ renderChart startar…");
+      try {
+        if (chart) chart.destroy();
 
-    if (chart) chart.destroy();
+        dataEntries.sort((a, b) => a.date.localeCompare(b.date));
 
-    // sortera data
-    dataEntries.sort((a, b) => a.date.localeCompare(b.date));
-
-    const labels = dataEntries.map(e => {
-      if (!e.date) return "";
-      const [y, m, d] = e.date.split("-");
-      return `${d}-${m}`;
-    });
-
-    const actual = dataEntries.map(e => e.actual);
-    const corrected = dataEntries.map(e => e.corrected);
-
-    // Symboler per dag
-    const symbolRows = dataEntries.map(e => {
-      const row = [];
-      if (e.sex) row.push('💞');
-      if (e.ovulation) row.push('🌼');
-      if (e.mucus) row.push('💧');
-      return row;
-    });
-
-    // === FASER ===
-    const ovIndex = dataEntries.findIndex(e => e.ovulation);
-    const anns = [];
-
-    // 🌸 Mens
-    const mensIndices = dataEntries
-      .map((e, i) => (e.mens ? i : null))
-      .filter(i => i !== null);
-
-    if (mensIndices.length > 0) {
-      anns.push({
-        type: "box",
-        xMin: mensIndices[0] - 0.5,
-        xMax: mensIndices[mensIndices.length - 1] + 0.5,
-        backgroundColor: "rgba(244,182,194,0.55)",
-        borderWidth: 0,
-        drawTime: 'beforeDatasetsDraw'
-      });
-    }
-
-    // 🌼 Ägglossning
-    if (ovIndex >= 0) {
-      anns.push({
-        type: "box",
-        xMin: ovIndex - 0.5,
-        xMax: ovIndex + 0.5,
-        backgroundColor: "rgba(255,244,176,0.65)",
-        borderWidth: 0,
-        drawTime: 'beforeDatasetsDraw'
-      });
-    }
-
-    // 💜 Lutealfas
-    if (ovIndex >= 0 && ovIndex < dataEntries.length - 1) {
-      anns.push({
-        type: "box",
-        xMin: ovIndex + 0.5,
-        xMax: dataEntries.length - 0.5,
-        backgroundColor: "rgba(224,195,252,0.6)",
-        borderWidth: 0,
-        drawTime: 'beforeDatasetsDraw'
-      });
-    }
-
-    // Vertikal linje vid ägglossning
-    if (ovIndex >= 0) {
-      anns.push({
-        type: "line",
-        xMin: ovIndex,
-        xMax: ovIndex,
-        borderColor: "rgba(120,120,120,0.6)",
-        borderWidth: 1,
-        borderDash: [3, 3]
-      });
-    }
-
-    // Medellinje – korrigerad temperatur fram till ägglossning
-    let meanBeforeOv = null;
-    let tempsBeforeOv;
-
-    if (ovIndex > 0) {
-      tempsBeforeOv = dataEntries
-        .slice(0, ovIndex)
-        .map(e => e.corrected)
-        .filter(v => v != null);
-    } else {
-      tempsBeforeOv = dataEntries
-        .map(e => e.corrected)
-        .filter(v => v != null);
-    }
-
-    if (tempsBeforeOv.length > 0) {
-      meanBeforeOv =
-        tempsBeforeOv.reduce((a, b) => a + b, 0) / tempsBeforeOv.length;
-    }
-
-    // 🔧 Hjärtform
-    function drawHeart(ctx, x, y, size, color) {
-      ctx.save();
-      ctx.translate(x, y);
-      ctx.scale(size / 100, size / 100);
-      ctx.fillStyle = color;
-      ctx.beginPath();
-      ctx.moveTo(75, 40);
-      ctx.bezierCurveTo(75, 37, 70, 25, 50, 25);
-      ctx.bezierCurveTo(20, 25, 20, 62.5, 20, 62.5);
-      ctx.bezierCurveTo(20, 80, 40, 102, 75, 120);
-      ctx.bezierCurveTo(110, 102, 130, 80, 130, 62.5);
-      ctx.bezierCurveTo(130, 62.5, 130, 25, 100, 25);
-      ctx.bezierCurveTo(85, 25, 75, 37, 75, 40);
-      ctx.closePath();
-      ctx.fill();
-      ctx.restore();
-    }
-
-    // ✨ Stjärna
-    function drawStar(ctx, x, y, size, color) {
-      const spikes = 5;
-      const outerRadius = size / 2;
-      const innerRadius = outerRadius / 2.5;
-      let rot = Math.PI / 2 * 3;
-      const step = Math.PI / spikes;
-
-      ctx.save();
-      ctx.beginPath();
-      ctx.translate(x, y);
-      ctx.moveTo(0, -outerRadius);
-
-      for (let i = 0; i < spikes; i++) {
-        ctx.lineTo(Math.cos(rot) * outerRadius, Math.sin(rot) * outerRadius);
-        rot += step;
-        ctx.lineTo(Math.cos(rot) * innerRadius, Math.sin(rot) * innerRadius);
-        rot += step;
-      }
-
-      ctx.closePath();
-      ctx.fillStyle = color;
-      ctx.fill();
-      ctx.restore();
-    }
-
-    // 🔧 Specialpunkter ritas ovanpå
-    const customShapesPlugin = {
-      id: 'customShapesPlugin',
-      afterDatasetsDraw(chart) {
-        const ctx = chart.ctx;
-
-        chart.data.datasets.forEach((ds, di) => {
-          const meta = chart.getDatasetMeta(di);
-          if (meta.hidden) return;
-
-          meta.data.forEach((pt, i) => {
-            const x = pt.x;
-            const y = pt.y;
-            const size = ds.pointRadius ?? 3;
-            const color = ds.pointBackgroundColor ?? ds.borderColor;
-
-            if (ds.pointStyle === 'heart') {
-              drawHeart(ctx, x, y - size * 0.6, size * 2.8, color);
-            }
-            if (ds.pointStyle === 'star') {
-              drawStar(ctx, x, y, size * 2.5, color);
-            }
-          });
+        const labels = dataEntries.map(e => {
+          if (!e.date) return "";
+          const [y, m, d] = e.date.split("-");
+          return `${d}-${m}`;
         });
-      }
-    };
-    Chart.register(customShapesPlugin);
 
-    chart = new Chart(el.chartCanvas, {
-      type: "line",
-      data: {
-        labels,
-        datasets: [
-          {
-            label: "Faktisk temperatur",
-            data: actual,
-            borderColor: "rgba(90,140,255,0.9)",
-            backgroundColor: "rgba(90,140,255,0.9)",
-            borderWidth: 2,
-            pointRadius: 3,
-            tension: 0.25,
-            spanGaps: true
-          },
-          {
-            label: "Korrigerad temperatur",
-            data: corrected,
-            borderColor: "rgba(240,100,120,0.85)",
-            backgroundColor: "rgba(240,100,120,0.85)",
-            borderDash: [4, 3],
-            borderWidth: 1.5,
-            pointRadius: 2.5,
-            tension: 0.25,
-            spanGaps: true
-          },
-          {
-            label: "Medel före ägglossning",
-            data: meanBeforeOv ? new Array(dataEntries.length).fill(meanBeforeOv) : [],
-            borderColor: "rgba(155, 185, 150, 0.9)",
-            borderWidth: 1.8,
-            pointRadius: 0,
-            fill: false,
-            tension: 0,
-            spanGaps: true
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        layout: { padding: { bottom: 26 } },
-        scales: {
-       y: {
-  min: Math.min(...corrected.filter(v => v != null)) - 0.25,
-  max: Math.max(...corrected.filter(v => v != null)) + 0.15,
+        const actual = dataEntries.map(e => e.actual);
+        const corrected = dataEntries.map(e => e.corrected);
+        const correctedValid = corrected.filter(v => v != null);
 
-  ticks: {
-    stepSize: 0.01,
-    precision: 2,
-    padding: 6,
+        if (correctedValid.length === 0) {
+          alert("Det finns ingen korrigerad temperatur att rita ännu.");
+          return;
+        }
 
-    callback: function(v) {
-      if (v == null || isNaN(v)) return "";
-      return Number(v).toFixed(2);
-    },
+        const ovIndex = dataEntries.findIndex(e => e.ovulation);
+        const anns = [];
 
-    color: function(ctx) {
-      const t = ctx.tick;
-      if (!t || t.value == null) return 'rgba(0,0,0,0.45)';
+        // 🌸 Mens
+        const mensIndices = dataEntries
+          .map((e, i) => (e.mens ? i : null))
+          .filter(i => i !== null);
 
-      const v = Number(t.value);
-      return (Math.round(v * 100) % 10 === 0)
-        ? '#000'
-        : 'rgba(0,0,0,0.45)';
-    },
-
-    font: function(ctx) {
-      const t = ctx.tick;
-      if (!t || t.value == null)
-        return { size: 9, weight: '400' };
-
-      const v = Number(t.value);
-      const isMajor = (Math.round(v * 100) % 10 === 0);
-
-      return {
-        size: isMajor ? 12 : 9,
-        weight: isMajor ? '600' : '400'
-      };
-    }
-  },
-
-  grid: {
-    color: function(ctx) {
-      const t = ctx.tick;
-      if (!t || t.value == null) return 'rgba(0,0,0,0.05)';
-
-      const v = Number(t.value);
-      return (Math.round(v * 100) % 10 === 0)
-        ? 'rgba(0,0,0,0.12)'
-        : 'rgba(0,0,0,0.05)';
-    },
-
-    lineWidth: function(ctx) {
-      const t = ctx.tick;
-      if (!t || t.value == null) return 0.5;
-
-      const v = Number(t.value);
-      return (Math.round(v * 100) % 10 === 0)
-        ? 1
-        : 0.5;
-    }
-  },
-
-  title: { display: true, text: "°C" }
-},
-          x: {
-            ticks: {
-              color: "#000",
-              autoSkip: true,
-              maxTicksLimit: 10,
-              maxRotation: 0
-            }
-          }
-        },
-        plugins: {
-          legend: { position: "bottom", labels: { color: "#000" } },
-          annotation: { drawTime: 'beforeDatasetsDraw', annotations: anns }
-        },
-        animation: false
-      },
-
-      // SYMBOLER OVANFÖR X-AXELN
-      plugins: [{
-        id: 'customSymbols',
-        afterDraw(chart) {
-          const { ctx, chartArea: { bottom }, scales: { x } } = chart;
-          const y = bottom - 15;
-
-          dataEntries.forEach((e, i) => {
-            const xPos = x.getPixelForValue(i);
-            const symbols = [];
-            if (e.sex) symbols.push('💞');
-            if (e.ovulation) symbols.push('🌼');
-            if (e.mucus) symbols.push('💧');
-
-            if (symbols.length) {
-              ctx.save();
-              ctx.font = '18px Apple Color Emoji, Segoe UI Emoji';
-              ctx.textAlign = 'center';
-              symbols.forEach((sym, j) => {
-                ctx.fillText(sym, xPos, y - j * 18);
-              });
-              ctx.restore();
-            }
+        if (mensIndices.length > 0) {
+          anns.push({
+            type: "box",
+            xMin: mensIndices[0] - 0.5,
+            xMax: mensIndices[mensIndices.length - 1] + 0.5,
+            backgroundColor: "rgba(244,182,194,0.55)",
+            borderWidth: 0,
+            drawTime: 'beforeDatasetsDraw'
           });
         }
-      }]
-    });
 
-  } catch (err) {
-    console.error("❌ Fel i renderChart:", err);
-    alert("Grafen kunde inte ritas:\n" + err.message);
-  }
-}
+        // 🌼 Ägglossning
+        if (ovIndex >= 0) {
+          anns.push({
+            type: "box",
+            xMin: ovIndex - 0.5,
+            xMax: ovIndex + 0.5,
+            backgroundColor: "rgba(255,244,176,0.65)",
+            borderWidth: 0,
+            drawTime: 'beforeDatasetsDraw'
+          });
+        }
+
+        // 💜 Lutealfas
+        if (ovIndex >= 0 && ovIndex < dataEntries.length - 1) {
+          anns.push({
+            type: "box",
+            xMin: ovIndex + 0.5,
+            xMax: dataEntries.length - 0.5,
+            backgroundColor: "rgba(224,195,252,0.6)",
+            borderWidth: 0,
+            drawTime: 'beforeDatasetsDraw'
+          });
+        }
+
+        // Vertikal linje vid ägglossning
+        if (ovIndex >= 0) {
+          anns.push({
+            type: "line",
+            xMin: ovIndex,
+            xMax: ovIndex,
+            borderColor: "rgba(120,120,120,0.6)",
+            borderWidth: 1,
+            borderDash: [3, 3]
+          });
+        }
+
+        // Medellinje – korrigerad temperatur fram till ägglossning
+        let tempsBeforeOv;
+        if (ovIndex > 0) {
+          tempsBeforeOv = dataEntries
+            .slice(0, ovIndex)
+            .map(e => e.corrected)
+            .filter(v => v != null);
+        } else {
+          tempsBeforeOv = dataEntries
+            .map(e => e.corrected)
+            .filter(v => v != null);
+        }
+
+        let meanBeforeOv = null;
+        if (tempsBeforeOv.length > 0) {
+          meanBeforeOv =
+            tempsBeforeOv.reduce((a, b) => a + b, 0) / tempsBeforeOv.length;
+        }
+
+        chart = new Chart(el.chartCanvas, {
+          type: "line",
+          data: {
+            labels,
+            datasets: [
+              {
+                label: "Faktisk temperatur",
+                data: actual,
+                borderColor: "rgba(90,140,255,0.9)",
+                backgroundColor: "rgba(90,140,255,0.9)",
+                borderWidth: 2,
+                pointRadius: 3,
+                tension: 0.25,
+                spanGaps: true
+              },
+              {
+                label: "Korrigerad temperatur",
+                data: corrected,
+                borderColor: "rgba(240,100,120,0.85)",
+                backgroundColor: "rgba(240,100,120,0.85)",
+                borderDash: [4, 3],
+                borderWidth: 1.5,
+                pointRadius: 2.5,
+                tension: 0.25,
+                spanGaps: true
+              },
+              {
+                label: "Medel före ägglossning",
+                data: meanBeforeOv ? new Array(dataEntries.length).fill(meanBeforeOv) : [],
+                borderColor: "rgba(155, 185, 150, 0.9)",
+                borderWidth: 1.8,
+                pointRadius: 0,
+                fill: false,
+                tension: 0,
+                spanGaps: true
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            layout: { padding: { bottom: 26 } },
+            scales: {
+              y: {
+                min: Math.min(...correctedValid) - 0.25,
+                max: Math.max(...correctedValid) + 0.15,
+                ticks: {
+                  stepSize: 0.01,
+                  precision: 2,
+                  padding: 6,
+                  callback: function(v) {
+                    if (v == null || isNaN(v)) return "";
+                    return Number(v).toFixed(2);
+                  },
+                  color: function(ctx) {
+                    const t = ctx.tick;
+                    if (!t || t.value == null) return 'rgba(0,0,0,0.45)';
+                    const v = Number(t.value);
+                    return (Math.round(v * 100) % 10 === 0)
+                      ? '#000'
+                      : 'rgba(0,0,0,0.45)';
+                  },
+                  font: function(ctx) {
+                    const t = ctx.tick;
+                    if (!t || t.value == null)
+                      return { size: 9, weight: '400' };
+                    const v = Number(t.value);
+                    const isMajor = (Math.round(v * 100) % 10 === 0);
+                    return {
+                      size: isMajor ? 12 : 9,
+                      weight: isMajor ? '600' : '400'
+                    };
+                  }
+                },
+                grid: {
+                  color: function(ctx) {
+                    const t = ctx.tick;
+                    if (!t || t.value == null) return 'rgba(0,0,0,0.05)';
+                    const v = Number(t.value);
+                    return (Math.round(v * 100) % 10 === 0)
+                      ? 'rgba(0,0,0,0.12)'
+                      : 'rgba(0,0,0,0.05)';
+                  },
+                  lineWidth: function(ctx) {
+                    const t = ctx.tick;
+                    if (!t || t.value == null) return 0.5;
+                    const v = Number(t.value);
+                    return (Math.round(v * 100) % 10 === 0)
+                      ? 1
+                      : 0.5;
+                  }
+                },
+                title: { display: true, text: "°C" }
+              },
+              x: {
+                ticks: {
+                  color: "#000",
+                  autoSkip: true,
+                  maxTicksLimit: 10,
+                  maxRotation: 0
+                }
+              }
+            },
+            plugins: {
+              legend: { position: "bottom", labels: { color: "#000" } },
+              annotation: { drawTime: 'beforeDatasetsDraw', annotations: anns }
+            },
+            animation: false
+          },
+
+          // SYMBOLER OVANFÖR X-AXELN
+          plugins: [{
+            id: 'customSymbols',
+            afterDraw(chart) {
+              const { ctx, chartArea: { bottom }, scales: { x } } = chart;
+              const y = bottom - 15;
+
+              dataEntries.forEach((e, i) => {
+                const xPos = x.getPixelForValue(i);
+                const symbols = [];
+                if (e.sex) symbols.push('💞');
+                if (e.ovulation) symbols.push('🌼');
+                if (e.mucus) symbols.push('💧');
+
+                if (symbols.length) {
+                  ctx.save();
+                  ctx.font = '18px Apple Color Emoji, Segoe UI Emoji';
+                  ctx.textAlign = 'center';
+                  symbols.forEach((sym, j) => {
+                    ctx.fillText(sym, xPos, y - j * 18);
+                  });
+                  ctx.restore();
+                }
+              });
+            }
+          }]
+        });
+
+      } catch (err) {
+        console.error("❌ Fel i renderChart:", err);
+        alert("Grafen kunde inte ritas:\n" + err.message);
+      }
+    }
+
     /* ===== Export / Import ===== */
     el.exportBtn.addEventListener('click', ()=>{
       const blob = new Blob([JSON.stringify({ bbtData:dataEntries, lhDataByDate:lhByDate }, null, 2)], {type:'application/json'});
@@ -1216,7 +1039,7 @@ function renderChart() {
           const o = JSON.parse(r.result);
           if(o.bbtData) dataEntries = o.bbtData;
           if(o.lhDataByDate) lhByDate  = o.lhDataByDate;
-          else if(o.lhData) { // extra nödfall, om någon gammal export
+          else if(o.lhData) {
             lhByDate = {};
             if(Array.isArray(o.lhData)) {
               o.lhData.forEach(e=>{
@@ -1272,7 +1095,7 @@ function renderChart() {
 
     function renderLHList(){
       el.lhList.innerHTML='';
-      const dates = Object.keys(lhByDate).sort(); // kronologiskt
+      const dates = Object.keys(lhByDate).sort();
       dates.forEach(date=>{
         (lhByDate[date]||[]).forEach((item, idx)=>{
           const row = document.createElement('div');
@@ -1287,9 +1110,7 @@ function renderChart() {
             </div>
             <div><button class="button danger" data-del="${date}::${idx}">Ta bort</button></div>
           `;
-          // fullskärm med bläddring
           row.querySelector('img').addEventListener('click', (ev)=>openGallery(date, parseInt(ev.target.dataset.idx,10)));
-          // radera
           row.querySelector('[data-del]').addEventListener('click', (ev)=>{
             const [d,iStr] = ev.target.getAttribute('data-del').split('::');
             const i = parseInt(iStr,10);
@@ -1305,7 +1126,6 @@ function renderChart() {
       });
     }
 
-    // Fullskärm + bläddring (genom alla poster i kronologisk ordning)
     function allLHFlat(){
       const out=[];
       Object.keys(lhByDate).sort().forEach(date=>{
@@ -1317,7 +1137,6 @@ function renderChart() {
       const flat = allLHFlat();
       if(!flat.length) return;
 
-      // hitta motsvarande index i flat
       let flatIndex = 0, count=0;
       Object.keys(lhByDate).sort().some(d=>{
         const arr = lhByDate[d]||[];
@@ -1385,7 +1204,6 @@ function renderChart() {
 
         localStorage.setItem('lhDataByDate', JSON.stringify(lhByDate));
 
-        // nollställ UI
         el.lhNote.value = '';
         el.lhFile.value = '';
         el.lhFm.checked = false; el.lhEm.checked = false;
@@ -1397,17 +1215,14 @@ function renderChart() {
       reader.onerror = ()=> alert('Kunde inte läsa in bilden.');
       reader.readAsDataURL(file);
     });
-/* ===== Events ===== */
-// När du lämnar fältet för faktisk temperatur – räkna ut korrigerad automatiskt
-el.actual.addEventListener('blur', computeCorrectedFormInputs);
 
-// När du ändrar tiden – uppdatera korrigeringen om faktisk temperatur finns
-el.time.addEventListener('change', ()=>{ 
-  if (el.actual.value) computeCorrectedFormInputs(); 
-});
+    /* ===== Events ===== */
+    el.actual.addEventListener('blur', computeCorrectedFormInputs);
+    el.time.addEventListener('change', ()=>{ 
+      if (el.actual.value) computeCorrectedFormInputs(); 
+    });
+    el.saveBtn.addEventListener('click', saveEntry);
 
-// När du klickar på "Spara" – spara posten
-el.saveBtn.addEventListener('click', saveEntry);
     /* ===== Init ===== */
     renderTable();
     renderLHList();
