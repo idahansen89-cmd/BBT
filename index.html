@@ -866,6 +866,8 @@ function formatTime(t) {
 
     /* ===== Graf med bakgrundsfärger för faser ===== */
 function renderChart() {
+  console.log("▶ renderChart startar…");
+try {
   if (chart) chart.destroy();
 
   // sortera data
@@ -1179,7 +1181,11 @@ y: {
     }
   }]
 });
-} // ← avslut på renderChart()
+} catch (err) {
+  console.error("❌ Fel i renderChart:", err);
+  alert("Grafen kunde inte ritas:\n" + err.message);
+}
+// ← avslut på renderChart()
     /* ===== Export / Import ===== */
     el.exportBtn.addEventListener('click', ()=>{
       const blob = new Blob([JSON.stringify({ bbtData:dataEntries, lhDataByDate:lhByDate }, null, 2)], {type:'application/json'});
