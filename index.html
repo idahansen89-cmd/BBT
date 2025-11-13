@@ -864,329 +864,309 @@ function formatTime(t) {
       renderLHList();
     }
 
-    /* ===== Graf med bakgrundsfärger för faser ===== */
+/* ===== Graf med bakgrundsfärger för faser ===== */
 function renderChart() {
   console.log("▶ renderChart startar…");
-try {
-  if (chart) chart.destroy();
+  try {
 
-  // sortera data
-  dataEntries.sort((a, b) => a.date.localeCompare(b.date));
+    if (chart) chart.destroy();
 
-  const labels = dataEntries.map(e => {
-    if (!e.date) return "";
-    const [y, m, d] = e.date.split("-");
-    return `${d}-${m}`;
-  });
+    // sortera data
+    dataEntries.sort((a, b) => a.date.localeCompare(b.date));
 
-  const actual = dataEntries.map(e => e.actual);
-  const corrected = dataEntries.map(e => e.corrected);
+    const labels = dataEntries.map(e => {
+      if (!e.date) return "";
+      const [y, m, d] = e.date.split("-");
+      return `${d}-${m}`;
+    });
 
-// Symboler per datum (ordning: 💞 samlag, 🌼 ägglossning, 💧 äggvitesekret)
-const symbolRows = dataEntries.map(e => {
-  const row = [];
-  if (e.sex)      row.push('💞');
-  if (e.ovulation) row.push('🌼');
-  if (e.mucus)    row.push('💧');
-  return row;
-});
+    const actual = dataEntries.map(e => e.actual);
+    const corrected = dataEntries.map(e => e.corrected);
 
- // === FASER ===
-const ovIndex = dataEntries.findIndex(e => e.ovulation);
-const anns = [];
+    // Symboler per dag
+    const symbolRows = dataEntries.map(e => {
+      const row = [];
+      if (e.sex) row.push('💞');
+      if (e.ovulation) row.push('🌼');
+      if (e.mucus) row.push('💧');
+      return row;
+    });
 
-// 🌸 Mensfas (rosa)
-const mensIndices = dataEntries
-  .map((e, i) => (e.symMens || e.mens === "Mens" || e.mens === true ? i : null))
-  .filter(i => i !== null);
+    // === FASER ===
+    const ovIndex = dataEntries.findIndex(e => e.ovulation);
+    const anns = [];
 
-if (mensIndices.length > 0) {
-  const start = mensIndices[0] - 0.5;
-  const end = mensIndices[mensIndices.length - 1] + 0.5;
-  anns.push({
-    type: "box",
-    xMin: start,
-    xMax: end,
-    backgroundColor: "rgba(244,182,194,0.55)", // rosa
-    borderWidth: 0,
-    drawTime: 'beforeDatasetsDraw'
-  });
-}
+    // 🌸 Mens
+    const mensIndices = dataEntries
+      .map((e, i) => (e.mens ? i : null))
+      .filter(i => i !== null);
 
-// 🌼 Ägglossning (gul)
-if (ovIndex >= 0)
-  anns.push({
-    type: "box",
-    xMin: ovIndex - 0.5,
-    xMax: ovIndex + 0.5,
-    backgroundColor: "rgba(255,244,176,0.65)", // mild gul
-    borderWidth: 0,
-    drawTime: 'beforeDatasetsDraw'
-  });
-
-// 💜 Lutealfas (lavendel)
-if (ovIndex >= 0 && ovIndex < dataEntries.length - 1)
-  anns.push({
-    type: "box",
-    xMin: ovIndex + 0.5,
-    xMax: dataEntries.length - 0.5,
-    backgroundColor: "rgba(224,195,252,0.6)", // mjuk lavendel
-    borderWidth: 0,
-    drawTime: 'beforeDatasetsDraw'
-  });
-
-// Vertikal linje vid ägglossning
-if (ovIndex >= 0)
-  anns.push({
-    type: "line",
-    xMin: ovIndex,
-    xMax: ovIndex,
-    borderColor: "rgba(120,120,120,0.6)",
-    borderWidth: 1,
-    borderDash: [3, 3]
-  });
-    
-// Medellinje som uppdateras löpande med alla korrigerade temp fram till ev. ägglossning
-let meanBeforeOv = null;
-let tempsBeforeOv;
-
-// Om ägglossning finns, använd data fram till den
-if (ovIndex > 0) {
-  tempsBeforeOv = dataEntries
-    .slice(0, ovIndex)
-    .map(e => e.corrected)
-    .filter(v => v != null);
-}
-// Om ägglossning ännu inte finns, använd all befintlig data hittills
-else {
-  tempsBeforeOv = dataEntries
-    .map(e => e.corrected)
-    .filter(v => v != null);
-}
-
-// Beräkna medel
-if (tempsBeforeOv && tempsBeforeOv.length > 0) {
-  meanBeforeOv = tempsBeforeOv.reduce((a, b) => a + b, 0) / tempsBeforeOv.length;
-}
-    // 💗 Hjärtform
-function drawHeart(ctx, x, y, size, color) {
-  ctx.save();
-  ctx.translate(x, y);
-  ctx.scale(size / 100, size / 100);
-  ctx.fillStyle = color;
-  ctx.beginPath();
-  ctx.moveTo(75, 40);
-  ctx.bezierCurveTo(75, 37, 70, 25, 50, 25);
-  ctx.bezierCurveTo(20, 25, 20, 62.5, 20, 62.5);
-  ctx.bezierCurveTo(20, 80, 40, 102, 75, 120);
-  ctx.bezierCurveTo(110, 102, 130, 80, 130, 62.5);
-  ctx.bezierCurveTo(130, 62.5, 130, 25, 100, 25);
-  ctx.bezierCurveTo(85, 25, 75, 37, 75, 40);
-  ctx.closePath();
-  ctx.fill();
-  ctx.restore();
-}
-
-// ✨ Stjärnform
-function drawStar(ctx, x, y, size, color) {
-  const spikes = 5;
-  const outerRadius = size / 2;
-  const innerRadius = outerRadius / 2.5;
-  let rot = Math.PI / 2 * 3;
-  const step = Math.PI / spikes;
-
-  ctx.save();
-  ctx.beginPath();
-  ctx.translate(x, y);
-  ctx.moveTo(0, -outerRadius);
-  for (let i = 0; i < spikes; i++) {
-    ctx.lineTo(Math.cos(rot) * outerRadius, Math.sin(rot) * outerRadius);
-    rot += step;
-    ctx.lineTo(Math.cos(rot) * innerRadius, Math.sin(rot) * innerRadius);
-    rot += step;
-  }
-  ctx.closePath();
-  ctx.fillStyle = color;
-  ctx.fill();
-  ctx.restore();
-}
-
-// 🔧 Rita specialpunkter ovanpå datasets
-const customShapesPlugin = {
-  id: 'customShapesPlugin',
-  afterDatasetsDraw(chart) {
-    const ctx = chart.ctx;
-    chart.data.datasets.forEach((ds, di) => {
-      const meta = chart.getDatasetMeta(di);
-      if (meta.hidden) return;
-      meta.data.forEach((pt, i) => {
-        const x = pt.x, y = pt.y;
-        const size  = (ds.pointRadius ?? 3);
-        const color = ds.pointFill ?? ds.pointBackgroundColor ?? ds.borderColor;
-
-        if (ds.pointStyle === 'heart') {
-          // hjärtat behöver större skala → *10
-          drawHeart(ctx, x, y - size * 0.6, size * 2.8, color);;
-        } else if (ds.pointStyle === 'star') {
-          // stjärnan blir lagom med *2.5
-          drawStar(ctx, x, y, size * 2.5, color);
-        }
+    if (mensIndices.length > 0) {
+      anns.push({
+        type: "box",
+        xMin: mensIndices[0] - 0.5,
+        xMax: mensIndices[mensIndices.length - 1] + 0.5,
+        backgroundColor: "rgba(244,182,194,0.55)",
+        borderWidth: 0,
+        drawTime: 'beforeDatasetsDraw'
       });
-    });
-  }
-};
-Chart.register(customShapesPlugin);
-
-chart = new Chart(el.chartCanvas, {
-  type: "line",
-  data: {
-    labels,
-    datasets: [
-      {
-        label: "Faktisk temperatur",
-        data: actual,
-        borderColor: "rgba(90,140,255,0.9)",
-        backgroundColor: "rgba(90,140,255,0.9)",
-        borderWidth: 2,
-        pointBackgroundColor: "#5a8cff",
-        pointRadius: 3,
-        tension: 0.25,
-        spanGaps: true
-      },
-      {
-        label: "Korrigerad temperatur",
-        data: corrected,
-        borderColor: "rgba(240,100,120,0.85)",
-        backgroundColor: "rgba(240,100,120,0.85)",
-        borderDash: [4,3],
-        borderWidth: 1.5,
-        pointRadius: 2.5,
-        tension: 0.25,
-        spanGaps: true
-      },
-      {
-        label: "Medel före ägglossning",
-        data: meanBeforeOv ? new Array(dataEntries.length).fill(meanBeforeOv) : [],
-        borderColor: "rgba(155, 185, 150, 0.9)",
-        borderWidth: 1.8,
-        pointRadius: 0,
-        fill: false,
-        tension: 0,
-        spanGaps: true
-      }
-    ]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false,
-    layout: { padding: { bottom: 26 } },
-    scales: {
-y: {
-  // ----- FELSÄKRA MIN/MAX -----
-  min: (() => {
-    const vals = corrected.filter(v => typeof v === "number" && !isNaN(v));
-    if (vals.length === 0) return 35.5;       // fallback om tomt
-    return Math.min(...vals) - 0.20;          // buffert
-  })(),
-
-  max: (() => {
-    const vals = corrected.filter(v => typeof v === "number" && !isNaN(v));
-    if (vals.length === 0) return 37.3;       // fallback om tomt
-    return Math.max(...vals) + 0.15;          // buffert
-  })(),
-
-  // ----- TICKS -----
-  ticks: {
-    stepSize: 0.01,
-    precision: 2,
-    padding: 6,
-
-    callback(value) {
-      return value.toFixed(2);
-    },
-
-    color(ctx) {
-      const v = Number(ctx.tick.value.toFixed(2));
-      return (v % 0.10 === 0) ? "#000" : "rgba(0,0,0,0.45)";
-    },
-
-    font(ctx) {
-      const v = Number(ctx.tick.value.toFixed(2));
-      return {
-        size: (v % 0.10 === 0) ? 12 : 9,
-        weight: (v % 0.10 === 0) ? "600" : "400"
-      };
     }
-  },
 
-  // ----- GRID -----
-  grid: {
-    color(ctx) {
-      const v = Number(ctx.tick.value.toFixed(2));
-      return (v % 0.10 === 0)
-        ? "rgba(0,0,0,0.12)"
-        : "rgba(0,0,0,0.05)";
-    },
-    lineWidth(ctx) {
-      const v = Number(ctx.tick.value.toFixed(2));
-      return (v % 0.10 === 0) ? 1 : 0.5;
+    // 🌼 Ägglossning
+    if (ovIndex >= 0) {
+      anns.push({
+        type: "box",
+        xMin: ovIndex - 0.5,
+        xMax: ovIndex + 0.5,
+        backgroundColor: "rgba(255,244,176,0.65)",
+        borderWidth: 0,
+        drawTime: 'beforeDatasetsDraw'
+      });
     }
-  },
 
-  title: {
-    display: true,
-    text: "°C"
-  }
-},
-      x: {
-        ticks: {
-          color: "#000",
-          autoSkip: true,
-          maxTicksLimit: 10,
-          maxRotation: 0
-        }
+    // 💜 Lutealfas
+    if (ovIndex >= 0 && ovIndex < dataEntries.length - 1) {
+      anns.push({
+        type: "box",
+        xMin: ovIndex + 0.5,
+        xMax: dataEntries.length - 0.5,
+        backgroundColor: "rgba(224,195,252,0.6)",
+        borderWidth: 0,
+        drawTime: 'beforeDatasetsDraw'
+      });
+    }
+
+    // Vertikal linje vid ägglossning
+    if (ovIndex >= 0) {
+      anns.push({
+        type: "line",
+        xMin: ovIndex,
+        xMax: ovIndex,
+        borderColor: "rgba(120,120,120,0.6)",
+        borderWidth: 1,
+        borderDash: [3, 3]
+      });
+    }
+
+    // Medellinje – korrigerad temperatur fram till ägglossning
+    let meanBeforeOv = null;
+    let tempsBeforeOv;
+
+    if (ovIndex > 0) {
+      tempsBeforeOv = dataEntries
+        .slice(0, ovIndex)
+        .map(e => e.corrected)
+        .filter(v => v != null);
+    } else {
+      tempsBeforeOv = dataEntries
+        .map(e => e.corrected)
+        .filter(v => v != null);
+    }
+
+    if (tempsBeforeOv.length > 0) {
+      meanBeforeOv =
+        tempsBeforeOv.reduce((a, b) => a + b, 0) / tempsBeforeOv.length;
+    }
+
+    // 🔧 Hjärtform
+    function drawHeart(ctx, x, y, size, color) {
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.scale(size / 100, size / 100);
+      ctx.fillStyle = color;
+      ctx.beginPath();
+      ctx.moveTo(75, 40);
+      ctx.bezierCurveTo(75, 37, 70, 25, 50, 25);
+      ctx.bezierCurveTo(20, 25, 20, 62.5, 20, 62.5);
+      ctx.bezierCurveTo(20, 80, 40, 102, 75, 120);
+      ctx.bezierCurveTo(110, 102, 130, 80, 130, 62.5);
+      ctx.bezierCurveTo(130, 62.5, 130, 25, 100, 25);
+      ctx.bezierCurveTo(85, 25, 75, 37, 75, 40);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // ✨ Stjärna
+    function drawStar(ctx, x, y, size, color) {
+      const spikes = 5;
+      const outerRadius = size / 2;
+      const innerRadius = outerRadius / 2.5;
+      let rot = Math.PI / 2 * 3;
+      const step = Math.PI / spikes;
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.translate(x, y);
+      ctx.moveTo(0, -outerRadius);
+
+      for (let i = 0; i < spikes; i++) {
+        ctx.lineTo(Math.cos(rot) * outerRadius, Math.sin(rot) * outerRadius);
+        rot += step;
+        ctx.lineTo(Math.cos(rot) * innerRadius, Math.sin(rot) * innerRadius);
+        rot += step;
       }
-    },
-    plugins: {
-      legend: { position: "bottom", labels: { color: "#000" } },
-      annotation: { drawTime: 'beforeDatasetsDraw', annotations: anns }
-    },
-    animation: false
-  },
 
-  // 👇 Vårt egna plugin för att rita symboler ovanför x-axeln
-  plugins: [{
-    id: 'customSymbols',
-    afterDraw(chart) {
-      const { ctx, chartArea: { bottom }, scales: { x } } = chart;
-      const y = bottom - 15; // justera höjden om det behövs
-      dataEntries.forEach((e, i) => {
-        const xPos = x.getPixelForValue(i);
-        // 💞🌼💧 — visa flera symboler samtidigt om flera är markerade
-        const symbols = [];
-        if (e.sex) symbols.push('💞');
-        if (e.ovulation) symbols.push('🌼');
-        if (e.mucus) symbols.push('💧');
-        
-      if (symbols.length) {
-        ctx.save();
-        ctx.font = '18px Apple Color Emoji, Segoe UI Emoji';
-        ctx.textAlign = 'center';
-        symbols.forEach((sym, j) => {
-          ctx.fillText(sym, xPos, y - j * 18); // stapla symbolerna vertikalt
+      ctx.closePath();
+      ctx.fillStyle = color;
+      ctx.fill();
+      ctx.restore();
+    }
+
+    // 🔧 Specialpunkter ritas ovanpå
+    const customShapesPlugin = {
+      id: 'customShapesPlugin',
+      afterDatasetsDraw(chart) {
+        const ctx = chart.ctx;
+
+        chart.data.datasets.forEach((ds, di) => {
+          const meta = chart.getDatasetMeta(di);
+          if (meta.hidden) return;
+
+          meta.data.forEach((pt, i) => {
+            const x = pt.x;
+            const y = pt.y;
+            const size = ds.pointRadius ?? 3;
+            const color = ds.pointBackgroundColor ?? ds.borderColor;
+
+            if (ds.pointStyle === 'heart') {
+              drawHeart(ctx, x, y - size * 0.6, size * 2.8, color);
+            }
+            if (ds.pointStyle === 'star') {
+              drawStar(ctx, x, y, size * 2.5, color);
+            }
+          });
         });
-        ctx.restore();
       }
-    });
-  }
-}]  // 👈 stänger plugins-arrayen
-);   // 👈 stänger new Chart(...)
+    };
+    Chart.register(customShapesPlugin);
 
-} catch (err) {
-  console.error("❌ Fel i renderChart:", err);
-  alert("Grafen kunde inte ritas:\n" + err.message);
+    chart = new Chart(el.chartCanvas, {
+      type: "line",
+      data: {
+        labels,
+        datasets: [
+          {
+            label: "Faktisk temperatur",
+            data: actual,
+            borderColor: "rgba(90,140,255,0.9)",
+            backgroundColor: "rgba(90,140,255,0.9)",
+            borderWidth: 2,
+            pointRadius: 3,
+            tension: 0.25,
+            spanGaps: true
+          },
+          {
+            label: "Korrigerad temperatur",
+            data: corrected,
+            borderColor: "rgba(240,100,120,0.85)",
+            backgroundColor: "rgba(240,100,120,0.85)",
+            borderDash: [4, 3],
+            borderWidth: 1.5,
+            pointRadius: 2.5,
+            tension: 0.25,
+            spanGaps: true
+          },
+          {
+            label: "Medel före ägglossning",
+            data: meanBeforeOv ? new Array(dataEntries.length).fill(meanBeforeOv) : [],
+            borderColor: "rgba(155, 185, 150, 0.9)",
+            borderWidth: 1.8,
+            pointRadius: 0,
+            fill: false,
+            tension: 0,
+            spanGaps: true
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        layout: { padding: { bottom: 26 } },
+        scales: {
+          y: {
+            min: Math.min(...corrected.filter(v => v != null)) - 0.25,
+            max: Math.max(...corrected.filter(v => v != null)) + 0.15,
+            ticks: {
+              stepSize: 0.01,
+              precision: 2,
+              padding: 6,
+              callback: v => v.toFixed(2),
+              color: ctx => {
+                const v = Number(ctx.tick.value.toFixed(2));
+                return (v * 100) % 10 === 0 ? '#000' : 'rgba(0,0,0,0.45)';
+              },
+              font: ctx => {
+                const v = Number(ctx.tick.value.toFixed(2));
+                return {
+                  size: (v * 100) % 10 === 0 ? 12 : 9,
+                  weight: (v * 100) % 10 === 0 ? "600" : "400"
+                };
+              }
+            },
+            grid: {
+              color: ctx => {
+                const v = Number(ctx.tick.value.toFixed(2));
+                return (v * 100) % 10 === 0
+                  ? "rgba(0,0,0,0.12)"
+                  : "rgba(0,0,0,0.05)";
+              },
+              lineWidth: ctx => {
+                const v = Number(ctx.tick.value.toFixed(2));
+                return (v * 100) % 10 === 0 ? 1 : 0.5;
+              }
+            },
+            title: { display: true, text: "°C" }
+          },
+          x: {
+            ticks: {
+              color: "#000",
+              autoSkip: true,
+              maxTicksLimit: 10,
+              maxRotation: 0
+            }
+          }
+        },
+        plugins: {
+          legend: { position: "bottom", labels: { color: "#000" } },
+          annotation: { drawTime: 'beforeDatasetsDraw', annotations: anns }
+        },
+        animation: false
+      },
+
+      // SYMBOLER OVANFÖR X-AXELN
+      plugins: [{
+        id: 'customSymbols',
+        afterDraw(chart) {
+          const { ctx, chartArea: { bottom }, scales: { x } } = chart;
+          const y = bottom - 15;
+
+          dataEntries.forEach((e, i) => {
+            const xPos = x.getPixelForValue(i);
+            const symbols = [];
+            if (e.sex) symbols.push('💞');
+            if (e.ovulation) symbols.push('🌼');
+            if (e.mucus) symbols.push('💧');
+
+            if (symbols.length) {
+              ctx.save();
+              ctx.font = '18px Apple Color Emoji, Segoe UI Emoji';
+              ctx.textAlign = 'center';
+              symbols.forEach((sym, j) => {
+                ctx.fillText(sym, xPos, y - j * 18);
+              });
+              ctx.restore();
+            }
+          });
+        }
+      }]
+    });
+
+  } catch (err) {
+    console.error("❌ Fel i renderChart:", err);
+    alert("Grafen kunde inte ritas:\n" + err.message);
+  }
 }
-} // ← avslut på renderChart()
     /* ===== Export / Import ===== */
     el.exportBtn.addEventListener('click', ()=>{
       const blob = new Blob([JSON.stringify({ bbtData:dataEntries, lhDataByDate:lhByDate }, null, 2)], {type:'application/json'});
