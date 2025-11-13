@@ -851,7 +851,40 @@ function renderChart() {
         borderDash: [3, 3]
       });
     }
+    // --- MEDELSPANN (faktisk + korrigerad) före ägglossning ---
 
+    let tempsActualBeforeOv = [];
+    let tempsCorrectedBeforeOv = [];
+
+    if (ovIndex > 0) {
+      tempsActualBeforeOv = dataEntries
+        .slice(0, ovIndex)
+        .map(e => e.actual)
+        .filter(v => v != null);
+
+  tempsCorrectedBeforeOv = dataEntries
+    .slice(0, ovIndex)
+    .map(e => e.corrected)
+    .filter(v => v != null);
+} else {
+  tempsActualBeforeOv = dataEntries
+    .map(e => e.actual)
+    .filter(v => v != null);
+
+  tempsCorrectedBeforeOv = dataEntries
+    .map(e => e.corrected)
+    .filter(v => v != null);
+}
+
+let meanMinBeforeOv = null;
+let meanMaxBeforeOv = null;
+
+if (tempsActualBeforeOv.length > 0 || tempsCorrectedBeforeOv.length > 0) {
+  const allTemps = tempsActualBeforeOv.concat(tempsCorrectedBeforeOv);
+
+  meanMinBeforeOv = Math.min(...allTemps);
+  meanMaxBeforeOv = Math.max(...allTemps);
+}
     // === MEDEL-SPANN FÖRE ÄGGLOSSNING (F & K) ===
 
     // --- Faktisk före ov ---
