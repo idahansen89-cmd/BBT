@@ -966,98 +966,90 @@ function renderChart() {
         scales: {
 scales: {
   y: {
-    position: "left",
-    min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 100) / 100,
-    max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 100) / 100,
+  position: "left",
 
-   ticks: {
-  stepSize: 0.05,
+  min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
+  max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
 
-  callback: v => {
-    return (Math.round(v * 100) % 10 === 0)
-      ? v.toFixed(2)
-      : null;
-  },
+  ticks: {
+    stepSize: 0.05,
 
-  font: ctx => {
-    const v = Number(ctx.tick.value);
-    const isMajor = Math.round(v * 100) % 10 === 0;
-    return {
-      size: isMajor ? 12 : 0,
-      weight: isMajor ? "600" : "400"
-    };
-  },
-
-  color: ctx => {
-    const v = Number(ctx.tick.value);
-    return Math.round(v * 100) % 10 === 0
-      ? "#000"
-      : "rgba(0,0,0,0)";
-  }
-},
-
-    grid: {
-      color: ctx => {
-        const v = Number(ctx.tick.value);
-
-        if (Math.round(v * 100) % 10 === 0)
-          return "rgba(0,0,0,0.25)"; // major (.10)
-
-        if (Math.round(v * 100) % 5 === 0)
-          return "rgba(0,0,0,0.08)"; // minor (.05)
-
-        return "rgba(0,0,0,0)"; // inga linjer
-      },
-
-      lineWidth: ctx => {
-        const v = Number(ctx.tick.value);
-
-        if (Math.round(v * 100) % 10 === 0) return 1.2; // major
-        if (Math.round(v * 100) % 5 === 0) return 0.7;  // minor
-        return 0;
-      }
+    callback: function (v) {
+      return (Math.round(v * 100) % 10 === 0)
+        ? v.toFixed(2)   // show 0.10 steps
+        : null;          // hide 0.05
     },
 
-    title: { display: true, text: "°C" }
+    font: function (ctx) {
+      const v = Number(ctx.tick.value);
+      const isMajor = Math.round(v * 100) % 10 === 0;
+      return {
+        size: isMajor ? 12 : 0,
+        weight: isMajor ? "600" : "400"
+      };
+    },
+
+    color: function (ctx) {
+      const v = Number(ctx.tick.value);
+      return Math.round(v * 100) % 10 === 0
+        ? "#000"
+        : "rgba(0,0,0,0)";
+    }
   },
 
-  // --- Höger axel ---
-  y1: {
-    position: "right",
-    min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 100) / 100,
-    max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 100) / 100,
-
-   ticks: {
-  stepSize: 0.05,
-
-  callback: v => {
-    return (Math.round(v * 100) % 10 === 0)
-      ? v.toFixed(2)
-      : null;
+  grid: {
+    color: function (ctx) {
+      const v = Number(ctx.tick.value);
+      return Math.round(v * 100) % 10 === 0
+        ? "rgba(0,0,0,0.15)"  // major grid
+        : "rgba(0,0,0,0.05)"; // minor grid
+    },
+    lineWidth: function (ctx) {
+      const v = Number(ctx.tick.value);
+      return Math.round(v * 100) % 10 === 0 ? 1 : 0.5;
+    }
   },
 
-  font: ctx => {
-    const v = Number(ctx.tick.value);
-    const isMajor = Math.round(v * 100) % 10 === 0;
-    return {
-      size: isMajor ? 12 : 0,
-      weight: isMajor ? "600" : "400"
-    };
-  },
-
-  color: ctx => {
-    const v = Number(ctx.tick.value);
-    return Math.round(v * 100) % 10 === 0
-      ? "#000"
-      : "rgba(0,0,0,0)";
-  }
+  title: { display: true, text: "°C" }
 },
 
-    grid: {
-      drawOnChartArea: false
+  // --- Höger axel ---
+y1: {
+  position: "right",
+
+  min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
+  max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
+
+  ticks: {
+    stepSize: 0.05,
+
+    callback: function (v) {
+      return (Math.round(v * 100) % 10 === 0)
+        ? v.toFixed(2)
+        : null;
+    },
+
+    font: function (ctx) {
+      const v = Number(ctx.tick.value);
+      const isMajor = Math.round(v * 100) % 10 === 0;
+      return {
+        size: isMajor ? 12 : 0,
+        weight: isMajor ? "600" : "400"
+      };
+    },
+
+    color: function (ctx) {
+      const v = Number(ctx.tick.value);
+      return Math.round(v * 100) % 10 === 0
+        ? "#000"
+        : "rgba(0,0,0,0)";
     }
+  },
+
+  grid: {
+    drawOnChartArea: false   // ⭐ right axis gets NO grid
   }
-}
+},
           x: {
             ticks: {
               color: "#000",
