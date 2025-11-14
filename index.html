@@ -968,34 +968,65 @@ scales: {
   // === VÄNSTER Y-AXEL ===
   y: {
     position: "left",
+
     min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
     max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
 
     ticks: {
       stepSize: 0.05,
-      callback: v => Math.round(v * 100) % 10 === 0 ? v.toFixed(2) : "",
-      font: ctx => {
-        if (!ctx?.tick?.value && ctx?.tick?.value !== 0) return { size: 0 };
+
+      // ✔ Major (0.10) visas, minor (0.05) osynliga men stabila
+      callback: function (v) {
+        if (v == null) return "";
+        return Math.round(v * 100) % 10 === 0
+          ? v.toFixed(2)
+          : " ";    // ← viktigt! INTE tomt, annars försvinner major
+      },
+
+      font: function (ctx) {
+        if (!ctx || !ctx.tick || ctx.tick.value == null)
+          return { size: 0, weight: "400" };
+
         const v = Number(ctx.tick.value);
         const isMajor = Math.round(v * 100) % 10 === 0;
-        return { size: isMajor ? 12 : 0, weight: isMajor ? "600" : "400" };
+
+        return {
+          size: isMajor ? 12 : 0,   // major synliga, minor osynliga
+          weight: isMajor ? "600" : "400"
+        };
       },
-      color: ctx => {
-        if (!ctx?.tick?.value && ctx?.tick?.value !== 0) return "rgba(0,0,0,0)";
+
+      color: function (ctx) {
+        if (!ctx || !ctx.tick || ctx.tick.value == null)
+          return "rgba(0,0,0,0)";
+
         const v = Number(ctx.tick.value);
-        return Math.round(v * 100) % 10 === 0 ? "#000" : "rgba(0,0,0,0)";
+        return Math.round(v * 100) % 10 === 0
+          ? "#000"
+          : "rgba(0,0,0,0)";
       }
     },
 
     grid: {
-      color: ctx => {
-        if (!ctx?.tick?.value && ctx?.tick?.value !== 0) return "rgba(0,0,0,0)";
+      drawTicks: true,
+      drawBorder: true,
+
+      // ✔ Major grid tydlig, minor grid svag (0.05 linjer)
+      color: function (ctx) {
+        if (!ctx || !ctx.tick || ctx.tick.value == null)
+          return "rgba(0,0,0,0)";
+
         const v = Number(ctx.tick.value);
         const isMajor = Math.round(v * 100) % 10 === 0;
-        return isMajor ? "rgba(0,0,0,0.15)" : "rgba(0,0,0,0.05)";
+
+        return isMajor
+          ? "rgba(0,0,0,0.15)"   // major 0.10
+          : "rgba(0,0,0,0.05)";  // minor 0.05
       },
-      lineWidth: ctx => {
-        if (!ctx?.tick?.value && ctx?.tick?.value !== 0) return 0.5;
+
+      lineWidth: function (ctx) {
+        if (!ctx || !ctx.tick || ctx.tick.value == null) return 0.5;
+
         const v = Number(ctx.tick.value);
         return Math.round(v * 100) % 10 === 0 ? 1 : 0.5;
       }
@@ -1007,29 +1038,50 @@ scales: {
   // === HÖGER Y-AXEL ===
   y1: {
     position: "right",
+
     min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
     max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
 
     ticks: {
       stepSize: 0.05,
-      callback: v => Math.round(v * 100) % 10 === 0 ? v.toFixed(2) : "",
-      font: ctx => {
-        if (!ctx?.tick?.value && ctx?.tick?.value !== 0) return { size: 0 };
+
+      callback: function (v) {
+        if (v == null) return "";
+        return Math.round(v * 100) % 10 === 0
+          ? v.toFixed(2)
+          : " ";
+      },
+
+      font: function (ctx) {
+        if (!ctx || !ctx.tick || ctx.tick.value == null)
+          return { size: 0, weight: "400" };
+
         const v = Number(ctx.tick.value);
         const isMajor = Math.round(v * 100) % 10 === 0;
-        return { size: isMajor ? 12 : 0, weight: isMajor ? "600" : "400" };
+
+        return {
+          size: isMajor ? 12 : 0,
+          weight: isMajor ? "600" : "400"
+        };
       },
-      color: ctx => {
-        if (!ctx?.tick?.value && ctx?.tick?.value !== 0) return "rgba(0,0,0,0)";
+
+      color: function (ctx) {
+        if (!ctx || !ctx.tick || ctx.tick.value == null)
+          return "rgba(0,0,0,0)";
+
         const v = Number(ctx.tick.value);
-        return Math.round(v * 100) % 10 === 0 ? "#000" : "rgba(0,0,0,0)";
+        return Math.round(v * 100) % 10 === 0
+          ? "#000"
+          : "rgba(0,0,0,0)";
       }
     },
 
-    grid: { drawOnChartArea: false }
+    grid: {
+      drawOnChartArea: false   // Ingen grid från höger axel
+    }
   },
 
-  // === X-AXEL ===
+  // === X-AXEL (DATUM) ===
   x: {
     ticks: {
       color: "#000",
@@ -1038,7 +1090,7 @@ scales: {
       maxRotation: 0
     }
   }
-},
+}
 
         plugins: {
           legend: { position: "bottom", labels: { color: "#000" } },
