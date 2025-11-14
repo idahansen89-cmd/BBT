@@ -964,8 +964,8 @@ function renderChart() {
         maintainAspectRatio: false,
         layout: { padding: { bottom: 26 } },
 
- scales: {
-  // --- VÄNSTER AXEL ---
+scales: {
+  // === VÄNSTER Y-AXEL ===
   y: {
     position: "left",
 
@@ -975,27 +975,30 @@ function renderChart() {
     ticks: {
       stepSize: 0.05,
 
-      // Visa endast 0.10, göm 0.05 (men rita grid)
       callback: function (v) {
-        return (Math.round(v * 100) % 10 === 0)
-          ? v.toFixed(2)     // grövre gradering
-          : "";              // inte null!
+        if (v == null) return "";
+        return Math.round(v * 100) % 10 === 0 ? v.toFixed(2) : "";
       },
 
       font: function (ctx) {
+        if (!ctx || !ctx.tick || ctx.tick.value == null)
+          return { size: 0, weight: "400" };
+
         const v = Number(ctx.tick.value);
         const isMajor = Math.round(v * 100) % 10 === 0;
+
         return {
-          size: isMajor ? 12 : 0,      // 0 för att helt gömma text
+          size: isMajor ? 12 : 0,
           weight: isMajor ? "600" : "400"
         };
       },
 
       color: function (ctx) {
+        if (!ctx || !ctx.tick || ctx.tick.value == null)
+          return "rgba(0,0,0,0)";
+
         const v = Number(ctx.tick.value);
-        return Math.round(v * 100) % 10 === 0
-          ? "#000"
-          : "rgba(0,0,0,0)";   // dold text vid 0.05
+        return Math.round(v * 100) % 10 === 0 ? "#000" : "rgba(0,0,0,0)";
       }
     },
 
@@ -1004,30 +1007,29 @@ function renderChart() {
       drawBorder: true,
 
       color: function (ctx) {
-        const tick = ctx.tick;
-        if (!tick || tick.value == null) return "rgba(0,0,0,0)";
+        if (!ctx || !ctx.tick || ctx.tick.value == null)
+          return "rgba(0,0,0,0)";
 
-        const v = Number(tick.value);
+        const v = Number(ctx.tick.value);
         const isMajor = Math.round(v * 100) % 10 === 0;
 
         return isMajor
-          ? "rgba(0,0,0,0.15)"  // major (0.10)
-          : "rgba(0,0,0,0.05)"; // minor (0.05)
+          ? "rgba(0,0,0,0.15)"
+          : "rgba(0,0,0,0.05)";
       },
 
       lineWidth: function (ctx) {
-        const tick = ctx.tick;
-        if (!tick || tick.value == null) return 0.5;
+        if (!ctx || !ctx.tick || ctx.tick.value == null) return 0.5;
 
-        const v = Number(tick.value);
-        return Math.round(v * 100) % 10 === 0 ? 1.0 : 0.5;
+        const v = Number(ctx.tick.value);
+        return Math.round(v * 100) % 10 === 0 ? 1 : 0.5;
       }
     },
 
     title: { display: true, text: "°C" }
   },
 
-  // --- HÖGER AXEL ---
+  // === HÖGER Y-AXEL ===
   y1: {
     position: "right",
 
@@ -1038,14 +1040,17 @@ function renderChart() {
       stepSize: 0.05,
 
       callback: function (v) {
-        return (Math.round(v * 100) % 10 === 0)
-          ? v.toFixed(2)
-          : "";
+        if (v == null) return "";
+        return Math.round(v * 100) % 10 === 0 ? v.toFixed(2) : "";
       },
 
       font: function (ctx) {
+        if (!ctx || !ctx.tick || ctx.tick.value == null)
+          return { size: 0, weight: "400" };
+
         const v = Number(ctx.tick.value);
         const isMajor = Math.round(v * 100) % 10 === 0;
+
         return {
           size: isMajor ? 12 : 0,
           weight: isMajor ? "600" : "400"
@@ -1053,18 +1058,19 @@ function renderChart() {
       },
 
       color: function (ctx) {
+        if (!ctx || !ctx.tick || ctx.tick.value == null)
+          return "rgba(0,0,0,0)";
+
         const v = Number(ctx.tick.value);
-        return Math.round(v * 100) % 10 === 0
-          ? "#000"
-          : "rgba(0,0,0,0)";
+        return Math.round(v * 100) % 10 === 0 ? "#000" : "rgba(0,0,0,0)";
       }
     },
 
     grid: {
-      drawOnChartArea: false   // höger axel ska INTE rita extra grid
+      drawOnChartArea: false
     }
   }
-},
+};
 
           // X-axeln (datum)
           x: {
