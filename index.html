@@ -1020,7 +1020,8 @@ function renderChart() {
   },
 
   title: { display: true, text: "°C" }
-},
+  }
+}
 y2: {
   position: "right",
   min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 100) / 100,
