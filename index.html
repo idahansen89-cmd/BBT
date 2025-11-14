@@ -970,27 +970,31 @@ scales: {
     min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 100) / 100,
     max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 100) / 100,
 
-    ticks: {
-      callback: v => {
-        return (Math.round(v * 100) % 10 === 0)
-          ? v.toFixed(2)  // visa bara 0.10, 0.20, 0.30 …
-          : "";
-      },
-      font: ctx => {
-        const v = Number(ctx.tick.value);
-        const isMajor = Math.round(v * 100) % 10 === 0;
-        return {
-          size: isMajor ? 12 : 9,
-          weight: isMajor ? "600" : "400"
-        };
-      },
-      color: ctx => {
-        const v = Number(ctx.tick.value);
-        return Math.round(v * 100) % 10 === 0
-          ? "#000"
-          : "rgba(0,0,0,0.45)";
-      }
-    },
+   ticks: {
+  stepSize: 0.05,
+
+  callback: v => {
+    return (Math.round(v * 100) % 10 === 0)
+      ? v.toFixed(2)
+      : null;
+  },
+
+  font: ctx => {
+    const v = Number(ctx.tick.value);
+    const isMajor = Math.round(v * 100) % 10 === 0;
+    return {
+      size: isMajor ? 12 : 0,
+      weight: isMajor ? "600" : "400"
+    };
+  },
+
+  color: ctx => {
+    const v = Number(ctx.tick.value);
+    return Math.round(v * 100) % 10 === 0
+      ? "#000"
+      : "rgba(0,0,0,0)";
+  }
+},
 
     grid: {
       color: ctx => {
@@ -1023,27 +1027,31 @@ scales: {
     min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 100) / 100,
     max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 100) / 100,
 
-    ticks: {
-      callback: v => {
-        return (Math.round(v * 100) % 10 === 0)
-          ? v.toFixed(2)
-          : "";
-      },
-      font: ctx => {
-        const v = Number(ctx.tick.value);
-        const isMajor = Math.round(v * 100) % 10 === 0;
-        return {
-          size: isMajor ? 12 : 9,
-          weight: isMajor ? "600" : "400"
-        };
-      },
-      color: ctx => {
-        const v = Number(ctx.tick.value);
-        return Math.round(v * 100) % 10 === 0
-          ? "#000"
-          : "rgba(0,0,0,0.45)";
-      }
-    },
+   ticks: {
+  stepSize: 0.05,
+
+  callback: v => {
+    return (Math.round(v * 100) % 10 === 0)
+      ? v.toFixed(2)
+      : null;
+  },
+
+  font: ctx => {
+    const v = Number(ctx.tick.value);
+    const isMajor = Math.round(v * 100) % 10 === 0;
+    return {
+      size: isMajor ? 12 : 0,
+      weight: isMajor ? "600" : "400"
+    };
+  },
+
+  color: ctx => {
+    const v = Number(ctx.tick.value);
+    return Math.round(v * 100) % 10 === 0
+      ? "#000"
+      : "rgba(0,0,0,0)";
+  }
+},
 
     grid: {
       drawOnChartArea: false
