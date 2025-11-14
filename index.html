@@ -963,102 +963,77 @@ function renderChart() {
         responsive: true,
         maintainAspectRatio: false,
         layout: { padding: { bottom: 26 } },
-      scales: {
+scales: {
   y: {
-  position: "left",
+    position: "left",
+    min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
+    max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
 
-  min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
-  max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
-
-  ticks: {
-    stepSize: 0.05,
-
-    callback: function (v) {
-      return (Math.round(v * 100) % 10 === 0)
-        ? v.toFixed(2)   // show 0.10 steps
-        : null;          // hide 0.05
+    ticks: {
+      stepSize: 0.05,
+      callback: v =>
+        (Math.round(v * 100) % 10 === 0 ? v.toFixed(2) : null),
+      font: ctx => {
+        const v = Number(ctx.tick.value);
+        const major = Math.round(v * 100) % 10 === 0;
+        return { size: major ? 12 : 0, weight: major ? "600" : "400" };
+      },
+      color: ctx => {
+        const v = Number(ctx.tick.value);
+        return Math.round(v * 100) % 10 === 0 ? "#000" : "rgba(0,0,0,0)";
+      }
     },
 
-    font: function (ctx) {
-      const v = Number(ctx.tick.value);
-      const isMajor = Math.round(v * 100) % 10 === 0;
-      return {
-        size: isMajor ? 12 : 0,
-        weight: isMajor ? "600" : "400"
-      };
+    grid: {
+      color: ctx => {
+        const v = Number(ctx.tick.value);
+        return Math.round(v * 100) % 10 === 0
+          ? "rgba(0,0,0,0.15)"
+          : "rgba(0,0,0,0.05)";
+      },
+      lineWidth: ctx => {
+        const v = Number(ctx.tick.value);
+        return Math.round(v * 100) % 10 === 0 ? 1 : 0.5;
+      }
     },
 
-    color: function (ctx) {
-      const v = Number(ctx.tick.value);
-      return Math.round(v * 100) % 10 === 0
-        ? "#000"
-        : "rgba(0,0,0,0)";
-    }
+    title: { display: true, text: "°C" }
   },
 
-  grid: {
-    color: function (ctx) {
-      const v = Number(ctx.tick.value);
-      return Math.round(v * 100) % 10 === 0
-        ? "rgba(0,0,0,0.15)"  // major grid
-        : "rgba(0,0,0,0.05)"; // minor grid
+  y1: {
+    position: "right",
+    min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
+    max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
+
+    ticks: {
+      stepSize: 0.05,
+      callback: v =>
+        (Math.round(v * 100) % 10 === 0 ? v.toFixed(2) : null),
+
+      font: ctx => {
+        const v = Number(ctx.tick.value);
+        const major = Math.round(v * 100) % 10 === 0;
+        return { size: major ? 12 : 0, weight: major ? "600" : "400" };
+      },
+
+      color: ctx => {
+        const v = Number(ctx.tick.value);
+        return Math.round(v * 100) % 10 === 0 ? "#000" : "rgba(0,0,0,0)";
+      }
     },
-    lineWidth: function (ctx) {
-      const v = Number(ctx.tick.value);
-      return Math.round(v * 100) % 10 === 0 ? 1 : 0.5;
-    }
+
+    grid: { drawOnChartArea: false }
   },
 
-  title: { display: true, text: "°C" }
-},
-
-  // --- Höger axel ---
-y1: {
-  position: "right",
-
-  min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
-  max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
-
-  ticks: {
-    stepSize: 0.05,
-
-    callback: function (v) {
-      return (Math.round(v * 100) % 10 === 0)
-        ? v.toFixed(2)
-        : null;
-    },
-
-    font: function (ctx) {
-      const v = Number(ctx.tick.value);
-      const isMajor = Math.round(v * 100) % 10 === 0;
-      return {
-        size: isMajor ? 12 : 0,
-        weight: isMajor ? "600" : "400"
-      };
-    },
-
-    color: function (ctx) {
-      const v = Number(ctx.tick.value);
-      return Math.round(v * 100) % 10 === 0
-        ? "#000"
-        : "rgba(0,0,0,0)";
-    }
-  },
-
-      grid: {
-      drawOnChartArea: false   // ⭐ right axis gets NO grid
+  x: {
+    ticks: {
+      color: "#000",
+      autoSkip: true,
+      maxTicksLimit: 10,
+      maxRotation: 0
     }
   }
-}
-          x: {
-            ticks: {
-              color: "#000",
-              autoSkip: true,
-              maxTicksLimit: 10,
-              maxRotation: 0
-            }
-          }
-        },
+},   // ⭐ SUPER-VIKTIG! Detta KOMMA saknades tidigare
         plugins: {
           legend: { position: "bottom", labels: { color: "#000" } },
           annotation: {
