@@ -1021,6 +1021,38 @@ function renderChart() {
 
   title: { display: true, text: "°C" }
 },
+y2: {
+  position: "right",
+  min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 100) / 100,
+  max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 100) / 100,
+  
+  ticks: {
+    stepSize: 0.01,
+    callback: v => v.toFixed(2),
+    font: function (ctx) {
+      const t = ctx.tick;
+      if (!t || t.value == null)
+        return { size: 9, weight: "400" };
+      const v = Number(t.value);
+      const isMajor = Math.round(v * 100) % 10 === 0;
+      return {
+        size: isMajor ? 12 : 9,
+        weight: isMajor ? "600" : "400"
+      };
+    },
+    color: function (ctx) {
+      const t = ctx.tick;
+      if (!t || t.value == null)
+        return "rgba(0,0,0,0.45)";
+      const v = Number(t.value);
+      return Math.round(v * 100) % 10 === 0 ? "#000" : "rgba(0,0,0,0.45)";
+    }
+  },
+
+  grid: {
+    drawOnChartArea: false  // ⭐️ Detta gör att högeraxeln BLIR tydlig utan extra gridlinjer
+  }
+}
           x: {
             ticks: {
               color: "#000",
