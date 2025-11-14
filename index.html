@@ -938,6 +938,7 @@ function renderChart() {
               backgroundColor: "rgba(90,140,255,0.9)",
               borderWidth: 2,
               pointRadius: 3,
+              pointStyle: "circle",
               tension: 0.25,
               spanGaps: true
             },
@@ -951,6 +952,8 @@ function renderChart() {
               borderDash: [4, 3],
               borderWidth: 1.5,
               pointRadius: 2.5,
+              pointStyle: "triangle",
+              rotation: 0,
               tension: 0.25,
               spanGaps: true
           }
@@ -962,18 +965,15 @@ function renderChart() {
         layout: { padding: { bottom: 26 } },
         scales: {
           y: {
-            min:
-              Math.min(...corrected.filter(v => v != null)) - 0.25,
-            max:
-              Math.max(...corrected.filter(v => v != null)) + 0.15,
+            min: 
+            Math.floor((Math.min(...corrected.filter(v=>v!=null)) - 0.25) * 100) / 100,
+            max: 
+            Math.ceil((Math.max(...corrected.filter(v=>v!=null)) + 0.15) * 100) / 100,
             ticks: {
               stepSize: 0.01,
-              precision: 2,
-              padding: 6,
-              callback: function (v) {
-                if (v == null || isNaN(v)) return "";
-                return Number(v).toFixed(2);
+              callback: v => v.toFixed(2)
               },
+              
               color: function (ctx) {
                 const t = ctx.tick;
                 if (!t || t.value == null)
