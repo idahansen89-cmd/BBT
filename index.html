@@ -965,6 +965,7 @@ function renderChart() {
         layout: { padding: { bottom: 26 } },
 
 scales: {
+
   // === VÄNSTER Y-AXEL ===
   y: {
     position: "left",
@@ -975,35 +976,27 @@ scales: {
     ticks: {
       stepSize: 0.05,
 
-      // ✔ Major (0.10) visas, minor (0.05) osynliga men stabila
+      // ✔ Major (0.10) visas, minor (0.05) osynliga
       callback: function (v) {
         if (v == null) return "";
-        return Math.round(v * 100) % 10 === 0
-          ? v.toFixed(2)
-          : " ";    // ← viktigt! INTE tomt, annars försvinner major
+        return Math.round(v * 100) % 10 === 0 ? v.toFixed(2) : "";
       },
 
+      // ✔ font måste ALLTID ha storlek i Safari
       font: function (ctx) {
-        if (!ctx || !ctx.tick || ctx.tick.value == null)
-          return { size: 0, weight: "400" };
-
         const v = Number(ctx.tick.value);
         const isMajor = Math.round(v * 100) % 10 === 0;
-
         return {
-          size: isMajor ? 12 : 0,   // major synliga, minor osynliga
-          weight: isMajor ? "600" : "400"
+          size: 12,                       // alltid 12 px
+          weight: isMajor ? "600" : "400" // major = fet
         };
       },
 
+      // ✔ minor-ticks göms med transparent färg
       color: function (ctx) {
-        if (!ctx || !ctx.tick || ctx.tick.value == null)
-          return "rgba(0,0,0,0)";
-
         const v = Number(ctx.tick.value);
-        return Math.round(v * 100) % 10 === 0
-          ? "#000"
-          : "rgba(0,0,0,0)";
+        const isMajor = Math.round(v * 100) % 10 === 0;
+        return isMajor ? "#000" : "rgba(0,0,0,0)";
       }
     },
 
@@ -1011,22 +1004,17 @@ scales: {
       drawTicks: true,
       drawBorder: true,
 
-      // ✔ Major grid tydlig, minor grid svag (0.05 linjer)
+      // ✔ major = tydlig, minor = svag
       color: function (ctx) {
-        if (!ctx || !ctx.tick || ctx.tick.value == null)
-          return "rgba(0,0,0,0)";
-
         const v = Number(ctx.tick.value);
         const isMajor = Math.round(v * 100) % 10 === 0;
 
         return isMajor
-          ? "rgba(0,0,0,0.15)"   // major 0.10
-          : "rgba(0,0,0,0.05)";  // minor 0.05
+          ? "rgba(0,0,0,0.15)"  // major 0.10
+          : "rgba(0,0,0,0.05)"; // minor 0.05
       },
 
       lineWidth: function (ctx) {
-        if (!ctx || !ctx.tick || ctx.tick.value == null) return 0.5;
-
         const v = Number(ctx.tick.value);
         return Math.round(v * 100) % 10 === 0 ? 1 : 0.5;
       }
@@ -1047,41 +1035,31 @@ scales: {
 
       callback: function (v) {
         if (v == null) return "";
-        return Math.round(v * 100) % 10 === 0
-          ? v.toFixed(2)
-          : " ";
+        return Math.round(v * 100) % 10 === 0 ? v.toFixed(2) : "";
       },
 
       font: function (ctx) {
-        if (!ctx || !ctx.tick || ctx.tick.value == null)
-          return { size: 0, weight: "400" };
-
         const v = Number(ctx.tick.value);
         const isMajor = Math.round(v * 100) % 10 === 0;
-
         return {
-          size: isMajor ? 12 : 0,
+          size: 12,
           weight: isMajor ? "600" : "400"
         };
       },
 
       color: function (ctx) {
-        if (!ctx || !ctx.tick || ctx.tick.value == null)
-          return "rgba(0,0,0,0)";
-
         const v = Number(ctx.tick.value);
-        return Math.round(v * 100) % 10 === 0
-          ? "#000"
-          : "rgba(0,0,0,0)";
+        const isMajor = Math.round(v * 100) % 10 === 0;
+        return isMajor ? "#000" : "rgba(0,0,0,0)";
       }
     },
 
     grid: {
-      drawOnChartArea: false   // Ingen grid från höger axel
+      drawOnChartArea: false   // ✔ ingen extra grid från höger axel
     }
   },
 
-  // === X-AXEL (DATUM) ===
+  // === X-AXEL ===
   x: {
     ticks: {
       color: "#000",
