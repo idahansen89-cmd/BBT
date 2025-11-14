@@ -965,55 +965,62 @@ function renderChart() {
         layout: { padding: { bottom: 26 } },
         scales: {
           y: {
-            min: 
-            Math.floor((Math.min(...corrected.filter(v=>v!=null)) - 0.25) * 100) / 100,
-            max: 
-            Math.ceil((Math.max(...corrected.filter(v=>v!=null)) + 0.15) * 100) / 100,
-            ticks: {
-              stepSize: 0.01,
-              callback: v => v.toFixed(2)
-              },
-              
-              color: function (ctx) {
-                const t = ctx.tick;
-                if (!t || t.value == null)
-                  return "rgba(0,0,0,0.45)";
-                const v = Number(t.value);
-                return Math.round(v * 100) % 10 === 0
-                  ? "#000"
-                  : "rgba(0,0,0,0.45)";
-              },
-              font: function (ctx) {
-                const t = ctx.tick;
-                if (!t || t.value == null)
-                  return { size: 9, weight: "400" };
-                const v = Number(t.value);
-                const isMajor = Math.round(v * 100) % 10 === 0;
-                return {
-                  size: isMajor ? 12 : 9,
-                  weight: isMajor ? "600" : "400"
-                };
-              }
-            },
-            grid: {
-              color: function (ctx) {
-                const t = ctx.tick;
-                if (!t || t.value == null)
-                  return "rgba(0,0,0,0.05)";
-                const v = Number(t.value);
-                return Math.round(v * 100) % 10 === 0
-                  ? "rgba(0,0,0,0.12)"
-                  : "rgba(0,0,0,0.05)";
-              },
-              lineWidth: function (ctx) {
-                const t = ctx.tick;
-                if (!t || t.value == null) return 0.5;
-                const v = Number(t.value);
-                return Math.round(v * 100) % 10 === 0 ? 1 : 0.5;
-              }
-            },
-            title: { display: true, text: "°C" }
-          },
+  min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 100) / 100,
+  max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 100) / 100,
+
+  ticks: {
+    stepSize: 0.01,
+    callback: v => v.toFixed(2),
+
+    // ★ Här sätter vi font-styles som tillåts i Safari
+    font: function(ctx) {
+      const t = ctx.tick;
+      if (!t || t.value == null)
+        return { size: 9, weight: "400" };
+
+      const v = Number(t.value);
+      const isMajor = Math.round(v * 100) % 10 === 0;   // var 0.10
+
+      return {
+        size: isMajor ? 12 : 9,
+        weight: isMajor ? "600" : "400"
+      };
+    },
+
+    color: function(ctx) {
+      const t = ctx.tick;
+      if (!t || t.value == null)
+        return "rgba(0,0,0,0.45)";
+      const v = Number(t.value);
+      return Math.round(v * 100) % 10 === 0 
+        ? "#000"                    // major
+        : "rgba(0,0,0,0.45)";       // minor
+    }
+  },
+
+  grid: {
+    color: function(ctx) {
+      const t = ctx.tick;
+      if (!t || t.value == null)
+        return "rgba(0,0,0,0.05)";
+
+      const v = Number(t.value);
+      return Math.round(v * 100) % 10 === 0
+        ? "rgba(0,0,0,0.12)"        // major gridline
+        : "rgba(0,0,0,0.05)";       // minor
+    },
+
+    lineWidth: function(ctx) {
+      const t = ctx.tick;
+      if (!t || t.value == null) return 0.5;
+
+      const v = Number(t.value);
+      return Math.round(v * 100) % 10 === 0 ? 1 : 0.5;
+    }
+  },
+
+  title: { display: true, text: "°C" }
+},
           x: {
             ticks: {
               color: "#000",
