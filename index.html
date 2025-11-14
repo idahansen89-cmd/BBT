@@ -1065,23 +1065,20 @@ scales: {
         return Math.round(v * 100) % 10 === 0 ? "#000" : "rgba(0,0,0,0)";
       }
     },
-
     grid: {
       drawOnChartArea: false
+  },
+
+  // === X-AXEL ===
+  x: {
+    ticks: {
+      color: "#000",
+      autoSkip: true,
+      maxTicksLimit: 10,
+      maxRotation: 0
     }
   }
-};
-
-          // X-axeln (datum)
-          x: {
-            ticks: {
-              color: "#000",
-              autoSkip: true,
-              maxTicksLimit: 10,
-              maxRotation: 0
-            }
-          }
-        },
+},
 
         plugins: {
           legend: { position: "bottom", labels: { color: "#000" } },
