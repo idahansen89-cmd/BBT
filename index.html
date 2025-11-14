@@ -953,14 +953,6 @@ function renderChart() {
               pointRadius: 2.5,
               tension: 0.25,
               spanGaps: true
-          },
-          {
-            label: "",   // inga dubbla texter i legenden
-            data: meanMaxBeforeOv ? new Array(dataEntries.length).fill(meanMaxBeforeOv) : [],
-            borderWidth: 0,
-            pointRadius: 0,
-            fill: false,
-            backgroundColor: "rgba(180, 210, 170, 0.25)"
           }
         ]
       },
