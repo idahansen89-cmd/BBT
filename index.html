@@ -963,110 +963,126 @@ function renderChart() {
         responsive: true,
         maintainAspectRatio: false,
         layout: { padding: { bottom: 26 } },
-scales: {
-  y: {
-    position: "left",
 
-    min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
-    max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
+        scales: {
+          // Vänster Y-axel
+          y: {
+            position: "left",
 
-    ticks: {
-      stepSize: 0.05,
+            min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
+            max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
 
-      callback: function (v) {
-        return (Math.round(v * 100) % 10 === 0) ? v.toFixed(2) : null;
-      },
+            ticks: {
+              stepSize: 0.05,
 
-      font: function (ctx) {
-        if (!ctx || !ctx.tick || ctx.tick.value == null)
-          return { size: 0, weight: "400" };
+              // Visa bara vid varje 0,10 (t.ex. 36.10, 36.20 …)
+              callback: function (v) {
+                return (Math.round(v * 100) % 10 === 0)
+                  ? v.toFixed(2)
+                  : null;
+              },
 
-        const v = Number(ctx.tick.value);
-        const isMajor = Math.round(v * 100) % 10 === 0;
+              font: function (ctx) {
+                if (!ctx || !ctx.tick || ctx.tick.value == null) {
+                  return { size: 0, weight: "400" };
+                }
+                const v = Number(ctx.tick.value);
+                const isMajor = Math.round(v * 100) % 10 === 0;
+                return {
+                  size: isMajor ? 12 : 0,
+                  weight: isMajor ? "600" : "400"
+                };
+              },
 
-        return { size: isMajor ? 12 : 0, weight: isMajor ? "600" : "400" };
-      },
+              color: function (ctx) {
+                if (!ctx || !ctx.tick || ctx.tick.value == null) {
+                  return "rgba(0,0,0,0)";
+                }
+                const v = Number(ctx.tick.value);
+                return Math.round(v * 100) % 10 === 0
+                  ? "#000"
+                  : "rgba(0,0,0,0)";
+              }
+            },
 
-      color: function (ctx) {
-        if (!ctx || !ctx.tick || ctx.tick.value == null)
-          return "rgba(0,0,0,0)";
+            // Rutnät: både 0,05 och 0,10 — men 0,10 lite tydligare
+            grid: {
+              color: function (ctx) {
+                if (!ctx || !ctx.tick || ctx.tick.value == null) {
+                  return "rgba(0,0,0,0)";
+                }
+                const v = Number(ctx.tick.value);
+                return Math.round(v * 100) % 10 === 0
+                  ? "rgba(0,0,0,0.15)"  // major grid (0,10)
+                  : "rgba(0,0,0,0.05)"; // minor grid (0,05)
+              },
+              lineWidth: function (ctx) {
+                if (!ctx || !ctx.tick || ctx.tick.value == null) {
+                  return 0.5;
+                }
+                const v = Number(ctx.tick.value);
+                return Math.round(v * 100) % 10 === 0 ? 1 : 0.5;
+              }
+            },
 
-        const v = Number(ctx.tick.value);
-        return Math.round(v * 100) % 10 === 0 ? "#000" : "rgba(0,0,0,0)";
-      }
-    },
+            title: { display: true, text: "°C" }
+          },
 
-    grid: {
-      color: function (ctx) {
-        if (!ctx || !ctx.tick || ctx.tick.value == null)
-          return "rgba(0,0,0,0)";
+          // Höger Y-axel – speglar vänster, men utan eget rutnät
+          y1: {
+            position: "right",
 
-        const v = Number(ctx.tick.value);
-        return Math.round(v * 100) % 10 === 0
-          ? "rgba(0,0,0,0.15)"
-          : "rgba(0,0,0,0.05)";
-      },
+            min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
+            max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
 
-      lineWidth: function (ctx) {
-        if (!ctx || !ctx.tick || ctx.tick.value == null)
-          return 0.5;
+            ticks: {
+              stepSize: 0.05,
 
-        const v = Number(ctx.tick.value);
-        return Math.round(v * 100) % 10 === 0 ? 1 : 0.5;
-      }
-    },
+              callback: function (v) {
+                return (Math.round(v * 100) % 10 === 0)
+                  ? v.toFixed(2)
+                  : null;
+              },
 
-    title: { display: true, text: "°C" }
-  },
+              font: function (ctx) {
+                if (!ctx || !ctx.tick || ctx.tick.value == null) {
+                  return { size: 0, weight: "400" };
+                }
+                const v = Number(ctx.tick.value);
+                const isMajor = Math.round(v * 100) % 10 === 0;
+                return {
+                  size: isMajor ? 12 : 0,
+                  weight: isMajor ? "600" : "400"
+                };
+              },
 
-  // ----- HÖGER AXEL -----
-  y1: {
-    position: "right",
+              color: function (ctx) {
+                if (!ctx || !ctx.tick || ctx.tick.value == null) {
+                  return "rgba(0,0,0,0)";
+                }
+                const v = Number(ctx.tick.value);
+                return Math.round(v * 100) % 10 === 0
+                  ? "#000"
+                  : "rgba(0,0,0,0)";
+              }
+            },
 
-    min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
-    max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
+            grid: {
+              drawOnChartArea: false // ingen extra grid från höger
+            }
+          },
 
-    ticks: {
-      stepSize: 0.05,
+          // X-axeln (datum)
+          x: {
+            ticks: {
+              color: "#000",
+              autoSkip: true,
+              maxTicksLimit: 10,
+              maxRotation: 0
+            }
+          }
+        },
 
-      callback: function (v) {
-        return (Math.round(v * 100) % 10 === 0) ? v.toFixed(2) : null;
-      },
-
-      font: function (ctx) {
-        if (!ctx || !ctx.tick || ctx.tick.value == null)
-          return { size: 0, weight: "400" };
-
-        const v = Number(ctx.tick.value);
-        const isMajor = Math.round(v * 100) % 10 === 0;
-
-        return { size: isMajor ? 12 : 0, weight: isMajor ? "600" : "400" };
-      },
-
-      color: function (ctx) {
-        if (!ctx || !ctx.tick || ctx.tick.value == null)
-          return "rgba(0,0,0,0)";
-
-        const v = Number(ctx.tick.value);
-        return Math.round(v * 100) % 10 === 0 ? "#000" : "rgba(0,0,0,0)";
-      }
-    },
-
-    grid: {
-      drawOnChartArea: false
-    }
-  }
-}
-
-  x: {
-    ticks: {
-      color: "#000",
-      autoSkip: true,
-      maxTicksLimit: 10,
-      maxRotation: 0
-    }
-  }
-},   // ⭐ SUPER-VIKTIG! Detta KOMMA saknades tidigare
         plugins: {
           legend: { position: "bottom", labels: { color: "#000" } },
           annotation: {
@@ -1074,6 +1090,7 @@ scales: {
             annotations: anns
           }
         },
+
         animation: false
       },
 
