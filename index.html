@@ -964,113 +964,107 @@ function renderChart() {
         maintainAspectRatio: false,
         layout: { padding: { bottom: 26 } },
 
-        scales: {
-          // Vänster Y-axel
-          y: {
-            position: "left",
+ scales: {
+  // --- VÄNSTER AXEL ---
+  y: {
+    position: "left",
 
-            min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
-            max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
+    min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
+    max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
 
-            ticks: {
-              stepSize: 0.05,
+    ticks: {
+      stepSize: 0.05,
 
-              // Visa bara vid varje 0,10 (t.ex. 36.10, 36.20 …)
-              callback: function (v) {
-                return (Math.round(v * 100) % 10 === 0)
-                  ? v.toFixed(2)
-                  : null;
-              },
+      // Visa endast 0.10, göm 0.05 (men rita grid)
+      callback: function (v) {
+        return (Math.round(v * 100) % 10 === 0)
+          ? v.toFixed(2)     // grövre gradering
+          : "";              // inte null!
+      },
 
-              font: function (ctx) {
-                if (!ctx || !ctx.tick || ctx.tick.value == null) {
-                  return { size: 0, weight: "400" };
-                }
-                const v = Number(ctx.tick.value);
-                const isMajor = Math.round(v * 100) % 10 === 0;
-                return {
-                  size: isMajor ? 12 : 0,
-                  weight: isMajor ? "600" : "400"
-                };
-              },
+      font: function (ctx) {
+        const v = Number(ctx.tick.value);
+        const isMajor = Math.round(v * 100) % 10 === 0;
+        return {
+          size: isMajor ? 12 : 0,      // 0 för att helt gömma text
+          weight: isMajor ? "600" : "400"
+        };
+      },
 
-              color: function (ctx) {
-                if (!ctx || !ctx.tick || ctx.tick.value == null) {
-                  return "rgba(0,0,0,0)";
-                }
-                const v = Number(ctx.tick.value);
-                return Math.round(v * 100) % 10 === 0
-                  ? "#000"
-                  : "rgba(0,0,0,0)";
-              }
-            },
+      color: function (ctx) {
+        const v = Number(ctx.tick.value);
+        return Math.round(v * 100) % 10 === 0
+          ? "#000"
+          : "rgba(0,0,0,0)";   // dold text vid 0.05
+      }
+    },
 
-            // Rutnät: både 0,05 och 0,10 — men 0,10 lite tydligare
-            grid: {
-              color: function (ctx) {
-                if (!ctx || !ctx.tick || ctx.tick.value == null) {
-                  return "rgba(0,0,0,0)";
-                }
-                const v = Number(ctx.tick.value);
-                return Math.round(v * 100) % 10 === 0
-                  ? "rgba(0,0,0,0.15)"  // major grid (0,10)
-                  : "rgba(0,0,0,0.05)"; // minor grid (0,05)
-              },
-              lineWidth: function (ctx) {
-                if (!ctx || !ctx.tick || ctx.tick.value == null) {
-                  return 0.5;
-                }
-                const v = Number(ctx.tick.value);
-                return Math.round(v * 100) % 10 === 0 ? 1 : 0.5;
-              }
-            },
+    grid: {
+      drawTicks: true,
+      drawBorder: true,
 
-            title: { display: true, text: "°C" }
-          },
+      color: function (ctx) {
+        const tick = ctx.tick;
+        if (!tick || tick.value == null) return "rgba(0,0,0,0)";
 
-          // Höger Y-axel – speglar vänster, men utan eget rutnät
-          y1: {
-            position: "right",
+        const v = Number(tick.value);
+        const isMajor = Math.round(v * 100) % 10 === 0;
 
-            min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
-            max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
+        return isMajor
+          ? "rgba(0,0,0,0.15)"  // major (0.10)
+          : "rgba(0,0,0,0.05)"; // minor (0.05)
+      },
 
-            ticks: {
-              stepSize: 0.05,
+      lineWidth: function (ctx) {
+        const tick = ctx.tick;
+        if (!tick || tick.value == null) return 0.5;
 
-              callback: function (v) {
-                return (Math.round(v * 100) % 10 === 0)
-                  ? v.toFixed(2)
-                  : null;
-              },
+        const v = Number(tick.value);
+        return Math.round(v * 100) % 10 === 0 ? 1.0 : 0.5;
+      }
+    },
 
-              font: function (ctx) {
-                if (!ctx || !ctx.tick || ctx.tick.value == null) {
-                  return { size: 0, weight: "400" };
-                }
-                const v = Number(ctx.tick.value);
-                const isMajor = Math.round(v * 100) % 10 === 0;
-                return {
-                  size: isMajor ? 12 : 0,
-                  weight: isMajor ? "600" : "400"
-                };
-              },
+    title: { display: true, text: "°C" }
+  },
 
-              color: function (ctx) {
-                if (!ctx || !ctx.tick || ctx.tick.value == null) {
-                  return "rgba(0,0,0,0)";
-                }
-                const v = Number(ctx.tick.value);
-                return Math.round(v * 100) % 10 === 0
-                  ? "#000"
-                  : "rgba(0,0,0,0)";
-              }
-            },
+  // --- HÖGER AXEL ---
+  y1: {
+    position: "right",
 
-            grid: {
-              drawOnChartArea: false // ingen extra grid från höger
-            }
-          },
+    min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
+    max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
+
+    ticks: {
+      stepSize: 0.05,
+
+      callback: function (v) {
+        return (Math.round(v * 100) % 10 === 0)
+          ? v.toFixed(2)
+          : "";
+      },
+
+      font: function (ctx) {
+        const v = Number(ctx.tick.value);
+        const isMajor = Math.round(v * 100) % 10 === 0;
+        return {
+          size: isMajor ? 12 : 0,
+          weight: isMajor ? "600" : "400"
+        };
+      },
+
+      color: function (ctx) {
+        const v = Number(ctx.tick.value);
+        return Math.round(v * 100) % 10 === 0
+          ? "#000"
+          : "rgba(0,0,0,0)";
+      }
+    },
+
+    grid: {
+      drawOnChartArea: false   // höger axel ska INTE rita extra grid
+    }
+  }
+}
 
           // X-axeln (datum)
           x: {
