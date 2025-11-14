@@ -973,14 +973,10 @@ scales: {
     ticks: {
       stepSize: 0.05,
 
-      // Visa bara 0.10 (major) och göm 0.05 (minor)
       callback: function (v) {
-        return (Math.round(v * 100) % 10 === 0)
-          ? v.toFixed(2)
-          : null;
+        return (Math.round(v * 100) % 10 === 0) ? v.toFixed(2) : null;
       },
 
-      // Skydd + major/minor styling
       font: function (ctx) {
         if (!ctx || !ctx.tick || ctx.tick.value == null)
           return { size: 0, weight: "400" };
@@ -988,10 +984,7 @@ scales: {
         const v = Number(ctx.tick.value);
         const isMajor = Math.round(v * 100) % 10 === 0;
 
-        return {
-          size: isMajor ? 12 : 0,
-          weight: isMajor ? "600" : "400"
-        };
+        return { size: isMajor ? 12 : 0, weight: isMajor ? "600" : "400" };
       },
 
       color: function (ctx) {
@@ -999,13 +992,10 @@ scales: {
           return "rgba(0,0,0,0)";
 
         const v = Number(ctx.tick.value);
-        return Math.round(v * 100) % 10 === 0
-          ? "#000"
-          : "rgba(0,0,0,0)";
+        return Math.round(v * 100) % 10 === 0 ? "#000" : "rgba(0,0,0,0)";
       }
     },
 
-    // Rutnät: både major (0.10) och minor (0.05)
     grid: {
       color: function (ctx) {
         if (!ctx || !ctx.tick || ctx.tick.value == null)
@@ -1013,8 +1003,8 @@ scales: {
 
         const v = Number(ctx.tick.value);
         return Math.round(v * 100) % 10 === 0
-          ? "rgba(0,0,0,0.15)"   // major grid
-          : "rgba(0,0,0,0.05)";  // minor grid
+          ? "rgba(0,0,0,0.15)"
+          : "rgba(0,0,0,0.05)";
       },
 
       lineWidth: function (ctx) {
@@ -1029,7 +1019,7 @@ scales: {
     title: { display: true, text: "°C" }
   },
 
-  // -------- HÖGERAXELN (y1) --------
+  // ----- HÖGER AXEL -----
   y1: {
     position: "right",
 
@@ -1040,9 +1030,7 @@ scales: {
       stepSize: 0.05,
 
       callback: function (v) {
-        return (Math.round(v * 100) % 10 === 0)
-          ? v.toFixed(2)
-          : null;
+        return (Math.round(v * 100) % 10 === 0) ? v.toFixed(2) : null;
       },
 
       font: function (ctx) {
@@ -1052,10 +1040,7 @@ scales: {
         const v = Number(ctx.tick.value);
         const isMajor = Math.round(v * 100) % 10 === 0;
 
-        return {
-          size: isMajor ? 12 : 0,
-          weight: isMajor ? "600" : "400"
-        };
+        return { size: isMajor ? 12 : 0, weight: isMajor ? "600" : "400" };
       },
 
       color: function (ctx) {
@@ -1063,13 +1048,10 @@ scales: {
           return "rgba(0,0,0,0)";
 
         const v = Number(ctx.tick.value);
-        return Math.round(v * 100) % 10 === 0
-          ? "#000"
-          : "rgba(0,0,0,0)";
+        return Math.round(v * 100) % 10 === 0 ? "#000" : "rgba(0,0,0,0)";
       }
     },
 
-    // Höger axel ska INTE rita linjer i grafen
     grid: {
       drawOnChartArea: false
     }
