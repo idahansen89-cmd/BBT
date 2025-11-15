@@ -188,14 +188,20 @@
   .table-btn:hover { background: var(--pink-hover); }
 
   /* ===== Chart ===== */
-  #chartContainer {
-    width: 100%;
-    max-width: 1200px;
-    height: 520px;
-    margin: auto;
-    overflow: hidden;
-    position: relative;
-  }
+ #chartContainer {
+  width: 100%;
+  max-width: 900px; /* bredare graf */
+  margin: 0 auto;
+}
+
+canvas {
+  width: 100% !important;
+}
+
+.graph-wrapper {
+  margin-left: -10px;
+  margin-right: -10px;
+}
   #bbtChart {
     display: block;
     width: 100% !important;
@@ -965,28 +971,24 @@ options: {
 
   layout: {
     padding: {
-      left: 10,
-      right: 40,   // ger plats åt höger-y-axeln
-      top: 10,
-      bottom: 26
+      left: 0,
+      right: 20,
+      top: 5,
+      bottom: 30
     }
   },
 
   scales: {
-    // ==========================
-    //   VÄNSTER Y-AXEL
-    // ==========================
+    // === VÄNSTER Y-AXEL ===
     y: {
       position: "left",
 
-      // Säker min/max så 36.30 alltid får plats
-      min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20 - 0.001,
-      max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20 + 0.001,
+      min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
+      max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
 
       ticks: {
         stepSize: 0.05,
 
-        // Visa bara var 0.10
         callback: function (v) {
           if (v == null) return "";
           return Math.round(v * 100) % 10 === 0 ? v.toFixed(2) : "";
@@ -995,9 +997,9 @@ options: {
         font: function (ctx) {
           const safe = ctx && ctx.tick && ctx.tick.value != null;
           if (!safe) return { size: 0, weight: "400" };
-          
+
           const v = Number(ctx.tick.value);
-          const isMajor = Math.round(v * 100) % 10 === 0;
+          const isMajor = Math.abs((v * 100) % 10) === 0;
 
           return {
             size: isMajor ? 12 : 0,
@@ -1008,9 +1010,11 @@ options: {
         color: function (ctx) {
           const safe = ctx && ctx.tick && ctx.tick.value != null;
           if (!safe) return "rgba(0,0,0,0)";
-          
+
           const v = Number(ctx.tick.value);
-          return Math.round(v * 100) % 10 === 0 ? "#000" : "rgba(0,0,0,0)";
+          const isMajor = Math.abs((v * 100) % 10) === 0;
+
+          return isMajor ? "#000" : "rgba(0,0,0,0)";
         }
       },
 
@@ -1018,31 +1022,23 @@ options: {
         drawTicks: true,
         drawBorder: true,
 
-        // Exakt samma grid för 0.05 och 0.10
-        color: function (ctx) {
-          const safe = ctx && ctx.tick && ctx.tick.value != null;
-          if (!safe) return "rgba(0,0,0,0)";
-          return "rgba(0,0,0,0.12)";
-        },
-
-        lineWidth: function (ctx) {
-          const safe = ctx && ctx.tick && ctx.tick.value != null;
-          if (!safe) return 1;
-          return 1; // samma tjocklek
-        }
+        // ALLA linjer identiska: alla 0.05 och 0.10 syns lika bra
+        color: "rgba(0,0,0,0.12)",
+        lineWidth: 1
       },
 
-      title: { display: true, text: "°C" }
+      title: {
+        display: true,
+        text: "°C"
+      }
     },
 
-    // ==========================
-    //   HÖGER Y-AXEL
-    // ==========================
+    // === HÖGER Y-AXEL ===
     y1: {
       position: "right",
 
-      min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20 - 0.001,
-      max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20 + 0.001,
+      min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
+      max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
 
       ticks: {
         stepSize: 0.05,
@@ -1055,9 +1051,9 @@ options: {
         font: function (ctx) {
           const safe = ctx && ctx.tick && ctx.tick.value != null;
           if (!safe) return { size: 0, weight: "400" };
-          
+
           const v = Number(ctx.tick.value);
-          const isMajor = Math.round(v * 100) % 10 === 0;
+          const isMajor = Math.abs((v * 100) % 10) === 0;
 
           return {
             size: isMajor ? 12 : 0,
@@ -1068,9 +1064,11 @@ options: {
         color: function (ctx) {
           const safe = ctx && ctx.tick && ctx.tick.value != null;
           if (!safe) return "rgba(0,0,0,0)";
-          
+
           const v = Number(ctx.tick.value);
-          return Math.round(v * 100) % 10 === 0 ? "#000" : "rgba(0,0,0,0)";
+          const isMajor = Math.abs((v * 100) % 10) === 0;
+
+          return isMajor ? "#000" : "rgba(0,0,0,0)";
         }
       },
 
@@ -1079,11 +1077,8 @@ options: {
       }
     },
 
-    // ==========================
-    //   X-AXEL (Datum)
-    // ==========================
+    // === X-AXEL ===
     x: {
-      offset: true,
       ticks: {
         color: "#000",
         autoSkip: true,
@@ -1093,13 +1088,12 @@ options: {
     }
   },
 
-  // ==========================
-  //   PLUGINS
-  // ==========================
   plugins: {
     legend: {
       position: "bottom",
-      labels: { color: "#000" }
+      labels: {
+        color: "#000"
+      }
     },
 
     annotation: {
@@ -1107,16 +1101,16 @@ options: {
       annotations: anns
     },
 
-    // === ZOOM & PAN ===
+    // ZOOM / PAN
     zoom: {
       zoom: {
         wheel: { enabled: true },
         pinch: { enabled: true },
-        mode: "xy"
+        mode: "x"
       },
       pan: {
         enabled: true,
-        mode: "xy"
+        mode: "x"
       }
     }
   },
