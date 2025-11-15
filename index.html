@@ -1015,16 +1015,35 @@ scales: {
     ticks: {
       stepSize: 0.05,
 
-      callback: function(v) {
-        return Math.round(v * 100) % 10 === 0 ? v.toFixed(2) : "";
+      // ✔ Visa bara 0.10-värden
+      callback: function (value, index, ticks) {
+        if (value == null) return "";
+        const num = Number(value);
+        return Math.round(num * 100) % 10 === 0 ? num.toFixed(2) : "";
       },
-
-      font: {
-        size: 12,
-        weight: "600"
+    
+      // ✔ Safari-säker font
+      font: function (ctx) {
+        const safe = ctx && ctx.tick && ctx.tick.value != null;
+        if (!safe) return { size: 0, weight: "400" };
+    
+        const v = Number(ctx.tick.value);
+        const isMajor = Math.round(v * 100) % 10 === 0;
+    
+        return {
+          size: isMajor ? 12 : 0,
+          weight: isMajor ? "600" : "400"
+        };
       },
-
-      color: "#000"
+    
+      // ✔ Safari-säker färg
+      color: function (ctx) {
+        const safe = ctx && ctx.tick && ctx.tick.value != null;
+        if (!safe) return "rgba(0,0,0,0)";
+    
+        const v = Number(ctx.tick.value);
+        return Math.round(v * 100) % 10 === 0 ? "#000" : "rgba(0,0,0,0)";
+      }
     },
 
     grid: {
