@@ -982,97 +982,81 @@ options: {
   scales: {
     // === VÄNSTER Y-AXEL ===
     y: {
-      position: "left",
+  position: "left",
 
-      min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
-      max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
+  min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
+  max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
 
-      ticks: {
-        stepSize: 0.05,
+  ticks: {
+    stepSize: 0.05,
 
-        callback: function (v) {
-          if (v == null) return "";
-          return Math.round(v * 100) % 10 === 0 ? v.toFixed(2) : " ";
-        },
-
-        font: function (ctx) {
-          const safe = ctx && ctx.tick && ctx.tick.value != null;
-          if (!safe) return { size: 0, weight: "400" };
-
-          const v = Number(ctx.tick.value);
-          const isMajor = Math.abs((v * 100) % 10) === 0;
-
-          return {
-            size: isMajor ? 12 : 0,
-            weight: isMajor ? "600" : "400"
-          };
-        },
-
-        color: function (ctx) {
-          const safe = ctx && ctx.tick && ctx.tick.value != null;
-          if (!safe) return "rgba(0,0,0,0)";
-
-          const v = Number(ctx.tick.value);
-          const isMajor = Math.abs((v * 100) % 10) === 0;
-
-          return isMajor ? "#000" : "rgba(0,0,0,0)";
-        }
-      },
-
-      grid: {
-        drawTicks: true,
-        drawBorder: true,
-        color: "rgba(0,0,0,0.12)",
-        lineWidth: 1
-      },
-
-      title: { display: true, text: "°C" }
+    // VISAR ENDAST 0.10-VÄRDEN
+    callback: function(v) {
+      if (v == null) return "";
+      const isMajor = Math.round(v * 100) % 10 === 0;
+      return isMajor ? v.toFixed(2) : "";
     },
+
+    // FONTER FÖR SAFARI
+    font: function(ctx) {
+      const t = ctx?.tick?.value;
+      if (t == null) return { size: 0 };
+
+      const isMajor = Math.round(t * 100) % 10 === 0;
+      return { size: isMajor ? 12 : 0, weight: isMajor ? "600" : "400" };
+    },
+
+    // FÄRG FÖR SAFARI
+    color: function(ctx) {
+      const t = ctx?.tick?.value;
+      if (t == null) return "rgba(0,0,0,0)";
+      const isMajor = Math.round(t * 100) % 10 === 0;
+      return isMajor ? "#000" : "rgba(0,0,0,0)";
+    }
+  },
+
+  grid: {
+    drawTicks: true,
+    drawBorder: true,
+    color: "rgba(0,0,0,0.12)",
+    lineWidth: 1
+  },
+
+  title: { display: true, text: "°C" }
+},
 
     // === HÖGER Y-AXEL ===
     y1: {
-      position: "right",
+  position: "right",
 
-      min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
-      max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
+  min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
+  max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
 
-      ticks: {
-        stepSize: 0.05,
-
-        callback: function (v) {
-          if (v == null) return "";
-          return Math.round(v * 100) % 10 === 0 ? v.toFixed(2) : " ";
-        },
-
-        font: function (ctx) {
-          const safe = ctx && ctx.tick && ctx.tick.value != null;
-          if (!safe) return { size: 0, weight: "400" };
-
-          const v = Number(ctx.tick.value);
-          const isMajor = Math.abs((v * 100) % 10) === 0;
-
-          return {
-            size: isMajor ? 12 : 0,
-            weight: isMajor ? "600" : "400"
-          };
-        },
-
-        color: function (ctx) {
-          const safe = ctx && ctx.tick && ctx.tick.value != null;
-          if (!safe) return "rgba(0,0,0,0)";
-
-          const v = Number(ctx.tick.value);
-          const isMajor = Math.abs((v * 100) % 10) === 0;
-
-          return isMajor ? "#000" : "rgba(0,0,0,0)";
-        }
-      },
-
-      grid: {
-        drawOnChartArea: false
-      }
+  ticks: {
+    stepSize: 0.05,
+    callback: function(v) {
+      if (v == null) return "";
+      const isMajor = Math.round(v * 100) % 10 === 0;
+      return isMajor ? v.toFixed(2) : "";
     },
+    font: function(ctx) {
+      const t = ctx?.tick?.value;
+      if (t == null) return { size: 0 };
+      const isMajor = Math.round(t * 100) % 10 === 0;
+      return { size: isMajor ? 12 : 0, weight: isMajor ? "600" : "400" };
+    },
+    color: function(ctx) {
+      const t = ctx?.tick?.value;
+      if (t == null) return "rgba(0,0,0,0)";
+      const isMajor = Math.round(t * 100) % 10 === 0;
+      return isMajor ? "#000" : "rgba(0,0,0,0)";
+    }
+  },
 
+  grid: { drawOnChartArea: false }
+},
+
+// === X-AXEL ===
     x: {
       ticks: {
         color: "#000",
