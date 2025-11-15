@@ -1008,31 +1008,31 @@ scales: {
       }
     },
 
-    grid: {
-      drawTicks: true,
-      drawBorder: true,
+grid: {
+  drawTicks: true,
+  drawBorder: true,
 
-      // Major 0.10-linjer tydliga, minor 0.05 svaga
-      color: function (ctx) {
-        const safe = ctx && ctx.tick && ctx.tick.value != null;
-        if (!safe) return "rgba(0,0,0,0)";
+  // 🔹 Färg på linjer
+  color: function (ctx) {
+    const safe = ctx && ctx.tick && ctx.tick.value != null;
+    if (!safe) return "rgba(0,0,0,0)";
 
-        const v = Number(ctx.tick.value);
-        const isMajor = Math.abs((v * 100) % 10) < 0.001;
+    const v = Number(ctx.tick.value);
+    const isMajor = Math.abs((v * 100) % 10) < 0.0001;  // 0.10-linje
 
-        return isMajor
-          ? "rgba(0,0,0,0.15)"
-          : "rgba(0,0,0,0.05)";
-      },
+    return isMajor
+      ? "rgba(0,0,0,0.15)"   // major 0.10-linjer
+      : "rgba(0,0,0,0.05)";  // minor 0.05-linjer
+  },
 
-      lineWidth: function (ctx) {
-        const safe = ctx && ctx.tick && ctx.tick.value != null;
-        if (!safe) return 0.5;
+  // 🔹 Tjocklek (alla lika)
+  lineWidth: function (ctx) {
+    const safe = ctx && ctx.tick && ctx.tick.value != null;
+    if (!safe) return 1;
 
-        const v = Number(ctx.tick.value);
-        return Math.abs((v * 100) % 10) < 0.001 ? 1 : 0.5;
-      }
-    },
+    return 1;   // både major och minor lika tydliga
+  }
+},
 
     title: { display: true, text: "°C" }
   },
