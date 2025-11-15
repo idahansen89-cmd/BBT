@@ -972,23 +972,38 @@ scales: {
     max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
 
     ticks: {
-      stepSize: 0.05,
+  stepSize: 0.05,
 
-      // ✔ Major (0.10) visas
-      // ✔ Minor (0.05) returnerar "" men orsakar INTE crash
-      callback: function(v) {
-        return Math.round(v * 100) % 10 === 0 ? v.toFixed(2) : "";
-      },
+  // ✔ Visa bara 0.10-värden
+  callback: function (value, index, ticks) {
+    if (value == null) return "";
+    const num = Number(value);
+    return Math.round(num * 100) % 10 === 0 ? num.toFixed(2) : "";
+  },
 
-      // ✔ statiskt fontobjekt = Safari-säkert
-      font: {
-        size: 12,
-        weight: "600"
-      },
+  // ✔ Safari-säker font
+  font: function (ctx) {
+    const safe = ctx && ctx.tick && ctx.tick.value != null;
+    if (!safe) return { size: 0, weight: "400" };
 
-      // ✔ statisk färg — minor ticks blir osynliga eftersom de inte har text
-      color: "#000"
-    },
+    const v = Number(ctx.tick.value);
+    const isMajor = Math.round(v * 100) % 10 === 0;
+
+    return {
+      size: isMajor ? 12 : 0,
+      weight: isMajor ? "600" : "400"
+    };
+  },
+
+  // ✔ Safari-säker färg
+  color: function (ctx) {
+    const safe = ctx && ctx.tick && ctx.tick.value != null;
+    if (!safe) return "rgba(0,0,0,0)";
+
+    const v = Number(ctx.tick.value);
+    return Math.round(v * 100) % 10 === 0 ? "#000" : "rgba(0,0,0,0)";
+  }
+},
 
     grid: {
       color: function(ctx) {
