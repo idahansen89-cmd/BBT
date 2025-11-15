@@ -965,7 +965,6 @@ function renderChart() {
         layout: { padding: { bottom: 26 } },
 
 scales: {
-  // === VÄNSTER Y ===
   y: {
     position: "left",
 
@@ -975,46 +974,30 @@ scales: {
     ticks: {
       stepSize: 0.05,
 
-      // ✔ Visa endast 0.10, göm 0.05
-      callback: function (v) {
-        return Math.round(v * 100) % 10 === 0
-          ? v.toFixed(2)
-          : "";
+      // ✔ Major (0.10) visas
+      // ✔ Minor (0.05) returnerar "" men orsakar INTE crash
+      callback: function(v) {
+        return Math.round(v * 100) % 10 === 0 ? v.toFixed(2) : "";
       },
 
-      // ✔ Safari-säker: inga font-size = 0
-      font: function (ctx) {
-        const v = Number(ctx.tick.value);
-        const isMajor = Math.round(v * 100) % 10 === 0;
-
-        return {
-          size: isMajor ? 12 : 11,
-          weight: isMajor ? "600" : "400"
-        };
+      // ✔ statiskt fontobjekt = Safari-säkert
+      font: {
+        size: 12,
+        weight: "600"
       },
 
-      // ✔ Minor tick osynliga via färg, inte via font-size
-      color: function (ctx) {
-        const v = Number(ctx.tick.value);
-        const isMajor = Math.round(v * 100) % 10 === 0;
-        return isMajor ? "#000" : "rgba(0,0,0,0)";
-      }
+      // ✔ statisk färg — minor ticks blir osynliga eftersom de inte har text
+      color: "#000"
     },
 
-    // RUTNÄT
     grid: {
-      drawTicks: true,
-      drawBorder: true,
-
-      color: function (ctx) {
+      color: function(ctx) {
         const v = Number(ctx.tick.value);
-        const isMajor = Math.round(v * 100) % 10 === 0;
-        return isMajor
-          ? "rgba(0,0,0,0.15)"   // tydlig 0.10
-          : "rgba(0,0,0,0.05)";  // svag 0.05
+        return Math.round(v * 100) % 10 === 0
+          ? "rgba(0,0,0,0.15)"   // major
+          : "rgba(0,0,0,0.05)";  // minor
       },
-
-      lineWidth: function (ctx) {
+      lineWidth: function(ctx) {
         const v = Number(ctx.tick.value);
         return Math.round(v * 100) % 10 === 0 ? 1 : 0.4;
       }
@@ -1023,7 +1006,6 @@ scales: {
     title: { display: true, text: "°C" }
   },
 
-  // === HÖGER Y ===
   y1: {
     position: "right",
 
@@ -1033,35 +1015,23 @@ scales: {
     ticks: {
       stepSize: 0.05,
 
-      callback: function (v) {
-        return Math.round(v * 100) % 10 === 0
-          ? v.toFixed(2)
-          : "";
+      callback: function(v) {
+        return Math.round(v * 100) % 10 === 0 ? v.toFixed(2) : "";
       },
 
-      font: function (ctx) {
-        const v = Number(ctx.tick.value);
-        const isMajor = Math.round(v * 100) % 10 === 0;
-        return {
-          size: isMajor ? 12 : 11,
-          weight: isMajor ? "600" : "400"
-        };
+      font: {
+        size: 12,
+        weight: "600"
       },
 
-      color: function (ctx) {
-        const v = Number(ctx.tick.value);
-        const isMajor = Math.round(v * 100) % 10 === 0;
-        return isMajor ? "#000" : "rgba(0,0,0,0)";
-      }
+      color: "#000"
     },
 
-    // ✔ Ingen grid från höger axeln
     grid: {
       drawOnChartArea: false
     }
   },
 
-  // === X-AXEL ===
   x: {
     ticks: {
       color: "#000",
