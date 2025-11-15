@@ -971,8 +971,8 @@ options: {
 
   layout: {
     padding: {
-      left: 0,
-      right: 20,
+      left: 10,
+      right: 10,
       top: 5,
       bottom: 30
     }
@@ -991,7 +991,7 @@ options: {
 
         callback: function (v) {
           if (v == null) return "";
-          return Math.round(v * 100) % 10 === 0 ? v.toFixed(2) : "";
+          return Math.round(v * 100) % 10 === 0 ? v.toFixed(2) : " ";
         },
 
         font: function (ctx) {
@@ -1021,16 +1021,11 @@ options: {
       grid: {
         drawTicks: true,
         drawBorder: true,
-
-        // ALLA linjer identiska: alla 0.05 och 0.10 syns lika bra
         color: "rgba(0,0,0,0.12)",
         lineWidth: 1
       },
 
-      title: {
-        display: true,
-        text: "°C"
-      }
+      title: { display: true, text: "°C" }
     },
 
     // === HÖGER Y-AXEL ===
@@ -1045,7 +1040,7 @@ options: {
 
         callback: function (v) {
           if (v == null) return "";
-          return Math.round(v * 100) % 10 === 0 ? v.toFixed(2) : "";
+          return Math.round(v * 100) % 10 === 0 ? v.toFixed(2) : " ";
         },
 
         font: function (ctx) {
@@ -1077,7 +1072,6 @@ options: {
       }
     },
 
-    // === X-AXEL ===
     x: {
       ticks: {
         color: "#000",
@@ -1091,9 +1085,7 @@ options: {
   plugins: {
     legend: {
       position: "bottom",
-      labels: {
-        color: "#000"
-      }
+      labels: { color: "#000" }
     },
 
     annotation: {
@@ -1101,7 +1093,6 @@ options: {
       annotations: anns
     },
 
-    // ZOOM / PAN
     zoom: {
       zoom: {
         wheel: { enabled: true },
