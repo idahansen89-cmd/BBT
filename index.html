@@ -189,29 +189,26 @@ td button:hover {
   background: #e599ab;
 }
 
-/* ===== GRAF ===== */
+/* === GRAF – STABIL OCH LUFTIG === */
 #chartContainer {
   width: 100%;
-  max-width: 1100px;
+  max-width: 1100px;   /* bredare graf på stora skärmar */
   margin: 0 auto;
+  height: 420px;       /* höjd – öka vid behov (t.ex. 480 eller 520) */
 }
+
 .graph-wrapper {
   margin-left: -5px;
   margin-right: -5px;
 }
-/* ===== Grafhöjd ===== */
+
 #bbtChart {
+  display: block;
   width: 100% !important;
-  height: 70vh !important;  /* standard – mobil */
+  height: 100% !important;   /* fyller hela chartContainer */
 }
 
-/* Desktop / större skärmar */
-@media (min-width: 900px) {
-  #bbtChart {
-    height: 55vh !important;
-  }
-}
-
+/* Export-knappen under grafen */
 .chart-toolbar {
   display: flex;
   justify-content: center;
