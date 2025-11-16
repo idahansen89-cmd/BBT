@@ -767,7 +767,6 @@ td button:hover {
       renderLHList();
     }
 
-/* ===== Graf med bakgrundsfärger för faser ===== */
 function renderChart() {
   console.log("▶ renderChart startar…");
   try {
@@ -785,20 +784,121 @@ function renderChart() {
     const actual    = dataEntries.map(e => e.actual);
     const corrected = dataEntries.map(e => e.corrected);
 
-    /* ============================================================
-       1) PLUGIN FÖR TUNNA GRID-LINJER VID 0.05   (👈 NYTT & RÄTT PLACERAT)
-    ============================================================ */
+    // === FASER ===
+    const ovIndex = dataEntries.findIndex(e => e.ovulation);
+    const anns = [];
+
+    // 🌸 Mens
+    const mensIndices = dataEntries
+      .map((e, i) => (e.mens ? i : null))
+      .filter(i => i !== null);
+
+    if (mensIndices.length > 0) {
+      anns.push({
+        type: "box",
+        xMin: mensIndices[0] - 0.5,
+        xMax: mensIndices[mensIndices.length - 1] + 0.5,
+        backgroundColor: "rgba(244,182,194,0.55)",
+        borderWidth: 0,
+        drawTime: "beforeDatasetsDraw"
+      });
+    }
+
+    // 🌼 Ägglossning (gul dag)
+    if (ovIndex >= 0) {
+      anns.push({
+        type: "box",
+        xMin: ovIndex - 0.5,
+        xMax: ovIndex + 0.5,
+        backgroundColor: "rgba(255,244,176,0.65)",
+        borderWidth: 0,
+        drawTime: "beforeDatasetsDraw"
+      });
+    }
+
+    // 💜 Lutealfas
+    if (ovIndex >= 0 && ovIndex < dataEntries.length - 1) {
+      anns.push({
+        type: "box",
+        xMin: ovIndex + 0.5,
+        xMax: dataEntries.length - 0.5,
+        backgroundColor: "rgba(224,195,252,0.6)",
+        borderWidth: 0,
+        drawTime: "beforeDatasetsDraw"
+      });
+    }
+
+    // Vertikal linje vid ägglossning
+    if (ovIndex >= 0) {
+      anns.push({
+        type: "line",
+        xMin: ovIndex,
+        xMax: ovIndex,
+        borderColor: "rgba(120,120,120,0.6)",
+        borderWidth: 1,
+        borderDash: [3, 3]
+      });
+    }
+
+    // === MEDEL-SPANN FÖRE ÄGGLOSSNING ===
+    let tempsActualBeforeOv = [];
+    let tempsCorrectedBeforeOv = [];
+
+    if (ovIndex > 0) {
+      tempsActualBeforeOv = dataEntries
+        .slice(0, ovIndex)
+        .map(e => e.actual)
+        .filter(v => v != null);
+
+      tempsCorrectedBeforeOv = dataEntries
+        .slice(0, ovIndex)
+        .map(e => e.corrected)
+        .filter(v => v != null);
+    } else {
+      tempsActualBeforeOv = dataEntries.map(e => e.actual).filter(v => v != null);
+      tempsCorrectedBeforeOv = dataEntries.map(e => e.corrected).filter(v => v != null);
+    }
+
+    let meanA = null;
+    let meanC = null;
+
+    if (tempsActualBeforeOv.length > 0) {
+      meanA =
+        tempsActualBeforeOv.reduce((a, b) => a + b, 0) /
+        tempsActualBeforeOv.length;
+    }
+
+    if (tempsCorrectedBeforeOv.length > 0) {
+      meanC =
+        tempsCorrectedBeforeOv.reduce((a, b) => a + b, 0) /
+        tempsCorrectedBeforeOv.length;
+    }
+
+    let bandMin = null;
+    let bandMax = null;
+
+    if (meanA != null && meanC != null) {
+      bandMin = Math.min(meanA, meanC);
+      bandMax = Math.max(meanA, meanC);
+    } else if (meanA != null) {
+      bandMin = bandMax = meanA;
+    } else if (meanC != null) {
+      bandMin = bandMax = meanC;
+    }
+
+    const bandData = bandMax != null
+      ? new Array(dataEntries.length).fill(bandMax)
+      : [];
+
+    // === Plugin för tunna 0.05-linjer ===
     const minorGrid = {
       id: "minorGrid",
-      afterDraw(chart, args, options) {
+      afterDraw(chart) {
         const yScale = chart.scales.y;
         const { ctx, chartArea } = chart;
-
         const step = 0.05;
-        const start = yScale.min;
-        const end = yScale.max;
 
-        for (let v = start; v <= end; v += step) {
+        for (let v = yScale.min; v <= yScale.max; v += step) {
           const isMajor = Math.abs((v * 100) % 10) === 0;
           if (isMajor) continue;
 
@@ -816,105 +916,6 @@ function renderChart() {
       }
     };
 
-
-    /* ============================================================
-       2) ANNOTATIONS: mens / ägglossning / luteal osv
-    ============================================================ */
-    const ovIndex = dataEntries.findIndex(e => e.ovulation);
-    const anns = [];
-
-    // Mens
-    const mensIndices = dataEntries
-      .map((e, i) => (e.mens ? i : null))
-      .filter(i => i !== null);
-
-    if (mensIndices.length > 0) {
-      anns.push({
-        type: "box",
-        xMin: mensIndices[0] - 0.5,
-        xMax: mensIndices[mensIndices.length - 1] + 0.5,
-        backgroundColor: "rgba(244,182,194,0.55)",
-        borderWidth: 0,
-        drawTime: "beforeDatasetsDraw"
-      });
-    }
-
-    // Ägglossningsdag
-    if (ovIndex >= 0) {
-      anns.push({
-        type: "box",
-        xMin: ovIndex - 0.5,
-        xMax: ovIndex + 0.5,
-        backgroundColor: "rgba(255,244,176,0.65)",
-        borderWidth: 0,
-        drawTime: "beforeDatasetsDraw"
-      });
-    }
-
-    // Lutealfas
-    if (ovIndex >= 0 && ovIndex < dataEntries.length - 1) {
-      anns.push({
-        type: "box",
-        xMin: ovIndex + 0.5,
-        xMax: dataEntries.length - 0.5,
-        backgroundColor: "rgba(224,195,252,0.6)",
-        borderWidth: 0,
-        drawTime: "beforeDatasetsDraw"
-      });
-    }
-
-    // Vertikal linje vid Ö
-    if (ovIndex >= 0) {
-      anns.push({
-        type: "line",
-        xMin: ovIndex,
-        xMax: ovIndex,
-        borderColor: "rgba(120,120,120,0.6)",
-        borderWidth: 1,
-        borderDash: [3, 3]
-      });
-    }
-
-
-    /* ============================================================
-       3) MEDELSPANN FÖRE ÄGGLOSSNING
-    ============================================================ */
-    let tempsActualBeforeOv = [];
-    let tempsCorrectedBeforeOv = [];
-
-    if (ovIndex > 0) {
-      tempsActualBeforeOv = dataEntries.slice(0, ovIndex).map(e => e.actual).filter(v => v != null);
-      tempsCorrectedBeforeOv = dataEntries.slice(0, ovIndex).map(e => e.corrected).filter(v => v != null);
-    } else {
-      tempsActualBeforeOv = actual.filter(v => v != null);
-      tempsCorrectedBeforeOv = corrected.filter(v => v != null);
-    }
-
-    let meanActualBeforeOv = tempsActualBeforeOv.length
-      ? tempsActualBeforeOv.reduce((a, b) => a + b, 0) / tempsActualBeforeOv.length
-      : null;
-
-    let meanCorrBeforeOv = tempsCorrectedBeforeOv.length
-      ? tempsCorrectedBeforeOv.reduce((a, b) => a + b, 0) / tempsCorrectedBeforeOv.length
-      : null;
-
-    let bandMin = null;
-    let bandMax = null;
-    if (meanActualBeforeOv != null && meanCorrBeforeOv != null) {
-      bandMin = Math.min(meanActualBeforeOv, meanCorrBeforeOv);
-      bandMax = Math.max(meanActualBeforeOv, meanCorrBeforeOv);
-    } else {
-      bandMin = bandMax = meanActualBeforeOv ?? meanCorrBeforeOv;
-    }
-
-    const bandData = bandMax != null
-      ? new Array(dataEntries.length).fill(bandMax)
-      : [];
-
-
-    /* ============================================================
-       4) RITA CHARTEN
-    ============================================================ */
     chart = new Chart(el.chartCanvas, {
       type: "line",
       data: {
@@ -927,8 +928,8 @@ function renderChart() {
             pointRadius: 0,
             fill: bandMin != null ? {
               target: { value: bandMin },
-              above: "rgba(195,215,180,0.45)",
-              below: "rgba(195,215,180,0.45)"
+              above: "rgba(195, 215, 180, 0.45)",
+              below: "rgba(195, 215, 180, 0.45)"
             } : false,
             spanGaps: true
           },
@@ -954,7 +955,6 @@ function renderChart() {
             borderWidth: 1.5,
             pointRadius: 2.5,
             pointStyle: "triangle",
-            rotation: 0,
             tension: 0.25,
             spanGaps: true
           }
@@ -965,30 +965,31 @@ function renderChart() {
         responsive: true,
         maintainAspectRatio: false,
 
-        layout: {
-          padding: { left: 10, right: 10, top: 5, bottom: 30 }
-        },
-
         scales: {
           y: {
             position: "left",
+
             min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
             max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
 
             ticks: {
               stepSize: 0.05,
-              callback(v) {
-                if (v == null) return "";
+              callback(value) {
+                const v = Number(value);
                 const isMajor = Math.round(v * 100) % 10 === 0;
-                return isMajor ? Number(v).toFixed(2) : "";
+                return isMajor ? v.toFixed(2) : "";
               },
               font(ctx) {
-                const v = Number(ctx.tick.value);
+                const value = ctx?.tick?.value;
+                if (value == null) return { size: 0 };
+                const v = Number(value);
                 const isMajor = Math.round(v * 100) % 10 === 0;
                 return { size: isMajor ? 12 : 0, weight: isMajor ? "600" : "400" };
               },
               color(ctx) {
-                const v = Number(ctx.tick.value);
+                const value = ctx?.tick?.value;
+                if (value == null) return "rgba(0,0,0,0)";
+                const v = Number(value);
                 const isMajor = Math.round(v * 100) % 10 === 0;
                 return isMajor ? "#000" : "rgba(0,0,0,0)";
               }
@@ -1011,28 +1012,36 @@ function renderChart() {
 
           y1: {
             position: "right",
+
             min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
             max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
 
             ticks: {
               stepSize: 0.05,
-              callback(v) {
+              callback(value) {
+                const v = Number(value);
                 const isMajor = Math.round(v * 100) % 10 === 0;
-                return isMajor ? Number(v).toFixed(2) : "";
+                return isMajor ? v.toFixed(2) : "";
               },
               font(ctx) {
-                const v = Number(ctx.tick.value);
+                const value = ctx?.tick?.value;
+                if (value == null) return { size: 0 };
+                const v = Number(value);
                 const isMajor = Math.round(v * 100) % 10 === 0;
                 return { size: isMajor ? 12 : 0, weight: isMajor ? "600" : "400" };
               },
               color(ctx) {
-                const v = Number(ctx.tick.value);
+                const value = ctx?.tick?.value;
+                if (value == null) return "rgba(0,0,0,0)";
+                const v = Number(value);
                 const isMajor = Math.round(v * 100) % 10 === 0;
                 return isMajor ? "#000" : "rgba(0,0,0,0)";
               }
             },
 
-            grid: { drawOnChartArea: false }
+            grid: {
+              drawOnChartArea: false
+            }
           },
 
           x: {
@@ -1054,35 +1063,12 @@ function renderChart() {
           annotation: {
             drawTime: "beforeDatasetsDraw",
             annotations: anns
-          },
-
-          zoom: {
-            zoom: { wheel: { enabled: true }, pinch: { enabled: true }, mode: "x" },
-            pan: { enabled: true, mode: "x" }
-          },
-
-          titleOverYAxis: {
-            id: "titleOverYAxis",
-            afterDraw(chart, args, opts) {
-              const { ctx, chartArea } = chart;
-              ctx.save();
-              ctx.font = "600 16px Arial";
-              ctx.fillStyle = "#000";
-              ctx.textAlign = "left";
-              const x = chartArea.left - 10;
-              const y = chartArea.top - 10;
-              ctx.fillText("°C", x, y);
-              ctx.restore();
-            }
           }
         },
 
         animation: false
       },
 
-      /* ============================================================
-         5) PLUGINS-LISTA  (minorGrid + customSymbols)
-      ============================================================ */
       plugins: [
         minorGrid,
 
@@ -1094,7 +1080,6 @@ function renderChart() {
               chartArea: { bottom },
               scales: { x }
             } = chart;
-
             const y = bottom - 15;
 
             dataEntries.forEach((e, i) => {
