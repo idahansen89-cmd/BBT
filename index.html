@@ -199,9 +199,17 @@ td button:hover {
   margin-left: -5px;
   margin-right: -5px;
 }
+/* ===== Grafhöjd ===== */
 #bbtChart {
   width: 100% !important;
-  height: 100% !important;
+  height: 70vh !important;  /* standard – mobil */
+}
+
+/* Desktop / större skärmar */
+@media (min-width: 900px) {
+  #bbtChart {
+    height: 55vh !important;
+  }
 }
 
 .chart-toolbar {
