@@ -964,18 +964,13 @@ options: {
 
   // EXTRA LUFT runt grafen
   layout: {
-    padding: {
-      top: 25,
-      bottom: 35,
-      left: 15,
-      right: 15
-    }
+    padding: { top: 25, bottom: 35, left: 18, right: 18 }
   },
 
   scales: {
     // === VÄNSTER Y-AXEL ===
     y: {
-      type: "linear",   // ← KRITISKT! Annars visas inga siffror
+      type: "linear",
       position: "left",
 
       min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
@@ -983,19 +978,25 @@ options: {
 
       ticks: {
         stepSize: 0.05,
+
         callback(value) {
           const v = Number(value);
           const isMajor = Math.round(v * 100) % 10 === 0;
           return isMajor ? v.toFixed(2) : "";
         },
+
         font(ctx) {
-          const v = Number(ctx?.tick?.value);
-          const isMajor = Math.round(v * 100) % 10 === 0;
-          return { size: isMajor ? 12 : 0, weight: isMajor ? "600" : "400" };
+          const val = Number(ctx?.tick?.value);
+          const isMajor = Math.round(val * 100) % 10 === 0;
+          return {
+            size: isMajor ? 12 : 0,
+            weight: isMajor ? "600" : "400"
+          };
         },
+
         color(ctx) {
-          const v = Number(ctx?.tick?.value);
-          const isMajor = Math.round(v * 100) % 10 === 0;
+          const val = Number(ctx?.tick?.value);
+          const isMajor = Math.round(val * 100) % 10 === 0;
           return isMajor ? "#000" : "rgba(0,0,0,0)";
         }
       },
@@ -1007,18 +1008,13 @@ options: {
         lineWidth: 1
       },
 
-      // Titel på Y-axeln
-      title: {
-        display: true,
-        text: "°C",
-        font: { size: 16, weight: "600" },
-        padding: { bottom: 10 }
-      }
+      // Vi stänger av standard-titeln (vi ritar vår egen ovanför)
+      title: { display: false }
     },
 
     // === HÖGER Y-AXEL ===
     y1: {
-      type: "linear",  // ← också KRITISKT!
+      type: "linear",
       position: "right",
 
       min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
@@ -1032,20 +1028,21 @@ options: {
           return isMajor ? v.toFixed(2) : "";
         },
         font(ctx) {
-          const v = Number(ctx?.tick?.value);
-          const isMajor = Math.round(v * 100) % 10 === 0;
-          return { size: isMajor ? 12 : 0, weight: isMajor ? "600" : "400" };
+          const val = Number(ctx?.tick?.value);
+          const isMajor = Math.round(val * 100) % 10 === 0;
+          return {
+            size: isMajor ? 12 : 0,
+            weight: isMajor ? "600" : "400"
+          };
         },
         color(ctx) {
-          const v = Number(ctx?.tick?.value);
-          const isMajor = Math.round(v * 100) % 10 === 0;
+          const val = Number(ctx?.tick?.value);
+          const isMajor = Math.round(val * 100) % 10 === 0;
           return isMajor ? "#000" : "rgba(0,0,0,0)";
         }
       },
 
-      grid: {
-        drawOnChartArea: false
-      }
+      grid: { drawOnChartArea: false }
     },
 
     // === X-AXEL ===
@@ -1057,8 +1054,7 @@ options: {
         maxRotation: 0
       }
     }
-  }
-},
+  },
 
   plugins: {
     legend: {
@@ -1083,7 +1079,7 @@ options: {
       }
     },
 
-    // === Titel ovanför vänster Y-axel ===
+    // === ★ Titel ovanför vänster y-axel (perfekt placerad) ★ ===
     titleOverYAxis: {
       id: "titleOverYAxis",
       afterDraw(chart) {
@@ -1094,14 +1090,15 @@ options: {
         ctx.fillStyle = "#000";
         ctx.textAlign = "left";
 
-        const x = chartArea.left - 5;
-        const y = chartArea.top - 12;
+        const x = chartArea.left - 5;   // nära axeln
+        const y = chartArea.top - 12;   // ovanför axeln
 
         ctx.fillText("°C", x, y);
         ctx.restore();
       }
     }
-  },
+  }
+},
 
   animation: false
 },
