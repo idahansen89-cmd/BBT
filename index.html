@@ -1032,6 +1032,34 @@ y1: {
   },
 
   plugins: {
+    // === TUNNA GRID-LINJER VID 0.05 ===
+const minorGrid = {
+  id: "minorGrid",
+  afterDraw(chart, args, options) {
+    const yScale = chart.scales.y;
+    const { ctx, chartArea } = chart;
+
+    // Ritar tunna linjer mellan varje 0.10-streck
+    const step = 0.05;
+    const start = yScale.min;
+    const end = yScale.max;
+
+    for (let v = start; v <= end; v += step) {
+      const isMajor = Math.abs((v * 100) % 10) === 0; // 0.10-streck (t.ex. 36.40)
+      if (isMajor) continue; // hoppa över stora linjer
+
+      const y = yScale.getPixelForValue(v);
+      ctx.save();
+      ctx.beginPath();
+      ctx.moveTo(chartArea.left, y);
+      ctx.lineTo(chartArea.right, y);
+      ctx.strokeStyle = "rgba(0,0,0,0.07)";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
+};
   legend: {
     position: "bottom",
     labels: { color: "#000" }
