@@ -963,38 +963,32 @@ options: {
 
   scales: {
     // === VÄNSTER Y-AXEL ===
-    y: {
+y: {
   position: "left",
-
   min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
   max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
 
   ticks: {
-    stepSize: 0.05,
-    callback: function (value) {
-      if (value == null) return "";
-      const v = Number(value);
-      if (isNaN(v)) return "";
-      const isMajor = Math.round(v * 100) % 10 === 0;
-      return isMajor ? v.toFixed(2) : "";
-    },
-    font: function (ctx) {
-      const v = Number(ctx?.tick?.value);
-      const isMajor = !isNaN(v) && Math.round(v * 100) % 10 === 0;
-      return { size: isMajor ? 12 : 0, weight: isMajor ? "600" : "400" };
-    },
-    color: function (ctx) {
-      const v = Number(ctx?.tick?.value);
-      const isMajor = !isNaN(v) && Math.round(v * 100) % 10 === 0;
-      return isMajor ? "#000" : "rgba(0,0,0,0)";
-    }
+    stepSize: 0.1,           // stora siffror var 0.10
+    font: { size: 12 },
+    color: "#444",
   },
 
   grid: {
+    color: "rgba(0,0,0,0.12)",
+    lineWidth: 1,
     drawTicks: true,
     drawBorder: true,
-    color: "rgba(0,0,0,0.12)",
-    lineWidth: 1
+  },
+
+  minor: {
+    ticks: {
+      stepSize: 0.05        // små 0.05-linjer
+    },
+    grid: {
+      color: "rgba(0,0,0,0.08)", 
+      lineWidth: 1
+    }
   },
 
   title: {
@@ -1006,31 +1000,15 @@ options: {
 },
 
     // === HÖGER Y-AXEL ===
-    y1: {
+y1: {
   position: "right",
-
   min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
   max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
 
   ticks: {
-    stepSize: 0.05,
-    callback: function (value) {
-      if (value == null) return "";
-      const v = Number(value);
-      if (isNaN(v)) return "";
-      const isMajor = Math.round(v * 100) % 10 === 0;
-      return isMajor ? v.toFixed(2) : "";
-    },
-    font: function (ctx) {
-      const v = Number(ctx?.tick?.value);
-      const isMajor = !isNaN(v) && Math.round(v * 100) % 10 === 0;
-      return { size: isMajor ? 12 : 0, weight: isMajor ? "600" : "400" };
-    },
-    color: function (ctx) {
-      const v = Number(ctx?.tick?.value);
-      const isMajor = !isNaN(v) && Math.round(v * 100) % 10 === 0;
-      return isMajor ? "#000" : "rgba(0,0,0,0)";
-    }
+    stepSize: 0.1,
+    font: { size: 12 },
+    color: "#444",
   },
 
   grid: {
