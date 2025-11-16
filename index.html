@@ -778,14 +778,14 @@ function renderChart() {
       return `${d}-${m}`;
     });
 
-    const actual    = dataEntries.map(e => e.actual);
+    const actual = dataEntries.map(e => e.actual);
     const corrected = dataEntries.map(e => e.corrected);
 
-    // === FASER ===
+    // === FASER (bakgrunder) ===
     const ovIndex = dataEntries.findIndex(e => e.ovulation);
     const anns = [];
 
-    // 🌸 Mens
+    // Mens
     const mensIndices = dataEntries
       .map((e, i) => (e.mens ? i : null))
       .filter(i => i !== null);
@@ -801,7 +801,7 @@ function renderChart() {
       });
     }
 
-    // 🌼 Ägglossning (gul dag)
+    // Ägglossning
     if (ovIndex >= 0) {
       anns.push({
         type: "box",
@@ -813,7 +813,7 @@ function renderChart() {
       });
     }
 
-    // 💜 Lutealfas
+    // Lutealfas
     if (ovIndex >= 0 && ovIndex < dataEntries.length - 1) {
       anns.push({
         type: "box",
@@ -837,39 +837,24 @@ function renderChart() {
       });
     }
 
-    // === MEDEL-SPANN FÖRE ÄGGLOSSNING ===
-    let tempsActualBeforeOv = [];
-    let tempsCorrectedBeforeOv = [];
+    // === MEDELSPANN FÖRE OV ===
+    const beforeOvActual = dataEntries
+      .slice(0, ovIndex > 0 ? ovIndex : dataEntries.length)
+      .map(e => e.actual)
+      .filter(v => v != null);
 
-    if (ovIndex > 0) {
-      tempsActualBeforeOv = dataEntries
-        .slice(0, ovIndex)
-        .map(e => e.actual)
-        .filter(v => v != null);
+    const beforeOvCorrected = dataEntries
+      .slice(0, ovIndex > 0 ? ovIndex : dataEntries.length)
+      .map(e => e.corrected)
+      .filter(v => v != null);
 
-      tempsCorrectedBeforeOv = dataEntries
-        .slice(0, ovIndex)
-        .map(e => e.corrected)
-        .filter(v => v != null);
-    } else {
-      tempsActualBeforeOv = dataEntries.map(e => e.actual).filter(v => v != null);
-      tempsCorrectedBeforeOv = dataEntries.map(e => e.corrected).filter(v => v != null);
-    }
+    const meanA = beforeOvActual.length
+      ? beforeOvActual.reduce((a, b) => a + b, 0) / beforeOvActual.length
+      : null;
 
-    let meanA = null;
-    let meanC = null;
-
-    if (tempsActualBeforeOv.length > 0) {
-      meanA =
-        tempsActualBeforeOv.reduce((a, b) => a + b, 0) /
-        tempsActualBeforeOv.length;
-    }
-
-    if (tempsCorrectedBeforeOv.length > 0) {
-      meanC =
-        tempsCorrectedBeforeOv.reduce((a, b) => a + b, 0) /
-        tempsCorrectedBeforeOv.length;
-    }
+    const meanC = beforeOvCorrected.length
+      ? beforeOvCorrected.reduce((a, b) => a + b, 0) / beforeOvCorrected.length
+      : null;
 
     let bandMin = null;
     let bandMax = null;
@@ -887,34 +872,10 @@ function renderChart() {
       ? new Array(dataEntries.length).fill(bandMax)
       : [];
 
-    // === Plugin för tunna 0.05-linjer ===
-    const minorGrid = {
-      id: "minorGrid",
-      afterDraw(chart) {
-        const yScale = chart.scales.y;
-        const { ctx, chartArea } = chart;
-        const step = 0.05;
-
-        for (let v = yScale.min; v <= yScale.max; v += step) {
-          const isMajor = Math.abs((v * 100) % 10) === 0;
-          if (isMajor) continue;
-
-          const y = yScale.getPixelForValue(v);
-
-          ctx.save();
-          ctx.beginPath();
-          ctx.moveTo(chartArea.left, y);
-          ctx.lineTo(chartArea.right, y);
-          ctx.strokeStyle = "rgba(0,0,0,0.07)";
-          ctx.lineWidth = 1;
-          ctx.stroke();
-          ctx.restore();
-        }
-      }
-    };
-
+    // === RITA GRAF ===
     chart = new Chart(el.chartCanvas, {
       type: "line",
+
       data: {
         labels,
         datasets: [
@@ -958,211 +919,186 @@ function renderChart() {
         ]
       },
 
-options: {
-  responsive: true,
-  maintainAspectRatio: false,
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
 
-  // EXTRA LUFT runt grafen
-  layout: {
-    padding: { top: 25, bottom: 35, left: 18, right: 18 }
-  },
-
-  scales: {
-    // === VÄNSTER Y-AXEL ===
-    y: {
-      type: "linear",
-      position: "left",
-
-      min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
-      max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
-
-      ticks: {
-        stepSize: 0.05,
-
-        callback(value) {
-          const v = Number(value);
-          const isMajor = Math.round(v * 100) % 10 === 0;
-          return isMajor ? v.toFixed(2) : "";
+        layout: {
+          padding: { top: 25, bottom: 35, left: 20, right: 20 }
         },
 
-        font(ctx) {
-          const val = Number(ctx?.tick?.value);
-          const isMajor = Math.round(val * 100) % 10 === 0;
-          return {
-            size: isMajor ? 12 : 0,
-            weight: isMajor ? "600" : "400"
-          };
+        scales: {
+          y: {
+            type: "linear",
+            position: "left",
+            min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
+            max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
+
+            ticks: {
+              stepSize: 0.05,
+              callback(v) {
+                const isMajor = Math.round(v * 100) % 10 === 0;
+                return isMajor ? v.toFixed(2) : "";
+              },
+              font(ctx) {
+                const v = Number(ctx?.tick?.value);
+                const isMajor = Math.round(v * 100) % 10 === 0;
+                return { size: isMajor ? 12 : 0, weight: isMajor ? "600" : "400" };
+              },
+              color(ctx) {
+                const v = Number(ctx?.tick?.value);
+                const isMajor = Math.round(v * 100) % 10 === 0;
+                return isMajor ? "#000" : "rgba(0,0,0,0)";
+              }
+            },
+
+            grid: {
+              drawTicks: true,
+              drawBorder: true,
+              color: "rgba(0,0,0,0.12)",
+              lineWidth: 1
+            },
+
+            title: { display: false }
+          },
+
+          y1: {
+            type: "linear",
+            position: "right",
+            min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
+            max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
+
+            ticks: {
+              stepSize: 0.05,
+              callback(v) {
+                const isMajor = Math.round(v * 100) % 10 === 0;
+                return isMajor ? v.toFixed(2) : "";
+              },
+              font(ctx) {
+                const v = Number(ctx?.tick?.value);
+                const isMajor = Math.round(v * 100) % 10 === 0;
+                return { size: isMajor ? 12 : 0 };
+              },
+              color(ctx) {
+                const v = Number(ctx?.tick?.value);
+                const isMajor = Math.round(v * 100) % 10 === 0;
+                return isMajor ? "#000" : "rgba(0,0,0,0)";
+              }
+            },
+
+            grid: { drawOnChartArea: false }
+          },
+
+          x: {
+            ticks: {
+              color: "#000",
+              autoSkip: true,
+              maxTicksLimit: 10,
+              maxRotation: 0
+            }
+          }
         },
 
-        color(ctx) {
-          const val = Number(ctx?.tick?.value);
-          const isMajor = Math.round(val * 100) % 10 === 0;
-          return isMajor ? "#000" : "rgba(0,0,0,0)";
+        plugins: {
+          legend: { position: "bottom", labels: { color: "#000" } },
+
+          annotation: {
+            drawTime: "beforeDatasetsDraw",
+            annotations: anns
+          },
+
+          zoom: {
+            zoom: {
+              wheel: { enabled: true },
+              pinch: { enabled: true },
+              mode: "x"
+            },
+            pan: {
+              enabled: true,
+              mode: "x"
+            }
+          }
         }
       },
 
-      grid: {
-        drawTicks: true,
-        drawBorder: true,
-        color: "rgba(0,0,0,0.12)",
-        lineWidth: 1
-      },
+      animation: false,
 
-      // Vi stänger av standard-titeln (vi ritar vår egen ovanför)
-      title: { display: false }
-    },
+      plugins: [
 
-    // === HÖGER Y-AXEL ===
-    y1: {
-      type: "linear",
-      position: "right",
+        // --- 0.05-linjer ---
+        {
+          id: "minorGrid",
+          afterDraw(chart) {
+            const yScale = chart.scales.y;
+            if (!yScale) return;
+            const { ctx, chartArea } = chart;
 
-      min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
-      max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
+            for (let v = yScale.min; v <= yScale.max; v += 0.05) {
+              const isMajor = Math.round(v * 100) % 10 === 0;
+              if (isMajor) continue;
 
-      ticks: {
-        stepSize: 0.05,
-        callback(value) {
-          const v = Number(value);
-          const isMajor = Math.round(v * 100) % 10 === 0;
-          return isMajor ? v.toFixed(2) : "";
+              const y = yScale.getPixelForValue(v);
+
+              ctx.save();
+              ctx.beginPath();
+              ctx.moveTo(chartArea.left, y);
+              ctx.lineTo(chartArea.right, y);
+              ctx.strokeStyle = "rgba(0,0,0,0.07)";
+              ctx.lineWidth = 1;
+              ctx.stroke();
+              ctx.restore();
+            }
+          }
         },
-        font(ctx) {
-          const val = Number(ctx?.tick?.value);
-          const isMajor = Math.round(val * 100) % 10 === 0;
-          return {
-            size: isMajor ? 12 : 0,
-            weight: isMajor ? "600" : "400"
-          };
+
+        // --- Titel över y-axeln ---
+        {
+          id: "titleOverYAxis",
+          afterDraw(chart) {
+            const { ctx, chartArea } = chart;
+
+            ctx.save();
+            ctx.font = "600 16px Arial";
+            ctx.fillStyle = "#000";
+            ctx.textAlign = "left";
+
+            const x = chartArea.left - 5;
+            const y = chartArea.top - 12;
+
+            ctx.fillText("°C", x, y);
+            ctx.restore();
+          }
         },
-        color(ctx) {
-          const val = Number(ctx?.tick?.value);
-          const isMajor = Math.round(val * 100) % 10 === 0;
-          return isMajor ? "#000" : "rgba(0,0,0,0)";
+
+        // --- Symboler ---
+        {
+          id: "customSymbols",
+          afterDraw(chart) {
+            const { ctx, chartArea, scales } = chart;
+            const xScale = scales.x;
+            const y = chartArea.bottom - 15;
+
+            dataEntries.forEach((e, i) => {
+              const xPos = xScale.getPixelForValue(i);
+              const symbols = [];
+
+              if (e.sex) symbols.push("💞");
+              if (e.ovulation) symbols.push("🌼");
+              if (e.mucus) symbols.push("💧");
+
+              if (symbols.length) {
+                ctx.save();
+                ctx.font = "18px Apple Color Emoji, Segoe UI Emoji";
+                ctx.textAlign = "center";
+                symbols.forEach((sym, j) => {
+                  ctx.fillText(sym, xPos, y - j * 18);
+                });
+                ctx.restore();
+              }
+            });
+          }
         }
-      },
-
-      grid: { drawOnChartArea: false }
-    },
-
-    // === X-AXEL ===
-    x: {
-      ticks: {
-        color: "#000",
-        autoSkip: true,
-        maxTicksLimit: 10,
-        maxRotation: 0
-      }
-    }
-  },
-
-  plugins: {
-    legend: {
-      position: "bottom",
-      labels: { color: "#000" }
-    },
-
-    annotation: {
-      drawTime: "beforeDatasetsDraw",
-      annotations: anns
-    },
-
-    zoom: {
-      zoom: {
-        wheel: { enabled: true },
-        pinch: { enabled: true },
-        mode: "x"
-      },
-      pan: {
-        enabled: true,
-        mode: "x"
-      }
-    },
-
-    // === ★ Titel ovanför vänster y-axel (perfekt placerad) ★ ===
-    titleOverYAxis: {
-      id: "titleOverYAxis",
-      afterDraw(chart) {
-        const { ctx, chartArea } = chart;
-
-        ctx.save();
-        ctx.font = "600 16px Arial";
-        ctx.fillStyle = "#000";
-        ctx.textAlign = "left";
-
-        const x = chartArea.left - 5;   // nära axeln
-        const y = chartArea.top - 12;   // ovanför axeln
-
-        ctx.fillText("°C", x, y);
-        ctx.restore();
-      }
-    }
-  }
-},
-
-  animation: false
-},
-
-plugins: [
-  // === MINDRE GRIDLINJER VID 0.05 ===
-  {
-    id: "minorGrid",
-    afterDraw(chart) {
-      const yScale = chart.scales.y;
-      if (!yScale) return;
-      const { ctx, chartArea } = chart;
-
-      const step = 0.05;
-      const start = yScale.min;
-      const end   = yScale.max;
-
-      for (let v = start; v <= end; v += step) {
-        const isMajor = Math.round(v * 100) % 10 === 0; // 0.10-linjer
-        if (isMajor) continue;
-
-        const y = yScale.getPixelForValue(v);
-
-        ctx.save();
-        ctx.beginPath();
-        ctx.moveTo(chartArea.left, y);
-        ctx.lineTo(chartArea.right, y);
-        ctx.strokeStyle = "rgba(0,0,0,0.07)";  // tunn linje
-        ctx.lineWidth = 1;
-        ctx.stroke();
-        ctx.restore();
-      }
-    }
-  },
-
-  // === SYMBOLER OVANFÖR X-AXELN ===
-  {
-    id: "customSymbols",
-    afterDraw(chart) {
-      const { ctx, chartArea, scales } = chart;
-      const xScale = scales.x;
-      const y = chartArea.bottom - 15;
-
-      dataEntries.forEach((e, i) => {
-        const xPos = xScale.getPixelForValue(i);
-        const symbols = [];
-
-        if (e.sex) symbols.push("💞");
-        if (e.ovulation) symbols.push("🌼");
-        if (e.mucus) symbols.push("💧");
-
-        if (symbols.length) {
-          ctx.save();
-          ctx.font = "18px Apple Color Emoji, Segoe UI Emoji";
-          ctx.textAlign = "center";
-          symbols.forEach((sym, j) => {
-            ctx.fillText(sym, xPos, y - j * 18);
-          });
-          ctx.restore();
-        }
-      });
-    }
-  }
-],
+      ]
     });
 
   } catch (err) {
