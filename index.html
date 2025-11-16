@@ -1432,6 +1432,17 @@ function renderChart() {
     renderTable();
     renderLHList();
   });
+  /* --- Legend popup — öppna/stäng --- */
+const legendPopup = document.getElementById("legendPopup");
+document.getElementById("infoBtn").addEventListener("click", () => {
+  legendPopup.style.display = "flex";
+});
+document.getElementById("legendCloseBtn").addEventListener("click", () => {
+  legendPopup.style.display = "none";
+});
+legendPopup.addEventListener("click", (e) => {
+  if (e.target === legendPopup) legendPopup.style.display = "none";
+});
   </script>
 </body>
 </html>
