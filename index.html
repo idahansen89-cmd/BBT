@@ -1106,39 +1106,39 @@ const minorGrid = {
   animation: false
 },
 
-      // SYMBOLER OVANFÖR X-AXELN
-      plugins: [
-        {
-          id: "customSymbols",
-          afterDraw(chart) {
-            const {
-              ctx,
-              chartArea: { bottom },
-              scales: { x }
-            } = chart;
-            const y = bottom - 15;
+    plugins: [
+  minorGrid,  // ← vår nya plugin för 0.05-linjer
 
-            dataEntries.forEach((e, i) => {
-              const xPos = x.getPixelForValue(i);
-              const symbols = [];
-              if (e.sex) symbols.push("💞");
-              if (e.ovulation) symbols.push("🌼");
-              if (e.mucus) symbols.push("💧");
+  {
+    id: "customSymbols",
+    afterDraw(chart) {
+      const {
+        ctx,
+        chartArea: { bottom },
+        scales: { x }
+      } = chart;
+      const y = bottom - 15;
 
-              if (symbols.length) {
-                ctx.save();
-                ctx.font =
-                  "18px Apple Color Emoji, Segoe UI Emoji";
-                ctx.textAlign = "center";
-                symbols.forEach((sym, j) => {
-                  ctx.fillText(sym, xPos, y - j * 18);
-                });
-                ctx.restore();
-              }
-            });
-          }
+      dataEntries.forEach((e, i) => {
+        const xPos = x.getPixelForValue(i);
+        const symbols = [];
+        if (e.sex) symbols.push("💞");
+        if (e.ovulation) symbols.push("🌼");
+        if (e.mucus) symbols.push("💧");
+
+        if (symbols.length) {
+          ctx.save();
+          ctx.font = "18px Apple Color Emoji, Segoe UI Emoji";
+          ctx.textAlign = "center";
+          symbols.forEach((sym, j) => {
+            ctx.fillText(sym, xPos, y - j * 18);
+          });
+          ctx.restore();
         }
-      ]
+      });
+    }
+  }
+]
     });
   } catch (err) {
     console.error("❌ Fel i renderChart:", err);
