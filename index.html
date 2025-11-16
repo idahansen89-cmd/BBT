@@ -934,15 +934,21 @@ function renderChart() {
             min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
             max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
 
-            ticks: {
-              stepSize: 0.05,
-              callback(value) {
-                console.log("TICK VALUE:", value);
-                return Number(value).toFixed(2);
-            },
-              font: { size: 12, weight: "600" },
-                color: "#000"
-            },
+           ticks: {
+  stepSize: 0.05,
+
+  callback(value) {
+    alert("tick: " + value);
+    return Number(value).toFixed(2);
+  },
+
+  font: {
+    size: 12,
+    weight: "600"
+  },
+
+  color: "#000"
+},
 
             grid: {
               drawTicks: true,
