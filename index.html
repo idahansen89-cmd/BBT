@@ -965,28 +965,31 @@ options: {
     // === VÄNSTER Y-AXEL ===
 y: {
   position: "left",
+
   min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
   max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
 
   ticks: {
-    stepSize: 0.1,           // stora siffror var 0.10
+    stepSize: 0.1,          // stora värden (36.10, 36.20, 36.30...)
     font: { size: 12 },
-    color: "#444",
+    color: "#444"
   },
 
+  // mindre stödlinjer mellan stora
   grid: {
     color: "rgba(0,0,0,0.12)",
     lineWidth: 1,
     drawTicks: true,
-    drawBorder: true,
+    drawBorder: true
   },
 
+  // små linjer vid 0.05
   minor: {
     ticks: {
-      stepSize: 0.05        // små 0.05-linjer
+      stepSize: 0.05
     },
     grid: {
-      color: "rgba(0,0,0,0.08)", 
+      color: "rgba(0,0,0,0.07)",
       lineWidth: 1
     }
   },
@@ -1002,13 +1005,14 @@ y: {
     // === HÖGER Y-AXEL ===
 y1: {
   position: "right",
+
   min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
   max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
 
   ticks: {
     stepSize: 0.1,
     font: { size: 12 },
-    color: "#444",
+    color: "#444"
   },
 
   grid: {
