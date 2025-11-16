@@ -985,41 +985,38 @@ options: {
 
   ticks: {
     stepSize: 0.05,
-
-    // VISAR ENDAST 0.10-VÄRDEN
-    callback: function(v) {
-      if (v == null) return "";
+    callback: function (value) {
+      if (value == null) return "";
+      const v = Number(value);
+      if (isNaN(v)) return "";
       const isMajor = Math.round(v * 100) % 10 === 0;
       return isMajor ? v.toFixed(2) : "";
     },
-
-    // FONTER FÖR SAFARI
-    font: function(ctx) {
-      const t = ctx?.tick?.value;
-      if (t == null) return { size: 0 };
-
-      const isMajor = Math.round(t * 100) % 10 === 0;
+    font: function (ctx) {
+      const v = Number(ctx?.tick?.value);
+      const isMajor = !isNaN(v) && Math.round(v * 100) % 10 === 0;
       return { size: isMajor ? 12 : 0, weight: isMajor ? "600" : "400" };
     },
-
-    // FÄRG FÖR SAFARI
-    color: function(ctx) {
-      const t = ctx?.tick?.value;
-      if (t == null) return "rgba(0,0,0,0)";
-      const isMajor = Math.round(t * 100) % 10 === 0;
+    color: function (ctx) {
+      const v = Number(ctx?.tick?.value);
+      const isMajor = !isNaN(v) && Math.round(v * 100) % 10 === 0;
       return isMajor ? "#000" : "rgba(0,0,0,0)";
     }
   },
 
   grid: {
-  drawTicks: true,
-  drawBorder: true,
-  color: "rgba(0,0,0,0.12)",
-  lineWidth: 1,
-  tickLength: 6   // längre streck för tickmarkering
-},
+    drawTicks: true,
+    drawBorder: true,
+    color: "rgba(0,0,0,0.12)",
+    lineWidth: 1
+  },
 
-  title: { display: true, text: "°C" }
+  title: {
+    display: true,
+    text: "°C",
+    font: { size: 14, weight: "600" },
+    padding: { bottom: 10 }
+  }
 },
 
     // === HÖGER Y-AXEL ===
@@ -1031,31 +1028,28 @@ options: {
 
   ticks: {
     stepSize: 0.05,
-    callback: function(v) {
-      if (v == null) return "";
+    callback: function (value) {
+      if (value == null) return "";
+      const v = Number(value);
+      if (isNaN(v)) return "";
       const isMajor = Math.round(v * 100) % 10 === 0;
       return isMajor ? v.toFixed(2) : "";
     },
-    font: function(ctx) {
-      const t = ctx?.tick?.value;
-      if (t == null) return { size: 0 };
-      const isMajor = Math.round(t * 100) % 10 === 0;
+    font: function (ctx) {
+      const v = Number(ctx?.tick?.value);
+      const isMajor = !isNaN(v) && Math.round(v * 100) % 10 === 0;
       return { size: isMajor ? 12 : 0, weight: isMajor ? "600" : "400" };
     },
-    color: function(ctx) {
-      const t = ctx?.tick?.value;
-      if (t == null) return "rgba(0,0,0,0)";
-      const isMajor = Math.round(t * 100) % 10 === 0;
+    color: function (ctx) {
+      const v = Number(ctx?.tick?.value);
+      const isMajor = !isNaN(v) && Math.round(v * 100) % 10 === 0;
       return isMajor ? "#000" : "rgba(0,0,0,0)";
     }
   },
 
- grid: {
-  drawTicks: true,
-  drawBorder: true,
-  color: "rgba(0,0,0,0.12)",
-  lineWidth: 1,
-  tickLength: 6   // längre streck för tickmarkering
+  grid: {
+    drawOnChartArea: false
+  }
 },
 
 // === X-AXEL ===
