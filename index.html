@@ -920,103 +920,107 @@ function renderChart() {
       },
 
       options: {
-        responsive: true,
-        maintainAspectRatio: false,
+  responsive: true,
+  maintainAspectRatio: false,
 
-        layout: {
-          padding: { top: 25, bottom: 35, left: 20, right: 20 }
+  layout: {
+    padding: { top: 25, bottom: 35, left: 20, right: 20 }
+  },
+
+  scales: {
+    // === VÄNSTER Y-AXEL ===
+    y: {
+      type: "linear",
+      position: "left",
+
+      min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
+      max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
+
+      ticks: {
+        stepSize: 0.05,
+        callback(v) {
+          return Number(v).toFixed(2);   // visa ALLA värden
         },
-
-scales: {
-  // === VÄNSTER Y-AXEL ===
-  y: {
-    type: "linear",
-    position: "left",
-
-    min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
-    max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
-
-    ticks: {
-      stepSize: 0.05,
-      callback(v) {
-        return Number(v).toFixed(2);   // visa ALLA värden
+        font: {
+          size: 12,
+          weight: "600"
+        },
+        color: "#000"
       },
-      font: {
-        size: 12,
-        weight: "600"
+
+      grid: {
+        drawTicks: true,
+        drawBorder: true,
+        color: "rgba(0,0,0,0.12)",
+        lineWidth: 1
       },
-      color: "#000"
+
+      // vi använder din custom-titel-plugin – stäng av inbyggd
+      title: { display: false }
     },
 
-    grid: {
-      drawTicks: true,
-      drawBorder: true,
-      color: "rgba(0,0,0,0.12)",
-      lineWidth: 1
+    // === HÖGER Y-AXEL ===
+    y1: {
+      type: "linear",
+      position: "right",
+
+      min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
+      max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
+
+      ticks: {
+        stepSize: 0.05,
+        callback(v) {
+          return Number(v).toFixed(2);
+        },
+        font: {
+          size: 12,
+          weight: "600"
+        },
+        color: "#000"
+      },
+
+      grid: {
+        drawOnChartArea: false
+      }
     },
 
-    title: { display: false } // vi använder din custom-titel-plugin
-  },
-
-  // === HÖGER Y-AXEL ===
-  y1: {
-    type: "linear",
-    position: "right",
-
-    min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
-    max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
-
-    ticks: {
-      stepSize: 0.05,
-      callback(v) {
-        return Number(v).toFixed(2);   // samma stil på höger sida
-      },
-      font: {
-        size: 12,
-        weight: "600"
-      },
-      color: "#000"
-    },
-
-    grid: {
-      drawOnChartArea: false
+    // === X-AXEL ===
+    x: {
+      ticks: {
+        color: "#000",
+        autoSkip: true,
+        maxTicksLimit: 10,
+        maxRotation: 0
+      }
     }
   },
 
-  // === X-AXEL ===
-  x: {
-    ticks: {
-      color: "#000",
-      autoSkip: true,
-      maxTicksLimit: 10,
-      maxRotation: 0
-    }
-  }
-}
+  plugins: {
+    legend: {
+      position: "bottom",
+      labels: { color: "#000" }
+    },
 
-        plugins: {
-          legend: { position: "bottom", labels: { color: "#000" } },
+    annotation: {
+      drawTime: "beforeDatasetsDraw",
+      annotations: anns
+    },
 
-          annotation: {
-            drawTime: "beforeDatasetsDraw",
-            annotations: anns
-          },
-
-          zoom: {
-            zoom: {
-              wheel: { enabled: true },
-              pinch: { enabled: true },
-              mode: "x"
-            },
-            pan: {
-              enabled: true,
-              mode: "x"
-            }
-          }
-        }
+    zoom: {
+      zoom: {
+        wheel: { enabled: true },
+        pinch: { enabled: true },
+        mode: "x"
       },
+      pan: {
+        enabled: true,
+        mode: "x"
+      }
+    }
+  },
 
-      animation: false,
+  animation: false
+},
 
       plugins: [
 
