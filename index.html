@@ -973,94 +973,124 @@ function renderChart() {
   },
 
   scales: {
-    // === VÄNSTER Y-AXEL ===
-    y: {
-      position: "left",
+  // === VÄNSTER Y-AXEL ===
+  y: {
+    position: "left",
 
-      min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
-      max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
+    min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
+    max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
 
-      ticks: {
-        stepSize: 0.05,
-        callback(value) {
-          const v = Number(value);
-          const isMajor = Math.round(v * 100) % 10 === 0;
-          return isMajor ? v.toFixed(2) : "";
-        },
-        font(ctx) {
-          const value = ctx?.tick?.value;
-          if (value == null) return { size: 0 };
-          const v = Number(value);
-          const isMajor = Math.round(v * 100) % 10 === 0;
-          return { size: isMajor ? 12 : 0, weight: isMajor ? "600" : "400" };
-        },
-        color(ctx) {
-          const value = ctx?.tick?.value;
-          if (value == null) return "rgba(0,0,0,0)";
-          const v = Number(value);
-          const isMajor = Math.round(v * 100) % 10 === 0;
-          return isMajor ? "#000" : "rgba(0,0,0,0)";
-        }
+    ticks: {
+      stepSize: 0.05,
+
+      callback(value) {
+        if (value == null) return "";
+        const v = Number(value);
+        if (isNaN(v)) return "";
+        const isMajor = Math.round(v * 100) % 10 === 0;
+        return isMajor ? v.toFixed(2) : "";
       },
 
-      grid: {
-        drawTicks: true,
-        drawBorder: true,
-        color: "rgba(0,0,0,0.12)",
-        lineWidth: 1
+      font(context) {
+        const tick = context?.tick?.value;
+        if (tick == null) return { size: 0 };
+
+        const v = Number(tick);
+        if (isNaN(v)) return { size: 0 };
+
+        const isMajor = Math.round(v * 100) % 10 === 0;
+        return {
+          size: isMajor ? 12 : 0,
+          weight: isMajor ? "600" : "400"
+        };
       },
 
-      // Titel (vi ersätter denna med plugin nedanför)
-      title: {
-        display: false
+      color(context) {
+        const tick = context?.tick?.value;
+        if (tick == null) return "rgba(0,0,0,0)";
+
+        const v = Number(tick);
+        if (isNaN(v)) return "rgba(0,0,0,0)";
+
+        const isMajor = Math.round(v * 100) % 10 === 0;
+        return isMajor ? "#000" : "rgba(0,0,0,0)";
       }
     },
 
-    // === HÖGER Y-AXEL ===
-    y1: {
-      position: "right",
-
-      min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
-      max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
-
-      ticks: {
-        stepSize: 0.05,
-        callback(value) {
-          const v = Number(value);
-          const isMajor = Math.round(v * 100) % 10 === 0;
-          return isMajor ? v.toFixed(2) : "";
-        },
-        font(ctx) {
-          const value = ctx?.tick?.value;
-          if (value == null) return { size: 0 };
-          const v = Number(value);
-          const isMajor = Math.round(v * 100) % 10 === 0;
-          return { size: isMajor ? 12 : 0, weight: isMajor ? "600" : "400" };
-        },
-        color(ctx) {
-          const value = ctx?.tick?.value;
-          if (value == null) return "rgba(0,0,0,0)";
-          const v = Number(value);
-          const isMajor = Math.round(v * 100) % 10 === 0;
-          return isMajor ? "#000" : "rgba(0,0,0,0)";
-        }
-      },
-
-      grid: {
-        drawOnChartArea: false
-      }
+    grid: {
+      drawTicks: true,
+      drawBorder: true,
+      color: "rgba(0,0,0,0.12)",
+      lineWidth: 1
     },
 
-    // === X-AXEL ===
-    x: {
-      ticks: {
-        color: "#000",
-        autoSkip: true,
-        maxTicksLimit: 10,
-        maxRotation: 0
-      }
+    title: {
+      display: true,
+      text: "°C",
+      font: { size: 16, weight: "600" },
+      padding: { bottom: 10 }
     }
   },
+
+  // === HÖGER Y-AXEL ===
+  y1: {
+    position: "right",
+
+    min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
+    max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
+
+    ticks: {
+      stepSize: 0.05,
+
+      callback(value) {
+        if (value == null) return "";
+        const v = Number(value);
+        if (isNaN(v)) return "";
+        const isMajor = Math.round(v * 100) % 10 === 0;
+        return isMajor ? v.toFixed(2) : "";
+      },
+
+      font(context) {
+        const tick = context?.tick?.value;
+        if (tick == null) return { size: 0 };
+
+        const v = Number(tick);
+        if (isNaN(v)) return { size: 0 };
+
+        const isMajor = Math.round(v * 100) % 10 === 0;
+        return {
+          size: isMajor ? 12 : 0,
+          weight: isMajor ? "600" : "400"
+        };
+      },
+
+      color(context) {
+        const tick = context?.tick?.value;
+        if (tick == null) return "rgba(0,0,0,0)";
+
+        const v = Number(tick);
+        if (isNaN(v)) return "rgba(0,0,0,0)";
+
+        const isMajor = Math.round(v * 100) % 10 === 0;
+        return isMajor ? "#000" : "rgba(0,0,0,0)";
+      }
+    },
+
+    grid: {
+      drawOnChartArea: false
+    }
+  },
+
+  // === X-AXEL ===
+  x: {
+    ticks: {
+      color: "#000",
+      autoSkip: true,
+      maxTicksLimit: 10,
+      maxRotation: 0
+    }
+  }
+},
 
   plugins: {
     legend: {
