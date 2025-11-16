@@ -566,7 +566,43 @@ td button:hover {
   <!-- Mintblå pastell-i-knapp -->
   <button id="infoBtn" class="info-btn">i</button>
 </div>
+<!-- Legend-popup -->
+<div id="legendPopup">
+  <div class="legend-box">
+    <h3>Förklaring</h3>
+
+    <div class="legend-entry">
+      <div class="legend-color" style="background:rgba(90,140,255,0.9);"></div>
+      <span>Blå linje – Faktisk temperatur</span>
+    </div>
+
+    <div class="legend-entry">
+      <div class="legend-color" style="background:rgba(240,100,120,0.85);"></div>
+      <span>Röd prickad linje – Korrigerad temperatur</span>
+    </div>
+
+    <div class="legend-entry">
+      <div class="legend-color" style="background:rgba(195,215,180,0.45); height:10px;"></div>
+      <span>Grön ton – Medellinje före ägglossning</span>
+    </div>
+
+    <hr style="margin:0.9rem 0">
+
+    <strong>Symboler:</strong><br>
+
+    <div class="legend-entry">💞 – Samlag</div>
+    <div class="legend-entry">🌼 – Ägglossning</div>
+    <div class="legend-entry">💧 – Cervixsekret</div>
+    <div class="legend-entry">➕ – LH positiv</div>
+    <div class="legend-entry">➖ – LH negativ</div>
+    <div class="legend-entry">🩸 – Mens</div>
+
+    <div class="legend-close">
+      <button id="legendCloseBtn">Stäng</button>
+      </div>
+    </div>
   </div>
+</div>
 
   <!-- LH-test -->
   <div id="lh" class="tab-content">
