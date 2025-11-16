@@ -190,19 +190,15 @@
   /* ===== Chart ===== */
 #chartContainer {
   width: 100%;
-  max-width: 900px;
+  max-width: 1100px;   /* ännu bredare */
   margin: 0 auto;
-  min-height: 60vh;    /* 60% av skärmen */
-}
-
-canvas {
-  width: 100% !important;
 }
 
 .graph-wrapper {
-  margin-left: -10px;
-  margin-right: -10px;
+  margin-left: -5px;  /* mindre marginal */
+  margin-right: -5px;
 }
+
   #bbtChart {
     display: block;
     width: 100% !important;
@@ -1016,11 +1012,12 @@ options: {
   },
 
   grid: {
-    drawTicks: true,
-    drawBorder: true,
-    color: "rgba(0,0,0,0.12)",
-    lineWidth: 1
-  },
+  drawTicks: true,
+  drawBorder: true,
+  color: "rgba(0,0,0,0.12)",
+  lineWidth: 1,
+  tickLength: 6   // längre streck för tickmarkering
+},
 
   title: { display: true, text: "°C" }
 },
@@ -1053,7 +1050,12 @@ options: {
     }
   },
 
-  grid: { drawOnChartArea: false }
+ grid: {
+  drawTicks: true,
+  drawBorder: true,
+  color: "rgba(0,0,0,0.12)",
+  lineWidth: 1,
+  tickLength: 6   // längre streck för tickmarkering
 },
 
 // === X-AXEL ===
@@ -1068,28 +1070,48 @@ options: {
   },
 
   plugins: {
-    legend: {
-      position: "bottom",
-      labels: { color: "#000" }
-    },
+  legend: {
+    position: "bottom",
+    labels: { color: "#000" }
+  },
 
-    annotation: {
-      drawTime: "beforeDatasetsDraw",
-      annotations: anns
-    },
+  annotation: {
+    drawTime: "beforeDatasetsDraw",
+    annotations: anns
+  },
 
+  zoom: {
     zoom: {
-      zoom: {
-        wheel: { enabled: true },
-        pinch: { enabled: true },
-        mode: "x"
-      },
-      pan: {
-        enabled: true,
-        mode: "x"
-      }
+      wheel: { enabled: true },
+      pinch: { enabled: true },
+      mode: "x"
+    },
+    pan: {
+      enabled: true,
+      mode: "x"
     }
   },
+
+  // === RITA Y-AXEL-TITEL OVANFÖR GRAFEN ===
+  titleOverYAxis: {
+    id: "titleOverYAxis",
+    afterDraw(chart, args, opts) {
+      const { ctx, chartArea } = chart;
+
+      ctx.save();
+      ctx.font = "600 16px Arial";   // Storlek & vikt (kan justeras)
+      ctx.fillStyle = "#000";
+      ctx.textAlign = "left";
+
+      // Titelns position
+      const x = chartArea.left - 10;   // precis vänster om y-axeln
+      const y = chartArea.top - 10;    // ovanför axeln
+
+      ctx.fillText("°C", x, y);
+      ctx.restore();
+    }
+  }
+},
 
   animation: false
 },
