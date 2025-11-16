@@ -927,75 +927,72 @@ function renderChart() {
           padding: { top: 25, bottom: 35, left: 20, right: 20 }
         },
 
-        scales: {
-          y: {
-            type: "linear",
-            position: "left",
-            min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
-            max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
+scales: {
+  // === VÄNSTER Y-AXEL ===
+  y: {
+    type: "linear",
+    position: "left",
 
-           ticks: {
-  stepSize: 0.05,
+    min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
+    max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
 
-  callback(value) {
-    alert("tick: " + value);
-    return Number(value).toFixed(2);
+    ticks: {
+      stepSize: 0.05,
+      callback(v) {
+        return Number(v).toFixed(2);   // visa ALLA värden
+      },
+      font: {
+        size: 12,
+        weight: "600"
+      },
+      color: "#000"
+    },
+
+    grid: {
+      drawTicks: true,
+      drawBorder: true,
+      color: "rgba(0,0,0,0.12)",
+      lineWidth: 1
+    },
+
+    title: { display: false } // vi använder din custom-titel-plugin
   },
 
-  font: {
-    size: 12,
-    weight: "600"
+  // === HÖGER Y-AXEL ===
+  y1: {
+    type: "linear",
+    position: "right",
+
+    min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
+    max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
+
+    ticks: {
+      stepSize: 0.05,
+      callback(v) {
+        return Number(v).toFixed(2);   // samma stil på höger sida
+      },
+      font: {
+        size: 12,
+        weight: "600"
+      },
+      color: "#000"
+    },
+
+    grid: {
+      drawOnChartArea: false
+    }
   },
 
-  color: "#000"
-},
-
-            grid: {
-              drawTicks: true,
-              drawBorder: true,
-              color: "rgba(0,0,0,0.12)",
-              lineWidth: 1
-            },
-
-            title: { display: false }
-          },
-
-          y1: {
-            type: "linear",
-            position: "right",
-            min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
-            max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
-
-            ticks: {
-              stepSize: 0.05,
-              callback(v) {
-                const isMajor = Math.round(v * 100) % 10 === 0;
-                return isMajor ? v.toFixed(2) : "";
-              },
-              font(ctx) {
-                const v = Number(ctx?.tick?.value);
-                const isMajor = Math.round(v * 100) % 10 === 0;
-                return { size: isMajor ? 12 : 0 };
-              },
-              color(ctx) {
-                const v = Number(ctx?.tick?.value);
-                const isMajor = Math.round(v * 100) % 10 === 0;
-                return isMajor ? "#000" : "rgba(0,0,0,0)";
-              }
-            },
-
-            grid: { drawOnChartArea: false }
-          },
-
-          x: {
-            ticks: {
-              color: "#000",
-              autoSkip: true,
-              maxTicksLimit: 10,
-              maxRotation: 0
-            }
-          }
-        },
+  // === X-AXEL ===
+  x: {
+    ticks: {
+      color: "#000",
+      autoSkip: true,
+      maxTicksLimit: 10,
+      maxRotation: 0
+    }
+  }
+}
 
         plugins: {
           legend: { position: "bottom", labels: { color: "#000" } },
