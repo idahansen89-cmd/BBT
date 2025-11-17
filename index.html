@@ -704,7 +704,58 @@ document.querySelectorAll(".tab").forEach(btn => {
       });
     }
   };
+const MonthLabelPlugin = {
+  id: "monthLabelPlugin",
+  afterDraw(chart) {
+    const {ctx, chartArea, scales} = chart;
+    const xAxis = scales.xTop;
+    if (!xAxis) return;
 
+    const labels = chart.data.labels;
+    let prevMonth = null;
+
+    labels.forEach((label, i) => {
+      const [day, month] = label.split("-");
+      if (!month) return;
+
+      if (month !== prevMonth) {
+        prevMonth = month;
+
+        const x = xAxis.getPixelForValue(i);
+        const y = chartArea.top - 32;
+
+        const text = month;
+        ctx.font = "12px Helvetica";
+        const w = ctx.measureText(text).width + 14;
+
+        ctx.fillStyle = "rgba(168,216,255,0.55)";
+        ctx.strokeStyle = "rgba(120,150,180,0.35)";
+        ctx.lineWidth = 1;
+
+        const h = 18;
+        const r = 5;
+
+        ctx.beginPath();
+        ctx.moveTo(x - w/2 + r, y);
+        ctx.lineTo(x + w/2 - r, y);
+        ctx.quadraticCurveTo(x + w/2, y, x + w/2, y + r);
+        ctx.lineTo(x + w/2, y + h - r);
+        ctx.quadraticCurveTo(x + w/2, y + h, x + w/2 - r, y + h);
+        ctx.lineTo(x - w/2 + r, y + h);
+        ctx.quadraticCurveTo(x - w/2, y + h, x - w/2, y + h - r);
+        ctx.lineTo(x - w/2, y + r);
+        ctx.quadraticCurveTo(x - w/2, y, x - w/2 + r, y);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = "#2b4a65";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(text, x, y + h/2);
+      }
+    });
+  }
+};
   Chart.register(MonthLabelPlugin);
 
   function renderChart() {
@@ -823,45 +874,58 @@ document.querySelectorAll(".tab").forEach(btn => {
       },
 
       options:{
-        responsive:true,
-        maintainAspectRatio:false,
-        layout:{ padding:{top:35, bottom:25} },
+  responsive:true,
+  maintainAspectRatio:false,
 
-        scales:{
-          y:{
-            suggestedMin: Math.min(...corrected.filter(v=>v!=null)) - 0.2,
-            suggestedMax: Math.max(...corrected.filter(v=>v!=null)) + 0.15,
-            ticks:{ callback:v => v.toFixed(2) },
-            title:{ display:true, text:"°C" }
-          },
+  layout:{ padding:{ top:45, bottom:35 } },
 
-          xTop:{
-            type:"category",
-            position:"top",
-            labels: dateLabels,
-            ticks:{
-              font:{size:13},
-              maxRotation:0,
-              autoSkip:true
-            },
-            grid:{display:false}
-          },
+  scales:{
+    y:{
+      suggestedMin: Math.min(...corrected.filter(v=>v!=null)) - 0.20,
+      suggestedMax: Math.max(...corrected.filter(v=>v!=null)) + 0.15,
+      ticks:{
+        callback:v => v.toFixed(2)
+      },
+      title:{ display:false },   // ← FIX: Ingen °C-titel längre
+      grid:{ color:"rgba(0,0,0,0.12)" }
+    },
 
-          x:{
-            type:"category",
-            position:"bottom",
-            labels: cdLabels,
-            ticks:{ font:{size:13} },
-            title:{ display:true, text:"CD →", padding:{top:6} },
-            grid:{ display:false }
-          }
-        },
+    xTop:{
+      type:"category",
+      position:"top",
+      labels: dateLabels,
+      ticks:{
+        font:{ size:13 },
+        maxRotation:0,
+        autoSkip:true
+      },
+      grid:{ display:false }
+    },
 
-        plugins:{
-          legend:{display:false},
-          annotation:{annotations:anns}
-        }
-      }
+    x:{
+      type:"category",
+      position:"bottom",
+      labels: cdLabels,
+      ticks:{
+        font:{ size:13 },
+        padding:6
+      },
+      title:{
+        display:true,
+        text:"CD",
+        padding:{ top:8 },
+        color:"#444",
+        font:{ size:14, weight:'600' }
+      },
+      grid:{ display:false }
+    }
+  },
+
+  plugins:{
+    legend:{ display:false },
+    annotation:{ annotations:anns }
+  }
+}
     });
   }
 
