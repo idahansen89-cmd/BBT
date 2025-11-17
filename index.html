@@ -206,25 +206,38 @@ td button {
   margin-top: 0.75rem;
 }
 
+/* Extra tydligt rutnät */
+.chart-grid-line {
+  color: rgba(0,0,0,0.12);
+  stroke-width: 1px;
+}
 /* ============================
         INFO-BUTTON (i)
 ============================ */
+/* --- Info-knapp (i) med samma stil som exportknappen --- */
 .info-btn {
   position: absolute;
-  top: -8px;
-  right: -8px;
+  top: -10px;
+  right: -10px;
+
   width: 32px;
   height: 32px;
-  border-radius: 8px;
+
   background: var(--pink);
+  color: #222;
+  border: none;
+  border-radius: 8px;
+
   font-size: 1.15rem;
   font-weight: 900;
+  cursor: pointer;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  border: none;
-  cursor: pointer;
+
   box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  transition: 0.15s;
 }
 .info-btn:hover {
   background: var(--pink-hover);
@@ -271,11 +284,15 @@ td button {
 }
 .legend-close button {
   background: var(--pink);
+  color: #222;
   border: none;
   padding: 0.5rem 1.3rem;
   border-radius: 8px;
   font-weight: 700;
   cursor: pointer;
+}
+.legend-close button:hover {
+  background: var(--pink-hover);
 }
   </style>
 </head>
@@ -649,11 +666,13 @@ document.querySelectorAll(".tab").forEach(btn => {
   };
 
 // === Mintblå månadslappar ===
+// ====== Månadslappar över datum-raden ======
 const MonthLabelPlugin = {
   id: "monthLabelPlugin",
   afterDraw(chart) {
-    const {ctx, chartArea, scales} = chart;
-    const xAxis = scales.xTop;
+    const { ctx, chartArea, scales } = chart;
+
+    const xAxis = scales.xTop;  // Övre datumaxeln
     if (!xAxis) return;
 
     const labels = chart.data.labels;
@@ -667,19 +686,20 @@ const MonthLabelPlugin = {
         prevMonth = month;
 
         const x = xAxis.getPixelForValue(i);
-        const y = chartArea.top - 32;
+        const y = chartArea.top - 48;   // <-- Viktigt! Flytta upp lapparna
 
         const text = month;
         ctx.font = "12px Helvetica";
         const w = ctx.measureText(text).width + 14;
 
+        const h = 18;
+        const r = 5;
+
         ctx.fillStyle = "rgba(168,216,255,0.55)";
         ctx.strokeStyle = "rgba(120,150,180,0.35)";
         ctx.lineWidth = 1;
 
-        const h = 18;
-        const r = 5;
-
+        // Rundad ruta
         ctx.beginPath();
         ctx.moveTo(x - w/2 + r, y);
         ctx.lineTo(x + w/2 - r, y);
@@ -693,6 +713,7 @@ const MonthLabelPlugin = {
         ctx.fill();
         ctx.stroke();
 
+        // Text
         ctx.fillStyle = "#2b4a65";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
@@ -704,178 +725,179 @@ const MonthLabelPlugin = {
 
 Chart.register(MonthLabelPlugin);
 
-  Chart.register(MonthLabelPlugin);
+function renderChart() {
+  if (chart) chart.destroy();
+  if (!dataEntries.length) return;
 
-  function renderChart() {
-    if (chart) chart.destroy();
-    if (!dataEntries.length) return;
+  dataEntries.sort((a, b) => a.date.localeCompare(b.date));
 
-    dataEntries.sort((a,b)=>a.date.localeCompare(b.date));
+  // Datum (DD-MM)
+  const dateLabels = dataEntries.map(e => {
+    const [y, m, d] = e.date.split("-");
+    return `${d.padStart(2, "0")}-${m}`;
+  });
 
-    // Datum (DD-MM)
-    const dateLabels = dataEntries.map(e => {
-      const [y,m,d] = e.date.split("-");
-      return `${d.padStart(2,"0")}-${m}`;
+  // CD
+  const cdLabels = dataEntries.map((_, i) =>
+    (i + 1).toString().padStart(2, "0")
+  );
+
+  const actual = dataEntries.map(e => e.actual);
+  const corrected = dataEntries.map(e => e.corrected);
+
+  const ovIndex = dataEntries.findIndex(e => e.ovulation);
+  const anns = [];
+
+  // Mens
+  const mensIdx = dataEntries
+    .map((e, i) => e.mens ? i : null)
+    .filter(i => i !== null);
+
+  if (mensIdx.length) {
+    anns.push({
+      type: "box",
+      xMin: mensIdx[0] - 0.5,
+      xMax: mensIdx[mensIdx.length - 1] + 0.5,
+      backgroundColor: "rgba(244,182,194,0.55)",
+      borderWidth: 0,
+      drawTime: "beforeDatasetsDraw"
     });
+  }
 
-    // CD
-    const cdLabels = dataEntries.map((_,i)=>
-      (i+1).toString().padStart(2,"0")
-    );
+  // Ägglossning
+  if (ovIndex >= 0) {
+    anns.push({
+      type: "box",
+      xMin: ovIndex - 0.5,
+      xMax: ovIndex + 0.5,
+      backgroundColor: "rgba(255,244,176,0.65)",
+      borderWidth: 0,
+      drawTime: "beforeDatasetsDraw"
+    });
+  }
 
-    const actual = dataEntries.map(e => e.actual);
-    const corrected = dataEntries.map(e => e.corrected);
-    const ovIndex = dataEntries.findIndex(e=>e.ovulation);
+  // Lutealfas
+  if (ovIndex >= 0 && ovIndex < dataEntries.length - 1) {
+    anns.push({
+      type: "box",
+      xMin: ovIndex + 0.5,
+      xMax: dataEntries.length - 0.5,
+      backgroundColor: "rgba(224,195,252,0.6)",
+      borderWidth: 0,
+      drawTime: "beforeDatasetsDraw"
+    });
+  }
 
-    const anns = [];
+  // Medellinje
+  const beforeOv = ovIndex >= 0 ? dataEntries.slice(0, ovIndex) : dataEntries;
+  const beforeCorr = beforeOv.map(e => e.corrected).filter(v => v != null);
 
-    // Mens bakgrund
-    const mensIdx = dataEntries.map((e,i)=> e.mens?i:null).filter(i=>i!==null);
-    if (mensIdx.length){
-      anns.push({
-        type:"box",
-        xMin: mensIdx[0]-0.5,
-        xMax: mensIdx[mensIdx.length-1]+0.5,
-        backgroundColor:"rgba(244,182,194,0.55)",
-        borderWidth:0
-      });
-    }
+  let bandMin = null, bandMax = null;
 
-    // ÄL
-    if (ovIndex>=0){
-      anns.push({
-        type:"box",
-        xMin: ovIndex-0.5,
-        xMax: ovIndex+0.5,
-        backgroundColor:"rgba(255,244,176,0.65)",
-        borderWidth:0
-      });
-    }
+  if (beforeCorr.length) {
+    const mean = beforeCorr.reduce((a, b) => a + b, 0) / beforeCorr.length;
+    bandMin = mean - 0.01;
+    bandMax = mean + 0.01;
+  }
 
-    // Lutealfas
-    if (ovIndex>=0 && ovIndex < dataEntries.length-1){
-      anns.push({
-        type:"box",
-        xMin: ovIndex+0.5,
-        xMax: dataEntries.length-0.5,
-        backgroundColor:"rgba(224,195,252,0.6)",
-        borderWidth:0
-      });
-    }
+  const bandData = bandMax ? new Array(dataEntries.length).fill(bandMax) : [];
 
-    // Medellinje (grönt band)
-    const beforeOv = ovIndex>=0 ? dataEntries.slice(0,ovIndex) : dataEntries;
-    const beforeCorr = beforeOv.map(e=>e.corrected).filter(v=>v!=null);
-
-    let bandMin=null, bandMax=null;
-    if (beforeCorr.length){
-      const m = beforeCorr.reduce((a,b)=>a+b,0)/beforeCorr.length;
-      bandMin = m - 0.01;
-      bandMax = m + 0.01;
-    }
-
-    const bandData = bandMax
-      ? new Array(dataEntries.length).fill(bandMax)
-      : [];
-
-    chart = new Chart(el.chartCanvas, {
-      type:"line",
-      data:{
-        labels: dateLabels,
-        datasets:[
-          {
-            label:"Medelband",
-            data: bandData,
-            borderWidth:0,
-            pointRadius:0,
-            fill: bandMin!=null ? {
-              target:{value:bandMin},
-              above:"rgba(195,215,180,0.45)",
-              below:"rgba(195,215,180,0.45)"
-            } : false,
-            spanGaps:true
-          },
-          {
-            label:"Faktisk",
-            data: actual,
-            borderColor:"rgba(90,140,255,0.9)",
-            backgroundColor:"rgba(90,140,255,0.9)",
-            borderWidth:2,
-            pointRadius:3,
-            pointStyle:"circle",
-            tension:0.25,
-            spanGaps:true
-          },
-          {
-            label:"Korrigerad",
-            data: corrected,
-            borderColor:"rgba(240,100,120,0.85)",
-            backgroundColor:"rgba(240,100,120,0.85)",
-            borderDash:[4,3],
-            borderWidth:1.6,
-            pointStyle:"triangle",
-            pointRadius:3,
-            tension:0.25,
-            spanGaps:true
-          }
-        ]
-      },
-
-      options:{
-  responsive:true,
-  maintainAspectRatio:false,
-
-  layout:{ padding:{ top:45, bottom:35 } },
-
-  scales:{
-    y:{
-      suggestedMin: Math.min(...corrected.filter(v=>v!=null)) - 0.20,
-      suggestedMax: Math.max(...corrected.filter(v=>v!=null)) + 0.15,
-      ticks:{
-        callback:v => v.toFixed(2)
-      },
-      title:{ display:false },   // ← FIX: Ingen °C-titel längre
-      grid:{ color:"rgba(0,0,0,0.12)" }
-    },
-
-    xTop:{
-      type:"category",
-      position:"top",
+  chart = new Chart(el.chartCanvas, {
+    type: "line",
+    data: {
       labels: dateLabels,
-      ticks:{
-        font:{ size:13 },
-        maxRotation:0,
-        autoSkip:true
-      },
-      grid:{ display:false }
+      datasets: [
+        {
+          label: "Medelband",
+          data: bandData,
+          borderWidth: 0,
+          pointRadius: 0,
+          fill: bandMin != null ? {
+            target: { value: bandMin },
+            above: "rgba(195,215,180,0.45)",
+            below: "rgba(195,215,180,0.45)"
+          } : false,
+          spanGaps: true
+        },
+        {
+          label: "Faktisk",
+          data: actual,
+          borderColor: "rgba(90,140,255,0.9)",
+          backgroundColor: "rgba(90,140,255,0.9)",
+          borderWidth: 2,
+          pointRadius: 3,
+          pointStyle: "circle",
+          tension: 0.25,
+          spanGaps: true
+        },
+        {
+          label: "Korrigerad",
+          data: corrected,
+          borderColor: "rgba(240,100,120,0.85)",
+          backgroundColor: "rgba(240,100,120,0.85)",
+          borderDash: [4, 3],
+          borderWidth: 1.6,
+          pointRadius: 3,
+          pointStyle: "triangle",
+          tension: 0.25,
+          spanGaps: true
+        }
+      ]
     },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
 
-    x:{
-      type:"category",
-      position:"bottom",
-      labels: cdLabels,
-      ticks:{
-        font:{ size:13 },
-        padding:6
+      layout: {
+        padding: { top: 60, bottom: 35 }  // plats för månadslappar
       },
-      title:{
-        display:true,
-        text:"CD",
-        padding:{ top:8 },
-        color:"#444",
-        font:{ size:14, weight:'600' }
+
+      scales: {
+        y: {
+          ticks: {
+            stepSize: 0.05,
+            callback: v => v.toFixed(2)
+          },
+          grid: {
+            color: "rgba(0,0,0,0.12)",
+            lineWidth: 1
+          }
+        },
+
+        xTop: {
+          type: "category",
+          position: "top",
+          labels: dateLabels,
+          ticks: {
+            font: { size: 13 },
+            maxRotation: 0
+          },
+          grid: { display: false }
+        },
+
+        x: {
+          type: "category",
+          position: "bottom",
+          labels: cdLabels,
+          ticks: {
+            font: { size: 13 }
+          },
+          title: {
+            display: true,
+            text: "CD →",
+            padding: { top: -4 }   // Rätt radplacering
+          },
+          grid: { display: false }
+        }
       },
-      grid:{ display:false }
+
+      plugins: {
+        legend: { display: false },
+        annotation: { annotations: anns }
+      }
     }
-  },
-
-  plugins:{
-    legend:{ display:false },
-    annotation:{ annotations:anns }
-  }
+  });
 }
-    });
-  }
 
   /* ============================
         LH-FLÖDE (kort version)
