@@ -666,40 +666,44 @@ document.querySelectorAll(".tab").forEach(btn => {
   };
 
 // === Mintblå månadslappar ===
-// ====== Månadslappar över datum-raden ======
 const MonthLabelPlugin = {
   id: "monthLabelPlugin",
   afterDraw(chart) {
     const { ctx, chartArea, scales } = chart;
-
-    const xAxis = scales.xTop;  // Övre datumaxeln
+    const xAxis = scales.xTop;
     if (!xAxis) return;
 
     const labels = chart.data.labels;
+    if (!labels?.length) return;
+
+    const monthNames = {
+      "01": "Jan", "02": "Feb", "03": "Mar", "04": "Apr",
+      "05": "Maj", "06": "Jun", "07": "Jul", "08": "Aug",
+      "09": "Sep", "10": "Okt", "11": "Nov", "12": "Dec"
+    };
+
     let prevMonth = null;
 
     labels.forEach((label, i) => {
       const [day, month] = label.split("-");
       if (!month) return;
-
       if (month !== prevMonth) {
         prevMonth = month;
 
         const x = xAxis.getPixelForValue(i);
-        const y = chartArea.top - 48;   // <-- Viktigt! Flytta upp lapparna
+        const y = chartArea.top - 36;
 
-        const text = month;
-        ctx.font = "12px Helvetica";
-        const w = ctx.measureText(text).width + 14;
+        const text = monthNames[month] || month;
+        ctx.font = "13px Helvetica";
+        const w = ctx.measureText(text).width + 18;
 
-        const h = 18;
-        const r = 5;
+        const h = 20;
+        const r = 6;
 
-        ctx.fillStyle = "rgba(168,216,255,0.55)";
+        ctx.fillStyle = "rgba(168,216,255,0.40)";
         ctx.strokeStyle = "rgba(120,150,180,0.35)";
         ctx.lineWidth = 1;
 
-        // Rundad ruta
         ctx.beginPath();
         ctx.moveTo(x - w/2 + r, y);
         ctx.lineTo(x + w/2 - r, y);
@@ -713,7 +717,6 @@ const MonthLabelPlugin = {
         ctx.fill();
         ctx.stroke();
 
-        // Text
         ctx.fillStyle = "#2b4a65";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
@@ -853,43 +856,56 @@ function renderChart() {
       },
 
       scales: {
-        y: {
-          ticks: {
-            stepSize: 0.05,
-            callback: v => v.toFixed(2)
-          },
-          grid: {
-            color: "rgba(0,0,0,0.12)",
-            lineWidth: 1
-          }
-        },
+y: {
+  min: Math.min(...corrected.filter(v=>v!=null)) - 0.2,
+  max: Math.max(...corrected.filter(v=>v!=null)) + 0.15,
+  ticks: {
+    stepSize: 0.05,
+    callback: v => v.toFixed(2)
+  },
+  grid: {
+    color: "rgba(0,0,0,0.12)",
+    lineWidth: 1
+  },
+  title: {
+    display: true,
+    text: "°C"
+  }
+},
 
-        xTop: {
+         xTop: {
           type: "category",
           position: "top",
           labels: dateLabels,
           ticks: {
-            font: { size: 13 },
-            maxRotation: 0
+            autoSkip: false,
+            maxRotation: 0,
+            callback: (value, i) => {
+              const [day, month] = dateLabels[i].split("-");
+              return day; // visar endast dag (dd)
+            },
+            font: { size: 13 }
           },
           grid: { display: false }
         },
 
-        x: {
+         x: {
           type: "category",
           position: "bottom",
           labels: cdLabels,
           ticks: {
-            font: { size: 13 }
-          },
-          title: {
-            display: true,
-            text: "CD →",
-            padding: { top: -4 }   // Rätt radplacering
+            autoSkip: false,
+            maxRotation: 0,
+            font: { size: 13 },
+            callback: (value, index) => {
+      // SÄTT "CD →" framför första siffran endast
+              return index === 0 
+                ? `CD →  ${cdLabels[index]}` 
+                : cdLabels[index];
+            }
           },
           grid: { display: false }
-        }
-      },
+        },
 
       plugins: {
         legend: { display: false },
