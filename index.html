@@ -648,62 +648,7 @@ document.querySelectorAll(".tab").forEach(btn => {
     el.symLHneg.checked = e.lhNeg;
   };
 
-  /* ============================
-        GRAF – NYTT SYSTEM
-  ============================ */
-  const MonthLabelPlugin = {
-    id: "monthLabelPlugin",
-    afterDraw(chart, args, opts) {
-      const {ctx, chartArea, scales} = chart;
-      const xAxis = scales.xTop;
-
-      const labels = chart.data.labels;
-      if (!labels?.length) return;
-
-      let previousMonth = null;
-
-      labels.forEach((l, i) => {
-        const [day, month] = l.split("-");
-        if (!day || !month) return;
-
-        if (month !== previousMonth) {
-          previousMonth = month;
-
-          const x = xAxis.getPixelForValue(i);
-          const y = chartArea.top - 26;
-
-          ctx.font = "13px Helvetica";
-          const text = month;
-          const w = ctx.measureText(text).width + 16;
-
-          ctx.fillStyle = "rgba(168,216,255,0.35)";
-          ctx.strokeStyle = "rgba(70,100,130,0.25)";
-          ctx.lineWidth = 1.2;
-
-          const h = 20;
-          const r = 6;
-
-          ctx.beginPath();
-          ctx.moveTo(x - w/2 + r, y);
-          ctx.lineTo(x + w/2 - r, y);
-          ctx.quadraticCurveTo(x + w/2, y, x + w/2, y + r);
-          ctx.lineTo(x + w/2, y + h - r);
-          ctx.quadraticCurveTo(x + w/2, y + h, x + w/2 - r, y + h);
-          ctx.lineTo(x - w/2 + r, y + h);
-          ctx.quadraticCurveTo(x - w/2, y + h, x - w/2, y + h - r);
-          ctx.lineTo(x - w/2, y + r);
-          ctx.quadraticCurveTo(x - w/2, y, x - w/2 + r, y);
-          ctx.fill();
-          ctx.stroke();
-
-          ctx.fillStyle = "#2b4a65";
-          ctx.textAlign = "center";
-          ctx.textBaseline = "middle";
-          ctx.fillText(text, x, y + h/2);
-        }
-      });
-    }
-  };
+// === Mintblå månadslappar ===
 const MonthLabelPlugin = {
   id: "monthLabelPlugin",
   afterDraw(chart) {
@@ -756,6 +701,9 @@ const MonthLabelPlugin = {
     });
   }
 };
+
+Chart.register(MonthLabelPlugin);
+
   Chart.register(MonthLabelPlugin);
 
   function renderChart() {
