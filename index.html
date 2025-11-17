@@ -480,7 +480,26 @@ td button {
 ============================ -->
 <script>
 document.addEventListener("DOMContentLoaded", () => {
+/* ============================
+      TABS (flikväxling)
+============================ */
+document.querySelectorAll(".tab").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const id = btn.dataset.tab;
 
+    // inaktivera alla flikar
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+    document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+
+    // aktivera vald flik
+    btn.classList.add("active");
+    document.getElementById(id).classList.add("active");
+
+    // ladda graf eller LH-lista vid behov
+    if (id === "graf") renderChart();
+    if (id === "lh") renderLHList();
+  });
+});
   /* ============================
         ELEMENT-REFERENSER (el)
      (superviktigt – detta saknades)
