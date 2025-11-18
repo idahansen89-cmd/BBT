@@ -1064,17 +1064,20 @@ const MonthLabelPlugin = {
               }
             },
 
-           xTop:{
-    type:"category",
-    position:"top",
+xTop: {
+    type: "category",
+    position: "top",
     labels: dateLabels,
-    ticks:{
-        font:{ size:13 },
-        maxRotation:0,
-        autoSkip:false,   // visa ALLA datum
-        padding:6         // lite luft
+    ticks: {
+        font: { size: 13 },
+        maxRotation: 0,
+        minRotation: 0,
+        autoSkip: false,   // visa alla
+        padding: 10,       // MER luft
+        align: "center",
     },
-    grid:{ display:false }
+    offset: true,          // Viktigt: gör plats mellan punkter
+    grid: { display: false }
 },
 
             x: {
