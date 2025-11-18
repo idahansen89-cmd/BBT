@@ -782,87 +782,74 @@ document.addEventListener("DOMContentLoaded", () => {
         GRAF – DATUM + CD
   ============================ */
 
-  // Plugin: mintblå månadsetiketter ovanför datumraden
+ // Plugin: blå månads-etiketter ("Okt", "Nov" ...) ovanför datumraden
 const MonthLabelPlugin = {
   id: "monthLabelPlugin",
-  // rita efter att axlar & data är klara
-  afterDatasetsDraw(chart) {
-    const { ctx, scales } = chart;
+  afterDraw(chart, args, opts) {
+    const { ctx, chartArea, scales } = chart;
     const xAxis = scales.xTop;
     if (!xAxis) return;
 
-    // svenska månadsnamn (3 bokstäver)
-    const monthNames = [
-      "jan", "feb", "mar", "apr", "maj", "jun",
-      "jul", "aug", "sep", "okt", "nov", "dec"
-    ];
+    const labels = chart.data.labels;
+    const months = opts?.months || [];   // vi skickar in denna från renderChart
+    if (!labels || !labels.length) return;
 
-    // vi utgår från etiketterna på xTop-axeln (t.ex. "27-10", "01-11")
-    const labels = xAxis.getLabels
-      ? xAxis.getLabels()
-      : chart.data.labels;
+    const monthNames = [
+      "Jan","Feb","Mar","Apr","Maj","Jun",
+      "Jul","Aug","Sep","Okt","Nov","Dec"
+    ];
 
     let prevMonth = null;
 
-    ctx.save();
+    labels.forEach((_, i) => {
+      const mNum = months[i];
+      if (!mNum) return;
 
-    labels.forEach((label, i) => {
-      const parts = String(label).split("-");
-      const monthNum = parts[1];      // "10", "11" osv
-      if (!monthNum) return;
+      // hoppa om samma månad som förra etiketten
+      if (mNum === prevMonth) return;
+      prevMonth = mNum;
 
-      // bara första etiketten för varje månad
-      if (monthNum === prevMonth) return;
-      prevMonth = monthNum;
+      const monthIndex = parseInt(mNum, 10) - 1;
+      const text = monthNames[monthIndex] || mNum;
 
-      const monthIndex = Number(monthNum) - 1;
-      const rawName = monthNames[monthIndex];
-      if (!rawName) return;
-
-      const text = rawName.charAt(0).toUpperCase() + rawName.slice(1); // Okt, Nov …
-
-      // position: ovanför datumraden
       const x = xAxis.getPixelForValue(i);
-      const yAxisTop = xAxis.top;       // själva datumaxelns överkant
-      const y = yAxisTop - 12;          // 24px ovanför datumtexten
+      const y = chartArea.top - 20;  // höjd ovanför datumraden
 
-      ctx.font = "12px Helvetica";
-      const paddingX = 8;
-      const w = ctx.measureText(text).width + paddingX * 2;
-      const h = 18;
-      const r = 6;
+      ctx.save();
+      ctx.font = "13px Helvetica";
+      const w = ctx.measureText(text).width + 18;
+      const h = 22;
+      const r = 7;
 
-      const left = x - w / 2;
-      const top = y - h / 2;
-
-      // bakgrunds-badge (pastellblå)
-      ctx.fillStyle = "rgba(168,216,255,0.75)";
-      ctx.strokeStyle = "rgba(120,150,180,0.45)";
-      ctx.lineWidth = 1;
+      // Ljusblå rundad ruta
+      ctx.fillStyle = "rgba(168,216,255,0.9)";
+      ctx.strokeStyle = "rgba(120,150,180,0.5)";
+      ctx.lineWidth = 1.2;
 
       ctx.beginPath();
-      ctx.moveTo(left + r, top);
-      ctx.lineTo(left + w - r, top);
-      ctx.quadraticCurveTo(left + w, top, left + w, top + r);
-      ctx.lineTo(left + w, top + h - r);
-      ctx.quadraticCurveTo(left + w, top + h, left + w - r, top + h);
-      ctx.lineTo(left + r, top + h);
-      ctx.quadraticCurveTo(left, top + h, left, top + h - r);
-      ctx.lineTo(left, top + r);
-      ctx.quadraticCurveTo(left, top, left + r, top);
+      ctx.moveTo(x - w/2 + r, y);
+      ctx.lineTo(x + w/2 - r, y);
+      ctx.quadraticCurveTo(x + w/2, y, x + w/2, y + r);
+      ctx.lineTo(x + w/2, y + h - r);
+      ctx.quadraticCurveTo(x + w/2, y + h, x + w/2 - r, y + h);
+      ctx.lineTo(x - w/2 + r, y + h);
+      ctx.quadraticCurveTo(x - w/2, y + h, x - w/2, y + h - r);
+      ctx.lineTo(x - w/2, y + r);
+      ctx.quadraticCurveTo(x - w/2, y, x - w/2 + r, y);
       ctx.fill();
       ctx.stroke();
 
-      // texten "Okt", "Nov" …
+      // Texten "Okt", "Nov", ...
       ctx.fillStyle = "#2b4a65";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillText(text, x, top + h / 2);
+      ctx.fillText(text, x, y + h / 2);
+      ctx.restore();
     });
-
-    ctx.restore();
   }
 };
+
+Chart.register(MonthLabelPlugin);
 
   // Plugin: CD-etikett i blå ruta före siffrorna längst ned
   const CdLabelPlugin = {
@@ -917,11 +904,24 @@ const MonthLabelPlugin = {
 
       dataEntries.sort((a, b) => a.date.localeCompare(b.date));
 
-      // Datumlabels: "dd-mm" (för månadsetiketter + datumrad)
-    const dateLabels = dataEntries.map(e => {
+// Datumlabels: två rader med bara "dd" (varannan rad)
+const dateLabels = dataEntries.map((e, i) => {
   if (!e.date) return "";
   const [y, m, d] = e.date.split("-");
-  return `${d.padStart(2,"0")}\n${m}`;
+  const day = d.padStart(2, "0");
+
+  // Jämna index: dd på översta raden
+  // Udda index:  dd på nedersta raden
+  return (i % 2 === 0)
+    ? `${day}\n`   // rad 1: dd, rad 2: tom
+    : `\n${day}`;  // rad 1: tom, rad 2: dd
+});
+
+// Månadslista (mm) till månads-pluginen
+const monthNumbers = dataEntries.map(e => {
+  if (!e.date) return null;
+  const [y, m] = e.date.split("-");
+  return m;  // "10", "11", osv
 });
 
       // CD-labels: "01", "02", ...
@@ -1104,8 +1104,12 @@ xTop: {
             annotation: {
               drawTime: "beforeDatasetsDraw",
               annotations: anns
-            }
-          },
+              monthLabelPlugin: {
+              months: monthNumbers   // 👈 viktigt
+      }
+    }
+  }
+});
 
           animation: false
         }
