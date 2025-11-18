@@ -824,7 +824,7 @@ const MonthLabelPlugin = {
       // position: ovanför datumraden
       const x = xAxis.getPixelForValue(i);
       const yAxisTop = xAxis.top;       // själva datumaxelns överkant
-      const y = yAxisTop - 10;          // 24px ovanför datumtexten
+      const y = yAxisTop - 12;          // 24px ovanför datumtexten
 
       ctx.font = "12px Helvetica";
       const paddingX = 8;
@@ -918,10 +918,13 @@ const MonthLabelPlugin = {
       dataEntries.sort((a, b) => a.date.localeCompare(b.date));
 
       // Datumlabels: "dd-mm" (för månadsetiketter + datumrad)
-      const dateLabels = dataEntries.map(e => {
-        if (!e.date) return "";
-        const [y, m, d] = e.date.split("-");
-        return `${d.padStart(2,"0")}-${m}`;
+     const dateLabels = dataEntries.map((e, i) => {
+      if (!e.date) return "";
+      const [y, m, d] = e.date.split("-");
+      const day = d.padStart(2, "0");
+
+        // Varannan etikett flyttas ner till rad 2 för att undvika klumpning
+        return (i % 2 === 0) ? day : "\n" + day;
       });
 
       // CD-labels: "01", "02", ...
@@ -1069,14 +1072,16 @@ xTop: {
     position: "top",
     labels: dateLabels,
     ticks: {
-        font: { size: 13 },
-        maxRotation: 0,
-        minRotation: 0,
-        autoSkip: false,   // visa alla
-        padding: 10,       // MER luft
-        align: "center",
-    },
-    offset: true,          // Viktigt: gör plats mellan punkter
+      font: { size: 13 },
+      maxRotation: 0,
+      autoSkip: false,
+      padding: 6,          // 👈 NYTT! Luft mellan rader och element
+      callback: function(value, index) {
+        const label = this.getLabelForValue(value);
+        return label.split("\n");
+    }
+},
+    offset: true,
     grid: { display: false }
 },
 
