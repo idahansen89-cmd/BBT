@@ -1064,23 +1064,18 @@ const MonthLabelPlugin = {
               }
             },
 
-            xTop: {
-              type: "category",
-              position: "top",
-              labels: dateLabels,
-              ticks: {
-                autoSkip: false,
-                maxRotation: 0,
-                minRotation: 0,
-                font: { size: 12 },
-                callback(value) {
-                  const label = this.getLabelForValue(value) || "";
-                  const parts = label.split("-");
-                  return parts[0] || "";
-                }
-              },
-              grid: { display: false }
-            },
+           xTop:{
+    type:"category",
+    position:"top",
+    labels: dateLabels,
+    ticks:{
+        font:{ size:13 },
+        maxRotation:0,
+        autoSkip:false,   // visa ALLA datum
+        padding:6         // lite luft
+    },
+    grid:{ display:false }
+},
 
             x: {
               type: "category",
