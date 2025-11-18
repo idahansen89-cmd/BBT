@@ -1061,14 +1061,25 @@ xTop: {
   type: "category",
   position: "top",
   labels: dateLabels,
-  ticks: {
-    font: { size: 13 },
-    maxRotation: 0,
-    minRotation: 0,
-    autoSkip: false,
-    padding: 6,
-    align: "center"
-  },
+ticks: {
+  font: { size: 13 },
+  maxRotation: 0,
+  minRotation: 0,
+  autoSkip: false,
+  padding: 6,
+  callback: function (value, index) {
+    const label = this.getLabelForValue(value);
+
+    // jämna index → dd på rad 1
+    if (index % 2 === 0) {
+      return [label, ""];
+    }
+    // udda index → dd på rad 2
+    else {
+      return ["", label];
+    }
+  }
+},
   offset: true,
   grid: { display: false }
 },
