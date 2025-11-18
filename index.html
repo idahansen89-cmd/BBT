@@ -783,68 +783,86 @@ document.addEventListener("DOMContentLoaded", () => {
   ============================ */
 
   // Plugin: mintblå månadsetiketter ovanför datumraden
-  const MonthLabelPlugin = {
-    id: "monthLabelPlugin",
-    afterDraw(chart) {
-      const {ctx, chartArea, scales} = chart;
-      const xAxis = scales.xTop;
-      if (!xAxis) return;
+const MonthLabelPlugin = {
+  id: "monthLabelPlugin",
+  // rita efter att axlar & data är klara
+  afterDatasetsDraw(chart) {
+    const { ctx, scales } = chart;
+    const xAxis = scales.xTop;
+    if (!xAxis) return;
 
-      const labels = chart.data.labels || [];
-      if (!labels.length) return;
+    // svenska månadsnamn (3 bokstäver)
+    const monthNames = [
+      "jan", "feb", "mar", "apr", "maj", "jun",
+      "jul", "aug", "sep", "okt", "nov", "dec"
+    ];
 
-      const monthNames = {
-        "01":"Jan","02":"Feb","03":"Mar","04":"Apr",
-        "05":"Maj","06":"Jun","07":"Jul","08":"Aug",
-        "09":"Sep","10":"Okt","11":"Nov","12":"Dec"
-      };
+    // vi utgår från etiketterna på xTop-axeln (t.ex. "27-10", "01-11")
+    const labels = xAxis.getLabels
+      ? xAxis.getLabels()
+      : chart.data.labels;
 
-      let prevMonth = null;
+    let prevMonth = null;
 
-      labels.forEach((fullLabel, i) => {
-        if (!fullLabel) return;
-        const parts = fullLabel.split("-");
-        if (parts.length < 2) return;
-        const monthNum = parts[1];
+    ctx.save();
 
-        if (monthNum === prevMonth) return;
-        prevMonth = monthNum;
+    labels.forEach((label, i) => {
+      const parts = String(label).split("-");
+      const monthNum = parts[1];      // "10", "11" osv
+      if (!monthNum) return;
 
-        const text = monthNames[monthNum] || monthNum;
-        const x = xAxis.getPixelForValue(i);
-        const y = chartArea.top - 26;
+      // bara första etiketten för varje månad
+      if (monthNum === prevMonth) return;
+      prevMonth = monthNum;
 
-        ctx.save();
-        ctx.font = "13px Helvetica";
-        const w = ctx.measureText(text).width + 18;
-        const h = 20;
-        const r = 6;
+      const monthIndex = Number(monthNum) - 1;
+      const rawName = monthNames[monthIndex];
+      if (!rawName) return;
 
-        ctx.fillStyle = "rgba(168,216,255,0.55)";
-        ctx.strokeStyle = "rgba(120,150,180,0.35)";
-        ctx.lineWidth = 1.2;
+      const text = rawName.charAt(0).toUpperCase() + rawName.slice(1); // Okt, Nov …
 
-        ctx.beginPath();
-        ctx.moveTo(x - w/2 + r, y);
-        ctx.lineTo(x + w/2 - r, y);
-        ctx.quadraticCurveTo(x + w/2, y, x + w/2, y + r);
-        ctx.lineTo(x + w/2, y + h - r);
-        ctx.quadraticCurveTo(x + w/2, y + h, x + w/2 - r, y + h);
-        ctx.lineTo(x - w/2 + r, y + h);
-        ctx.quadraticCurveTo(x - w/2, y + h, x - w/2, y + h - r);
-        ctx.lineTo(x - w/2, y + r);
-        ctx.quadraticCurveTo(x - w/2, y, x - w/2 + r, y);
-        ctx.fill();
-        ctx.stroke();
+      // position: ovanför datumraden
+      const x = xAxis.getPixelForValue(i);
+      const yAxisTop = xAxis.top;       // själva datumaxelns överkant
+      const y = yAxisTop - 24;          // 24px ovanför datumtexten
 
-        ctx.fillStyle = "#2b4a65";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText(text, x, y + h/2);
-        ctx.restore();
-      });
-    }
-  };
+      ctx.font = "12px Helvetica";
+      const paddingX = 8;
+      const w = ctx.measureText(text).width + paddingX * 2;
+      const h = 18;
+      const r = 6;
+
+      const left = x - w / 2;
+      const top = y - h / 2;
+
+      // bakgrunds-badge (pastellblå)
+      ctx.fillStyle = "rgba(168,216,255,0.75)";
+      ctx.strokeStyle = "rgba(120,150,180,0.45)";
+      ctx.lineWidth = 1;
+
+      ctx.beginPath();
+      ctx.moveTo(left + r, top);
+      ctx.lineTo(left + w - r, top);
+      ctx.quadraticCurveTo(left + w, top, left + w, top + r);
+      ctx.lineTo(left + w, top + h - r);
+      ctx.quadraticCurveTo(left + w, top + h, left + w - r, top + h);
+      ctx.lineTo(left + r, top + h);
+      ctx.quadraticCurveTo(left, top + h, left, top + h - r);
+      ctx.lineTo(left, top + r);
+      ctx.quadraticCurveTo(left, top, left + r, top);
+      ctx.fill();
+      ctx.stroke();
+
+      // texten "Okt", "Nov" …
+      ctx.fillStyle = "#2b4a65";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(text, x, top + h / 2);
+    });
+
+    ctx.restore();
+  }
+};
 
   // Plugin: CD-etikett i blå ruta före siffrorna längst ned
   const CdLabelPlugin = {
