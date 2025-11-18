@@ -128,7 +128,7 @@ textarea { resize: vertical; min-height: 56px; }
 ============================ */
 .button {
   background: var(--pink);
-  color: #222;
+  color: #1f3b5b;          /* sammansatt med i-knappen */
   border: none;
   border-radius: 8px;
   padding: 0.55rem 1.1rem;
@@ -225,6 +225,7 @@ td button {
   border: none;
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+  color: #1f3b5b;          /* blå text */
 }
 .info-btn:hover {
   background: var(--pink-hover);
@@ -276,10 +277,11 @@ td button {
   border-radius: 8px;
   font-weight: 700;
   cursor: pointer;
+  color: #1f3b5b;
 }
 
 /* ============================
-        LH-FLIK (som tidigare)
+          LH-FLIK
 ============================ */
 .lh-toolbar {
   display: flex;
@@ -329,7 +331,7 @@ td button {
 }
 
 /* ============================
-        MOBIL
+          MOBIL
 ============================ */
 @media (max-width: 600px) {
   th, td {
@@ -447,9 +449,11 @@ td button {
 ============================ -->
 <div id="graf" class="tab-content">
   <div id="chartContainer">
+    <!-- Info-knapp -->
     <button id="infoBtn" class="info-btn">i</button>
     <canvas id="bbtChart"></canvas>
   </div>
+
   <div class="chart-toolbar">
     <button class="button" id="exportChartBtn">Exportera graf</button>
   </div>
@@ -470,27 +474,22 @@ td button {
 
     <div class="legend-entry">
       <div class="legend-color" style="background:rgba(240,100,120,0.85);"></div>
-      <span>Röd prickad linje – Korrigerad temp</span>
+      <span>Röd prickad linje – Korrigerad temperatur</span>
     </div>
 
     <div class="legend-entry">
       <div class="legend-color" style="background:rgba(195,215,180,0.45); height:10px;"></div>
-      <span>Grönt band – Medellinje före ÄL</span>
-    </div>
-
-    <div class="legend-entry">
-      <div class="legend-color" style="background:rgba(244,182,194,0.55); height:10px;"></div>
-      <span>Rosa ton – Mens</span>
+      <span>Grönt band – Medellinje före ägglossning</span>
     </div>
 
     <div class="legend-entry">
       <div class="legend-color" style="background:rgba(255,244,176,0.65); height:10px;"></div>
-      <span>Gul ton – Ägglossningsdag</span>
+      <span>Gult fält – Ägglossningsdag</span>
     </div>
 
     <div class="legend-entry">
       <div class="legend-color" style="background:rgba(224,195,252,0.6); height:10px;"></div>
-      <span>Lila ton – Lutealfas</span>
+      <span>Lila fält – Lutealfas</span>
     </div>
 
     <hr style="margin:1rem 0;">
@@ -506,7 +505,6 @@ td button {
 
   </div>
 </div>
-
 <!-- ============================
               LH-FLIK
 ============================ -->
@@ -517,20 +515,21 @@ td button {
       <button class="button" id="lhPickBtn">Välj bild</button>
       <input type="file" id="lhFile" accept="image/*" style="display:none">
     </div>
+
     <input type="date" id="lhDate">
   </div>
 
   <div class="lh-symbols-row" style="margin:.4rem 0 .3rem">
-    <label class="lh-symbol-checkbox">🩷<small>N</small><br><input type="checkbox" class="lhSym" value="🩷"></label>
-    <label class="lh-symbol-checkbox">❤️<small>T</small><br><input type="checkbox" class="lhSym" value="❤️"></label>
-    <label class="lh-symbol-checkbox">💜<small>H</small><br><input type="checkbox" class="lhSym" value="💜"></label>
-    <label class="lh-symbol-checkbox">💙<small>L</small><br><input type="checkbox" class="lhSym" value="💙"></label>
-    <label class="lh-symbol-checkbox">💚<small>–</small><br><input type="checkbox" class="lhSym" value="💚"></label>
-    <label class="lh-symbol-checkbox">💛<small>?</small><br><input type="checkbox" class="lhSym" value="💛"></label>
+    <label class="lh-symbol-checkbox" title="Nästan positiv">🩷<small>N</small><br><input type="checkbox" class="lhSym" value="🩷"></label>
+    <label class="lh-symbol-checkbox" title="LH-topp">❤️<small>T</small><br><input type="checkbox" class="lhSym" value="❤️"></label>
+    <label class="lh-symbol-checkbox" title="Hög">💜<small>H</small><br><input type="checkbox" class="lhSym" value="💜"></label>
+    <label class="lh-symbol-checkbox" title="Låg">💙<small>L</small><br><input type="checkbox" class="lhSym" value="💙"></label>
+    <label class="lh-symbol-checkbox" title="Negativ">💚<small>–</small><br><input type="checkbox" class="lhSym" value="💚"></label>
+    <label class="lh-symbol-checkbox" title="Oklart">💛<small>?</small><br><input type="checkbox" class="lhSym" value="💛"></label>
 
     <span class="lh-fm-em">
-      <label class="lh-symbol-checkbox">☀️<small>FM</small><br><input type="checkbox" id="lhFm"></label>
-      <label class="lh-symbol-checkbox">🌙<small>EM</small><br><input type="checkbox" id="lhEm"></label>
+      <label class="lh-symbol-checkbox" title="FM (förmiddag)">☀️<small>FM</small><br><input type="checkbox" id="lhFm"></label>
+      <label class="lh-symbol-checkbox" title="EM (eftermiddag/kväll)">🌙<small>EM</small><br><input type="checkbox" id="lhEm"></label>
     </span>
   </div>
 
@@ -545,27 +544,19 @@ td button {
   </div>
 
   <div id="lhList"></div>
+
 </div>
 
+
 <!-- ============================
-       SCRIPT
+       SCRIPT STARTAR HÄR
 ============================ -->
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-  /* ===== Tabs ===== */
-  document.querySelectorAll(".tab").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const id = btn.dataset.tab;
-      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-      document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
-      btn.classList.add("active");
-      document.getElementById(id).classList.add("active");
-      if (id === "graf") renderChart();
-      if (id === "lh") renderLHList();
-    });
-  });
 
-  /* ===== Elementreferenser ===== */
+  /* ============================
+        ELEMENTREFERENSER
+  ============================ */
   const el = {
     date: document.getElementById("date"),
     time: document.getElementById("time"),
@@ -604,13 +595,39 @@ document.addEventListener("DOMContentLoaded", () => {
     lhSymChecks: () => Array.from(document.querySelectorAll(".lhSym:checked"))
   };
 
-  /* ===== State ===== */
+  /* ============================
+        STATE & LOCALSTORAGE
+  ============================ */
   let dataEntries = JSON.parse(localStorage.getItem("bbtData") || "[]");
+
+  // LH-migrering till objekt per datum
+  (function migrateLH(){
+    const newKey = "lhDataByDate";
+    const oldArr = JSON.parse(localStorage.getItem("lhData") || "null");
+    let obj = JSON.parse(localStorage.getItem(newKey) || "null") || {};
+
+    if (Array.isArray(oldArr)) {
+      oldArr.forEach(e => {
+        const d = e.date || "okänt-datum";
+        if (!obj[d]) obj[d] = [];
+        obj[d].push({
+          dataUrl: e.dataUrl,
+          symbols: e.symbols || [],
+          note: e.note || "",
+          tod: null,
+          ts: Date.now()
+        });
+      });
+      localStorage.removeItem("lhData");
+    }
+    localStorage.setItem(newKey, JSON.stringify(obj));
+  })();
+
   let lhByDate = JSON.parse(localStorage.getItem("lhDataByDate") || "{}");
-  let chart = null;
+  let chart;
 
   /* ============================
-        TEMPKORRIGERING
+      TEMPKORRIGERING
   ============================ */
   const minutesFrom0400 = (t) => {
     if (!t) return 0;
@@ -628,12 +645,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const a = parseFloat(el.actual.value);
     if (!isNaN(a)) {
       const c = computeCorrectedFrom(a, el.time.value);
-      el.corrected.value = c != null ? c.toFixed(2) : "";
+      el.corrected.value = (c !== null && c !== undefined) ? c.toFixed(2) : "";
     }
   }
 
   /* ============================
-        SPARA & TABELL
+        SPARA ENTRY + TABELL
   ============================ */
   function saveEntry() {
     const e = {
@@ -641,12 +658,12 @@ document.addEventListener("DOMContentLoaded", () => {
       time: el.time.value,
       actual: el.actual.value ? Number(el.actual.value) : null,
       corrected: el.corrected.value ? Number(el.corrected.value) : null,
-      mens: el.symMens.checked,
-      sex: el.symSex.checked,
-      ovulation: el.symOv.checked,
-      mucus: el.symMucus.checked,
-      lhPos: el.symLHpos.checked,
-      lhNeg: el.symLHneg.checked,
+      mens: el.symMens.checked || false,
+      sex: el.symSex.checked || false,
+      ovulation: el.symOv.checked || false,
+      mucus: el.symMucus.checked || false,
+      lhPos: el.symLHpos.checked || false,
+      lhNeg: el.symLHneg.checked || false,
       note: el.note.value || ""
     };
 
@@ -657,19 +674,33 @@ document.addEventListener("DOMContentLoaded", () => {
     else dataEntries.push(e);
 
     localStorage.setItem("bbtData", JSON.stringify(dataEntries));
+
+    el.date.value = "";
+    el.time.value = "";
+    el.actual.value = "";
+    el.corrected.value = "";
+    el.note.value = "";
+    el.symMens.checked = false;
+    el.symSex.checked = false;
+    el.symOv.checked = false;
+    el.symMucus.checked = false;
+    el.symLHpos.checked = false;
+    el.symLHneg.checked = false;
+
     renderTable();
     alert("✅ Data sparad!");
   }
 
   function renderTable() {
     el.dataTableBody.innerHTML = "";
-    dataEntries.sort((a,b)=>a.date.localeCompare(b.date));
+    dataEntries.sort((a, b) => a.date.localeCompare(b.date));
 
     dataEntries.forEach((e, idx) => {
       const tr = document.createElement("tr");
 
-      if (e.mens) tr.classList.add("mens-row");
+      if (e.mens) tr.style.backgroundColor = "#ffe8ee";
       if (e.ovulation) tr.classList.add("ovulation-row");
+      if (e.mens && e.ovulation) tr.classList.remove("ovulation-row");
 
       let events = "";
       if (e.mens) events += "🩸 ";
@@ -680,48 +711,78 @@ document.addEventListener("DOMContentLoaded", () => {
       if (e.lhNeg) events += "➖ ";
 
       tr.innerHTML = `
-        <td>${e.date}</td>
+        <td>${e.date || ""}</td>
         <td>${e.time || ""}</td>
         <td>${e.actual ?? ""}</td>
         <td>${e.corrected ?? ""}</td>
         <td>${events.trim() || "–"}</td>
-        <td>${e.note}</td>
-        <td><button class="table-btn" data-edit="${idx}">✏️</button></td>
+        <td>${e.note || ""}</td>
+        <td>
+          <button class="table-btn small-edit" title="Redigera">✏️</button>
+          <button class="table-btn small-del" title="Radera">🗑️</button>
+        </td>
       `;
 
-      tr.querySelector("[data-edit]").addEventListener("click", () => {
+      const delBtn = tr.querySelector(".small-del");
+      if (delBtn) {
+        delBtn.addEventListener("click", (ev) => {
+          ev.stopPropagation();
+
+          let summary = "";
+          if (e.mens) summary += "🩸 ";
+          if (e.sex) summary += "💞 ";
+          if (e.ovulation) summary += "🌼 ";
+          if (e.mucus) summary += "💧 ";
+          if (e.lhPos) summary += "➕ ";
+          if (e.lhNeg) summary += "➖ ";
+          summary = summary.trim() || "–";
+
+          const confirmText = `Vill du ta bort posten den ${e.date}?\n\nHändelser: ${summary}`;
+          if (confirm(confirmText)) {
+            dataEntries.splice(idx, 1);
+            localStorage.setItem("bbtData", JSON.stringify(dataEntries));
+            renderTable();
+          }
+        });
+      }
+
+      tr.querySelector(".small-edit").addEventListener("click", () => {
         el.date.value = e.date;
-        el.time.value = e.time || "";
-        el.actual.value = e.actual ?? "";
-        el.corrected.value = e.corrected ?? "";
+        el.time.value = e.time;
+        el.actual.value = e.actual || "";
+        el.corrected.value = e.corrected || "";
         el.note.value = e.note || "";
 
-        el.symMens.checked = e.mens;
-        el.symSex.checked = e.sex;
-        el.symOv.checked = e.ovulation;
-        el.symMucus.checked = e.mucus;
-        el.symLHpos.checked = e.lhPos;
-        el.symLHneg.checked = e.lhNeg;
+        el.symMens.checked = e.mens || false;
+        el.symSex.checked = e.sex || false;
+        el.symOv.checked = e.ovulation || false;
+        el.symMucus.checked = e.mucus || false;
+        el.symLHpos.checked = e.lhPos || false;
+        el.symLHneg.checked = e.lhNeg || false;
+
+        alert("Posten laddades för redigering.");
       });
 
       el.dataTableBody.appendChild(tr);
     });
   }
 
-  function clearData() {
-    if (!confirm("Vill du verkligen rensa all data?")) return;
+  function clearData(){
+    if(!confirm("Vill du verkligen rensa all data?")) return;
     dataEntries = [];
     lhByDate = {};
     localStorage.removeItem("bbtData");
-    localStorage.removeItem("lhDataByDate");
-    if (chart) chart.destroy();
+    localStorage.removeItem("lhData");
+    localStorage.setItem("lhDataByDate", JSON.stringify(lhByDate));
+    if(chart) chart.destroy();
     renderTable();
     renderLHList();
   }
-
-  /* ============================
-      MÅNADS-PLUG-IN (JAN, FEB…)
+    /* ============================
+        GRAF – DATUM + CD
   ============================ */
+
+  // Plugin: mintblå månadsetiketter ovanför datumraden
   const MonthLabelPlugin = {
     id: "monthLabelPlugin",
     afterDraw(chart) {
@@ -729,33 +790,39 @@ document.addEventListener("DOMContentLoaded", () => {
       const xAxis = scales.xTop;
       if (!xAxis) return;
 
-      const months = chart.$months;
-      const labels = chart.data.labels;
-      if (!months || !labels || !labels.length) return;
+      const labels = chart.data.labels || [];
+      if (!labels.length) return;
 
-      const names = {
-        "01":"jan","02":"feb","03":"mar","04":"apr","05":"maj","06":"jun",
-        "07":"jul","08":"aug","09":"sep","10":"okt","11":"nov","12":"dec"
+      const monthNames = {
+        "01":"Jan","02":"Feb","03":"Mar","04":"Apr",
+        "05":"Maj","06":"Jun","07":"Jul","08":"Aug",
+        "09":"Sep","10":"Okt","11":"Nov","12":"Dec"
       };
 
-      let prev = null;
-      months.forEach((m, i) => {
-        if (!m || m === prev) return;
-        prev = m;
+      let prevMonth = null;
 
+      labels.forEach((fullLabel, i) => {
+        if (!fullLabel) return;
+        const parts = fullLabel.split("-");
+        if (parts.length < 2) return;
+        const monthNum = parts[1];
+
+        if (monthNum === prevMonth) return;
+        prevMonth = monthNum;
+
+        const text = monthNames[monthNum] || monthNum;
         const x = xAxis.getPixelForValue(i);
-        const y = chartArea.top - 24;
-        const text = names[m] || m;
+        const y = chartArea.top - 26;
 
         ctx.save();
-        ctx.font = "12px Helvetica";
-        const w = ctx.measureText(text).width + 16;
-        const h = 18;
+        ctx.font = "13px Helvetica";
+        const w = ctx.measureText(text).width + 18;
+        const h = 20;
         const r = 6;
 
-        ctx.fillStyle = "rgba(168,216,255,0.6)";
-        ctx.strokeStyle = "rgba(120,150,180,0.4)";
-        ctx.lineWidth = 1;
+        ctx.fillStyle = "rgba(168,216,255,0.55)";
+        ctx.strokeStyle = "rgba(120,150,180,0.35)";
+        ctx.lineWidth = 1.2;
 
         ctx.beginPath();
         ctx.moveTo(x - w/2 + r, y);
@@ -779,180 +846,329 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  Chart.register(MonthLabelPlugin);
+  // Plugin: CD-etikett i blå ruta före siffrorna längst ned
+  const CdLabelPlugin = {
+    id: "cdLabelPlugin",
+    afterDraw(chart) {
+      const {ctx, chartArea, scales} = chart;
+      const xScale = scales.x;
+      if (!xScale) return;
 
-  /* ============================
-        GRAF
-  ============================ */
+      const firstX = xScale.getPixelForValue(0);
+      const y = chartArea.bottom + 18;   // samma radområde som CD-siffrorna
+
+      const text = "CD";
+      ctx.save();
+      ctx.font = "13px Helvetica";
+      const w = ctx.measureText(text).width + 18;
+      const h = 20;
+      const r = 6;
+      const x = firstX - w - 6;          // precis framför första siffran
+
+      ctx.fillStyle = "rgba(168,216,255,0.55)";
+      ctx.strokeStyle = "rgba(120,150,180,0.35)";
+      ctx.lineWidth = 1.2;
+
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + w - r, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+      ctx.lineTo(x + w, y + h - r);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+      ctx.lineTo(x + r, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+      ctx.lineTo(x, y + r);
+      ctx.quadraticCurveTo(x, y, x + r, y);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = "#2b4a65";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(text, x + w/2, y + h/2);
+      ctx.restore();
+    }
+  };
+
+  Chart.register(MonthLabelPlugin, CdLabelPlugin);
+
   function renderChart() {
-    if (chart) chart.destroy();
-    if (!dataEntries.length) return;
+    try {
+      if (chart) chart.destroy();
+      if (!dataEntries.length) return;
 
-    dataEntries.sort((a,b)=>a.date.localeCompare(b.date));
+      dataEntries.sort((a, b) => a.date.localeCompare(b.date));
 
-    // Dagar (DD) + månader separat
-    const dayLabels = dataEntries.map(e => {
-      const [y,m,d] = e.date.split("-");
-      return d.padStart(2,"0");
-    });
-    const monthArray = dataEntries.map(e => e.date.split("-")[1]);
-
-    const actual = dataEntries.map(e => e.actual);
-    const corrected = dataEntries.map(e => e.corrected);
-
-    const ovIndex = dataEntries.findIndex(e => e.ovulation);
-
-    const anns = [];
-
-    // Mensbakgrund
-    const mensIdx = dataEntries.map((e,i)=>e.mens ? i : null).filter(i=>i!==null);
-    if (mensIdx.length) {
-      anns.push({
-        type:"box",
-        xMin: mensIdx[0]-0.5,
-        xMax: mensIdx[mensIdx.length-1]+0.5,
-        backgroundColor:"rgba(244,182,194,0.55)",
-        borderWidth:0
+      // Datumlabels: "dd-mm" (för månadsetiketter + datumrad)
+      const dateLabels = dataEntries.map(e => {
+        if (!e.date) return "";
+        const [y, m, d] = e.date.split("-");
+        return `${d.padStart(2,"0")}-${m}`;
       });
-    }
 
-    // Ägglossning
-    if (ovIndex >= 0) {
-      anns.push({
-        type:"box",
-        xMin: ovIndex-0.5,
-        xMax: ovIndex+0.5,
-        backgroundColor:"rgba(255,244,176,0.65)",
-        borderWidth:0
-      });
-    }
+      // CD-labels: "01", "02", ...
+      const cdLabels = dataEntries.map((_, i) =>
+        String(i + 1).padStart(2, "0")
+      );
 
-    // Lutealfas
-    if (ovIndex >= 0 && ovIndex < dataEntries.length-1) {
-      anns.push({
-        type:"box",
-        xMin: ovIndex+0.5,
-        xMax: dataEntries.length-0.5,
-        backgroundColor:"rgba(224,195,252,0.6)",
-        borderWidth:0
-      });
-    }
+      const actual = dataEntries.map(e => e.actual);
+      const corrected = dataEntries.map(e => e.corrected);
 
-    // Medellinje (grönt band)
-    const beforeOv = ovIndex>=0 ? dataEntries.slice(0,ovIndex) : dataEntries;
-    const beforeCorr = beforeOv.map(e=>e.corrected).filter(v=>v!=null);
+      const ovIndex = dataEntries.findIndex(e => e.ovulation);
+      const anns = [];
 
-    let bandMin=null, bandMax=null;
-    if (beforeCorr.length) {
-      const mean = beforeCorr.reduce((a,b)=>a+b,0)/beforeCorr.length;
-      bandMin = mean - 0.01;
-      bandMax = mean + 0.01;
-    }
-    const bandData = bandMax != null ? new Array(dataEntries.length).fill(bandMax) : [];
+      // Mensbakgrund
+      const mensIndices = dataEntries
+        .map((e, i) => (e.mens ? i : null))
+        .filter(i => i !== null);
 
-    chart = new Chart(el.chartCanvas, {
-      type:"line",
-      data:{
-        labels: dayLabels,
-        datasets:[
-          {
-            label:"Medelband",
-            data: bandData,
-            borderWidth:0,
-            pointRadius:0,
-            fill: bandMin!=null ? {
-              target:{value:bandMin},
-              above:"rgba(195,215,180,0.45)",
-              below:"rgba(195,215,180,0.45)"
-            } : false,
-            spanGaps:true
-          },
-          {
-            label:"Faktisk",
-            data: actual,
-            borderColor:"rgba(90,140,255,0.9)",
-            backgroundColor:"rgba(90,140,255,0.9)",
-            borderWidth:2,
-            pointStyle:"circle",
-            pointRadius:3,
-            tension:0.25,
-            spanGaps:true
-          },
-          {
-            label:"Korrigerad",
-            data: corrected,
-            borderColor:"rgba(240,100,120,0.85)",
-            backgroundColor:"rgba(240,100,120,0.85)",
-            borderDash:[4,3],
-            borderWidth:1.6,
-            pointStyle:"triangle",
-            pointRadius:3,
-            tension:0.25,
-            spanGaps:true
-          }
-        ]
-      },
-      options:{
-        responsive:true,
-        maintainAspectRatio:false,
-        layout:{ padding:{top:35, bottom:25} },
-        scales:{
-          y:{
-            suggestedMin: Math.min(...corrected.filter(v=>v!=null)) - 0.2,
-            suggestedMax: Math.max(...corrected.filter(v=>v!=null)) + 0.15,
-            ticks:{
-              stepSize:0.05,
-              callback:v => v.toFixed(2)
+      if (mensIndices.length > 0) {
+        anns.push({
+          type: "box",
+          xMin: mensIndices[0] - 0.5,
+          xMax: mensIndices[mensIndices.length - 1] + 0.5,
+          backgroundColor: "rgba(244,182,194,0.55)",
+          borderWidth: 0,
+          drawTime: "beforeDatasetsDraw"
+        });
+      }
+
+      // Ägglossningsdag (gult)
+      if (ovIndex >= 0) {
+        anns.push({
+          type: "box",
+          xMin: ovIndex - 0.5,
+          xMax: ovIndex + 0.5,
+          backgroundColor: "rgba(255,244,176,0.65)",
+          borderWidth: 0,
+          drawTime: "beforeDatasetsDraw"
+        });
+      }
+
+      // Lutealfas (lila)
+      if (ovIndex >= 0 && ovIndex < dataEntries.length - 1) {
+        anns.push({
+          type: "box",
+          xMin: ovIndex + 0.5,
+          xMax: dataEntries.length - 0.5,
+          backgroundColor: "rgba(224,195,252,0.6)",
+          borderWidth: 0,
+          drawTime: "beforeDatasetsDraw"
+        });
+      }
+
+      // Medellinje (grönt band) med korrigerad temp före ÄL
+      const beforeOvCorrected = (ovIndex >= 0 ? dataEntries.slice(0, ovIndex) : dataEntries)
+        .map(e => e.corrected)
+        .filter(v => v != null);
+
+      let bandMin = null, bandMax = null;
+      if (beforeOvCorrected.length) {
+        const mean = beforeOvCorrected.reduce((a,b)=>a+b,0) / beforeOvCorrected.length;
+        bandMin = mean - 0.01;
+        bandMax = mean + 0.01;
+      }
+
+      const bandData = bandMax != null
+        ? new Array(dataEntries.length).fill(bandMax)
+        : [];
+
+      chart = new Chart(el.chartCanvas, {
+        type: "line",
+        data: {
+          labels: dateLabels,      // används av xTop + månadsplugin
+          datasets: [
+            {
+              label: "Medelspann före ägglossning",
+              data: bandData,
+              borderWidth: 0,
+              pointRadius: 0,
+              fill: bandMin != null ? {
+                target: { value: bandMin },
+                above: "rgba(195, 215, 180, 0.45)",
+                below: "rgba(195, 215, 180, 0.45)"
+              } : false,
+              spanGaps: true
             },
-            grid:{
-              color:"rgba(0,0,0,0.12)",
-              lineWidth:1
+            {
+              label: "Faktisk temperatur",
+              data: actual,
+              borderColor: "rgba(90,140,255,0.9)",
+              backgroundColor: "rgba(90,140,255,0.9)",
+              borderWidth: 2,
+              pointRadius: 3,
+              pointStyle: "circle",
+              tension: 0.25,
+              spanGaps: true
+            },
+            {
+              label: "Korrigerad temperatur",
+              data: corrected,
+              borderColor: "rgba(240,100,120,0.85)",
+              backgroundColor: "rgba(240,100,120,0.85)",
+              borderDash: [4, 3],
+              borderWidth: 1.6,
+              pointRadius: 3,
+              pointStyle: "triangle",
+              tension: 0.25,
+              spanGaps: true
             }
+          ]
+        },
+
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+
+          layout: {
+            padding: { top: 40, bottom: 40, left: 20, right: 20 }
           },
-          xTop:{
-            type:"category",
-            position:"top",
-            labels: dayLabels,
-            ticks:{
-              autoSkip:false,
-              maxRotation:0,
-              font:{size:13}
-            },
-            grid:{ display:false }
-          },
-          x:{
-            type:"category",
-            position:"bottom",
-            labels: dayLabels,
-            ticks:{
-              autoSkip:false,
-              maxRotation:0,
-              font:{size:13},
-              callback:(value, index) => {
-                const cd = (index+1).toString().padStart(2,"0");
-                return index === 0 ? `CD → ${cd}` : cd;
+
+          scales: {
+            y: {
+              type: "linear",
+              position: "left",
+              min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
+              max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.15) * 20) / 20,
+              ticks: {
+                stepSize: 0.05,
+                callback(v) { return Number(v).toFixed(2); }
+              },
+              grid: {
+                drawTicks: true,
+                drawBorder: true,
+                color: "rgba(0,0,0,0.12)",
+                lineWidth: 1
+              },
+              title: {
+                display: true,
+                text: "°C"
               }
             },
-            grid:{ display:false }
-          }
-        },
-        plugins:{
-          legend:{ display:false },
-          annotation:{ annotations:anns }
-        }
-      }
-    });
 
-    // mata in månader till plug-in
-    chart.$months = monthArray;
+            xTop: {
+              type: "category",
+              position: "top",
+              labels: dateLabels,
+              ticks: {
+                autoSkip: false,
+                maxRotation: 0,
+                minRotation: 0,
+                font: { size: 12 },
+                callback(value) {
+                  const label = this.getLabelForValue(value) || "";
+                  const parts = label.split("-");
+                  return parts[0] || "";
+                }
+              },
+              grid: { display: false }
+            },
+
+            x: {
+              type: "category",
+              position: "bottom",
+              labels: cdLabels,
+              ticks: {
+                autoSkip: false,
+                maxRotation: 0,
+                minRotation: 0,
+                font: { size: 12 }
+              },
+              title: {
+                display: false
+              },
+              grid: { display: false }
+            }
+          },
+
+          plugins: {
+            legend: { display: false },
+            annotation: {
+              drawTime: "beforeDatasetsDraw",
+              annotations: anns
+            }
+          },
+
+          animation: false
+        }
+      });
+
+    } catch (err) {
+      console.error("❌ Fel i renderChart:", err);
+      alert("Grafen kunde inte ritas:\n" + err.message);
+    }
   }
 
   /* ============================
-        LH-FUNKTIONER (kort)
+          EXPORT / IMPORT
+  ============================ */
+  el.exportBtn.addEventListener("click", () => {
+    const blob = new Blob(
+      [JSON.stringify({ bbtData: dataEntries, lhDataByDate: lhByDate }, null, 2)],
+      { type: "application/json" }
+    );
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "BBT_Ida_data.json";
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+
+  el.importBtn.addEventListener("click", () => el.importFile.click());
+  el.importFile.addEventListener("change", (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const r = new FileReader();
+    r.onload = () => {
+      try {
+        const o = JSON.parse(r.result);
+        if (o.bbtData) dataEntries = o.bbtData;
+        if (o.lhDataByDate) lhByDate  = o.lhDataByDate;
+        else if (o.lhData) {
+          lhByDate = {};
+          if (Array.isArray(o.lhData)) {
+            o.lhData.forEach(e => {
+              const d = e.date || "okänt-datum";
+              if (!lhByDate[d]) lhByDate[d] = [];
+              lhByDate[d].push({
+                dataUrl: e.dataUrl,
+                symbols: e.symbols || [],
+                note: e.note || "",
+                tod: null,
+                ts: Date.now()
+              });
+            });
+          }
+        }
+        localStorage.setItem("bbtData", JSON.stringify(dataEntries));
+        localStorage.setItem("lhDataByDate", JSON.stringify(lhByDate));
+        renderTable();
+        renderLHList();
+        if (document.querySelector(".tab.active")?.dataset.tab === "graf") renderChart();
+        alert("Data importerad!");
+      } catch {
+        alert("Ogiltig fil.");
+      }
+    };
+    r.readAsText(file);
+    e.target.value = "";
+  });
+
+  el.clearBtn.addEventListener("click", clearData);
+
+  el.exportChartBtn?.addEventListener("click", () => {
+    const link = document.createElement("a");
+    link.download = "BBT_graf.png";
+    link.href = el.chartCanvas.toDataURL("image/png");
+    link.click();
+  });
+
+  /* ============================
+      LH: förhandsvisning + lista
   ============================ */
   function updateLHPreview(){
     const file = el.lhFile.files && el.lhFile.files[0];
-    if(!file){ el.lhPreview.style.display='none'; return; }
+    if (!file){ el.lhPreview.style.display = "none"; return; }
     const rd = new FileReader();
     rd.onload = (ev)=>{
       el.lhPreviewImg.src = ev.target.result;
@@ -960,11 +1176,18 @@ document.addEventListener("DOMContentLoaded", () => {
       const tod = el.lhFm.checked ? "☀️ FM" : (el.lhEm.checked ? "🌙 EM" : "—");
       const d = el.lhDate.value || "(Datum ej valt)";
       const n = el.lhNote.value ? `"${el.lhNote.value}"` : "";
-      el.lhPreviewInfo.textContent = `${d}  •  ${syms}  •  ${tod}  ${n?("• "+n):""}`;
+      el.lhPreviewInfo.textContent = `${d}  •  ${syms}  •  ${tod}  ${n ? ("• "+n) : ""}`;
       el.lhPreview.style.display = "flex";
     };
     rd.readAsDataURL(file);
   }
+
+  el.lhPickBtn.addEventListener("click", ()=> el.lhFile.click());
+  el.lhFile.addEventListener("change", updateLHPreview);
+  [el.lhDate, el.lhNote].forEach(x=>["input","change"].forEach(evt=>x.addEventListener(evt, updateLHPreview)));
+  document.querySelectorAll(".lhSym").forEach(cb=>cb.addEventListener("change", updateLHPreview));
+  el.lhFm.addEventListener("change", ()=>{ if(el.lhFm.checked) el.lhEm.checked=false; updateLHPreview(); });
+  el.lhEm.addEventListener("change", ()=>{ if(el.lhEm.checked) el.lhFm.checked=false; updateLHPreview(); });
 
   function renderLHList(){
     el.lhList.innerHTML = "";
@@ -974,107 +1197,136 @@ document.addEventListener("DOMContentLoaded", () => {
         const row = document.createElement("div");
         row.className = "lh-row";
         row.innerHTML = `
-          <div style="flex:0 0 38%"><img class="lh-img" src="${item.dataUrl}" alt="LH-bild"></div>
+          <div style="flex:0 0 38%">
+            <img class="lh-img" src="${item.dataUrl}" alt="LH-bild" data-date="${date}" data-idx="${idx}">
+          </div>
           <div class="lh-info">
             <div style="font-weight:700">${date}</div>
             <div style="font-size:1.15rem; margin:.15rem 0;">${(item.symbols||[]).join(" ")}</div>
             <div class="muted">${item.tod ? item.tod : "—"}</div>
             <div style="font-size:.9rem; color:#555">${item.note||""}</div>
           </div>
+          <div><button class="button danger" data-del="${date}::${idx}">Ta bort</button></div>
         `;
+        row.querySelector("img").addEventListener("click", (ev)=>openGallery(date, parseInt(ev.target.dataset.idx,10)));
+        row.querySelector("[data-del]").addEventListener("click", (ev)=>{
+          const [d,iStr] = ev.target.getAttribute("data-del").split("::");
+          const i = parseInt(iStr,10);
+          if(Array.isArray(lhByDate[d])) {
+            lhByDate[d].splice(i,1);
+            if(lhByDate[d].length===0) delete lhByDate[d];
+            localStorage.setItem("lhDataByDate", JSON.stringify(lhByDate));
+            renderLHList();
+          }
+        });
         el.lhList.appendChild(row);
       });
     });
   }
 
+  function allLHFlat(){
+    const out=[];
+    Object.keys(lhByDate).sort().forEach(date=>{
+      (lhByDate[date]||[]).forEach(item=>out.push({date, ...item}));
+    });
+    return out;
+  }
+
+  function openGallery(date, idxInDate){
+    const flat = allLHFlat();
+    if(!flat.length) return;
+
+    let flatIndex = 0, count=0;
+    Object.keys(lhByDate).sort().some(d=>{
+      const arr = lhByDate[d]||[];
+      if(d===date){ flatIndex = count + idxInDate; return true; }
+      count += arr.length; return false;
+    });
+
+    const o = document.createElement("div");
+    o.style = "position:fixed;inset:0;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;z-index:9999";
+    const img = document.createElement("img");
+    img.style = "max-width:92%;max-height:92%;border-radius:10px;background:#fff";
+    const left = document.createElement("div");
+    const right = document.createElement("div");
+    left.style = right.style = "position:absolute;top:0;width:50%;height:100%;";
+    left.style.left="0"; right.style.right="0";
+
+    function show(i){
+      if(i<0) i = flat.length-1;
+      if(i>=flat.length) i = 0;
+      flatIndex = i;
+      img.src = flat[flatIndex].dataUrl;
+    }
+    show(flatIndex);
+
+    left.addEventListener("click", (e)=>{ e.stopPropagation(); show(flatIndex-1); });
+    right.addEventListener("click", (e)=>{ e.stopPropagation(); show(flatIndex+1); });
+    o.addEventListener("click", ()=>document.body.removeChild(o));
+    o.appendChild(img); o.appendChild(left); o.appendChild(right);
+    document.body.appendChild(o);
+
+    function onKey(ev){
+      if(ev.key==="ArrowLeft"){ show(flatIndex-1); }
+      if(ev.key==="ArrowRight"){ show(flatIndex+1); }
+      if(ev.key==="Escape"){ cleanup(); }
+    }
+    function cleanup(){ document.removeEventListener("keydown", onKey); if(o.parentNode) document.body.removeChild(o); }
+    document.addEventListener("keydown", onKey);
+
+    let sx=null, sy=null;
+    o.addEventListener("touchstart", (e)=>{ const t=e.changedTouches[0]; sx=t.clientX; sy=t.clientY; }, {passive:true});
+    o.addEventListener("touchend", (e)=>{
+      const t=e.changedTouches[0]; if(sx===null) return;
+      const dx = t.clientX - sx, dy = t.clientY - sy;
+      if(Math.abs(dx)>40 && Math.abs(dy)<60){ if(dx<0) show(flatIndex+1); else show(flatIndex-1); }
+      else { cleanup(); }
+      sx=sy=null;
+    }, {passive:true});
+  }
+
   /* ============================
-          EVENTS
+        INFO-KNAPP / LEGEND
+  ============================ */
+  const legendPopup = document.getElementById("legendPopup");
+  document.getElementById("infoBtn").addEventListener("click", () => {
+    legendPopup.style.display = "flex";
+  });
+  document.getElementById("legendCloseBtn").addEventListener("click", () => {
+    legendPopup.style.display = "none";
+  });
+  legendPopup.addEventListener("click", (e) => {
+    if (e.target === legendPopup) legendPopup.style.display = "none";
+  });
+
+  /* ============================
+             TABS
+  ============================ */
+  document.querySelectorAll(".tab").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.tab;
+      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+      btn.classList.add("active");
+      document.getElementById(id).classList.add("active");
+
+      if (id === "graf") renderChart();
+      if (id === "lh") renderLHList();
+    });
+  });
+
+  /* ============================
+             EVENTS
   ============================ */
   el.actual.addEventListener("blur", computeCorrectedFormInputs);
-  el.time.addEventListener("change", computeCorrectedFormInputs);
+  el.time.addEventListener("change", () => {
+    if (el.actual.value) computeCorrectedFormInputs();
+  });
   el.saveBtn.addEventListener("click", saveEntry);
-  el.clearBtn.addEventListener("click", clearData);
 
-  el.exportBtn.addEventListener("click", () => {
-    const blob = new Blob([JSON.stringify({bbtData:dataEntries, lhDataByDate:lhByDate}, null, 2)],{type:"application/json"});
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "BBT_Ida_data.json";
-    a.click();
-  });
-
-  el.importBtn.addEventListener("click", ()=>el.importFile.click());
-  el.importFile.addEventListener("change", (e)=>{
-    const file = e.target.files && e.target.files[0];
-    if(!file) return;
-    const r = new FileReader();
-    r.onload = ()=>{
-      try{
-        const o = JSON.parse(r.result);
-        if(o.bbtData) dataEntries = o.bbtData;
-        if(o.lhDataByDate) lhByDate = o.lhDataByDate;
-        localStorage.setItem("bbtData", JSON.stringify(dataEntries));
-        localStorage.setItem("lhDataByDate", JSON.stringify(lhByDate));
-        renderTable();
-        renderLHList();
-        alert("Data importerad!");
-      }catch{
-        alert("Ogiltig fil.");
-      }
-    };
-    r.readAsText(file);
-  });
-
-  el.exportChartBtn.addEventListener("click", ()=>{
-    const link = document.createElement("a");
-    link.href = el.chartCanvas.toDataURL("image/png");
-    link.download = "BBT_graf.png";
-    link.click();
-  });
-
-  // LH-preview och sparning
-  el.lhPickBtn.addEventListener("click", ()=> el.lhFile.click());
-  el.lhFile.addEventListener("change", updateLHPreview);
-  [el.lhDate, el.lhNote].forEach(x=>['input','change'].forEach(evt=>x.addEventListener(evt, updateLHPreview)));
-  document.querySelectorAll(".lhSym").forEach(cb=>cb.addEventListener("change", updateLHPreview));
-  el.lhFm.addEventListener("change", ()=>{ if(el.lhFm.checked) el.lhEm.checked=false; updateLHPreview(); });
-  el.lhEm.addEventListener("change", ()=>{ if(el.lhEm.checked) el.lhFm.checked=false; updateLHPreview(); });
-
-  el.lhSaveBtn.addEventListener("click", ()=>{
-    const file = el.lhFile.files && el.lhFile.files[0];
-    if(!file) return alert("Välj bild först.");
-    if(!el.lhDate.value) return alert("Välj datum.");
-    const reader = new FileReader();
-    reader.onload = (e)=>{
-      const dataUrl = e.target.result;
-      const symbols = el.lhSymChecks().map(x=>x.value);
-      const note = el.lhNote.value || "";
-      const tod = el.lhFm.checked ? "☀️ FM" : (el.lhEm.checked ? "🌙 EM" : null);
-      const d = el.lhDate.value;
-      if(!lhByDate[d]) lhByDate[d] = [];
-      lhByDate[d].push({ dataUrl, symbols, note, tod, ts: Date.now() });
-      localStorage.setItem("lhDataByDate", JSON.stringify(lhByDate));
-
-      el.lhNote.value = "";
-      el.lhFile.value = "";
-      el.lhFm.checked = false; el.lhEm.checked = false;
-      document.querySelectorAll(".lhSym").forEach(cb=>cb.checked=false);
-      el.lhPreview.style.display="none";
-      renderLHList();
-      alert("✅ Bild sparad!");
-    };
-    reader.readAsDataURL(file);
-  });
-
-  // Legend-popup
-  const legendPopup = document.getElementById("legendPopup");
-  document.getElementById("infoBtn").addEventListener("click", ()=> legendPopup.style.display="flex");
-  document.getElementById("legendCloseBtn").addEventListener("click", ()=> legendPopup.style.display="none");
-  legendPopup.addEventListener("click", e=>{
-    if(e.target===legendPopup) legendPopup.style.display="none";
-  });
-
-  /* INIT */
+  /* ============================
+             INIT
+  ============================ */
   renderTable();
   renderLHList();
 });
@@ -1082,3 +1334,4 @@ document.addEventListener("DOMContentLoaded", () => {
 
 </body>
 </html>
+  
