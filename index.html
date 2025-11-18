@@ -918,14 +918,11 @@ const MonthLabelPlugin = {
       dataEntries.sort((a, b) => a.date.localeCompare(b.date));
 
       // Datumlabels: "dd-mm" (för månadsetiketter + datumrad)
-     const dateLabels = dataEntries.map((e, i) => {
-      if (!e.date) return "";
-      const [y, m, d] = e.date.split("-");
-      const day = d.padStart(2, "0");
-
-        // Varannan etikett flyttas ner till rad 2 för att undvika klumpning
-        return (i % 2 === 0) ? day : "\n" + day;
-      });
+    const dateLabels = dataEntries.map(e => {
+  if (!e.date) return "";
+  const [y, m, d] = e.date.split("-");
+  return `${d.padStart(2,"0")}\n${m}`;
+});
 
       // CD-labels: "01", "02", ...
       const cdLabels = dataEntries.map((_, i) =>
