@@ -903,10 +903,12 @@ const MonthLabelPlugin = {
       dataEntries.sort((a, b) => a.date.localeCompare(b.date));
 
 // Datumlabels: två rader med bara "dd" (varannan rad)
-const dateLabels = dataEntries.map((e, i) => {
+// Datumlabels: bara "dd" (riktig radbrytning görs i ticks.callback)
+const dateLabels = dataEntries.map(e => {
   if (!e.date) return "";
   const [y, m, d] = e.date.split("-");
-  const day = d.padStart(2, "0");
+  return d.padStart(2, "0");
+});
 
   // Jämna index: dd på översta raden
   // Udda index:  dd på nedersta raden
