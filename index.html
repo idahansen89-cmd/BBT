@@ -1090,22 +1090,19 @@ xTop: {
             }
           },
 
-          plugins: {
-            legend: { display: false },
-            annotation: {
-              drawTime: "beforeDatasetsDraw",
-              annotations: anns
-              },
-              monthLabelPlugin: {
-              months: monthNumbers   // 👈 viktigt
-      }
-    }
+plugins: {
+  legend: { display: false },
+  annotation: {
+    drawTime: "beforeDatasetsDraw",
+    annotations: anns
+  },
+  monthLabelPlugin: {
+    months: monthNumbers
   }
+},
+animation: false
+}
 });
-
-          animation: false
-        }
-      });
 
     } catch (err) {
       console.error("❌ Fel i renderChart:", err);
