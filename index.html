@@ -910,13 +910,6 @@ const dateLabels = dataEntries.map(e => {
   return d.padStart(2, "0");
 });
 
-  // Jämna index: dd på översta raden
-  // Udda index:  dd på nedersta raden
-  return (i % 2 === 0)
-    ? `${day}\n`   // rad 1: dd, rad 2: tom
-    : `\n${day}`;  // rad 1: tom, rad 2: dd
-});
-
 // Månadslista (mm) till månads-pluginen
 const monthNumbers = dataEntries.map(e => {
   if (!e.date) return null;
