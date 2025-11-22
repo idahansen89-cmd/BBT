@@ -863,10 +863,10 @@ const MonthLabelPlugin = {
       const text = "CD";
       ctx.save();
       ctx.font = "13px Helvetica";
-      const w = ctx.measureText(text).width + 10;
+      const w = ctx.measureText(text).width + 14;
       const h = 16;
       const r = 6;
-      const x = firstX - w - 6;          // precis framför första siffran
+      const x = firstX - w - 4;          // precis framför första siffran
 
       ctx.fillStyle = "rgba(150, 235, 220, 0.75)";      // Pastell turkos
 ctx.strokeStyle = "rgba(90, 160, 150, 0.40)";     // Diskret kantlinje
