@@ -1094,7 +1094,20 @@ ticks: {
                 autoSkip: false,
                 maxRotation: 0,
                 minRotation: 0,
-                font: { size: 12 }
+                font: { size: 12 },
+                padding: 6,
+                callback: function (value, index) {
+                  const label = this.getLabelForValue(value);
+
+                  // jämna index → CD på rad 1
+                  if (index % 2 === 0) {
+                    return [label, ""];
+                  }
+                  // udda index → CD på rad 2
+                  else {
+                  return ["", label];
+                  }
+                }
               },
               title: {
                 display: false
