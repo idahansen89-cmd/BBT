@@ -858,13 +858,13 @@ const MonthLabelPlugin = {
       if (!xScale) return;
 
       const firstX = xScale.getPixelForValue(0);
-      const y = chartArea.bottom + 18;   // samma radområde som CD-siffrorna
+      const y = chartArea.bottom + 10;   // samma radområde som CD-siffrorna
 
       const text = "CD";
       ctx.save();
       ctx.font = "13px Helvetica";
       const w = ctx.measureText(text).width + 18;
-      const h = 20;
+      const h = 18;
       const r = 6;
       const x = firstX - w - 6;          // precis framför första siffran
 
