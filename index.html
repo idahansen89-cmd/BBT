@@ -927,6 +927,30 @@ const monthNumbers = dataEntries.map(e => {
 
       const ovIndex = dataEntries.findIndex(e => e.ovulation);
       const anns = [];
+      
+      // === Trendlinje för korrigerad temperatur ===
+const trendX = corrected
+  .map((v, i) => (v != null ? i : null))
+  .filter(i => i !== null);
+
+const trendY = corrected.filter(v => v != null);
+
+let trendLine = [];
+
+if (trendX.length > 1) {
+  // 1) Beräkna linjär regression (minsta kvadratmetoden)
+  const n = trendX.length;
+  const sumX = trendX.reduce((a, b) => a + b, 0);
+  const sumY = trendY.reduce((a, b) => a + b, 0);
+  const sumXY = trendX.reduce((acc, x, i) => acc + x * trendY[i], 0);
+  const sumX2 = trendX.reduce((acc, x) => acc + x * x, 0);
+
+  const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+  const intercept = (sumY - slope * sumX) / n;
+
+  // 2) Skapa linjen (en punkt för varje dag)
+  trendLine = dataEntries.map((_, i) => slope * i + intercept);
+}
 
       // Mensbakgrund
       const mensIndices = dataEntries
@@ -1022,6 +1046,15 @@ const monthNumbers = dataEntries.map(e => {
               pointRadius: 3,
               pointStyle: "triangle",
               tension: 0.25,
+              spanGaps: true
+            },
+            {
+              label: "Trendlinje",
+              data: trendLine,
+              borderColor: "rgba(0,0,0,0.35)",
+              borderWidth: 2,
+              pointRadius: 0,
+              tension: 0.1,
               spanGaps: true
             }
           ]
