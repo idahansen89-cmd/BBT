@@ -803,14 +803,14 @@ tr.innerHTML = `
   <td>${e.actual ?? ""}</td>
   <td>${e.corrected ?? ""}</td>
 
-  <td class="event-cell">
-  <span class="dpo-badge">
-    ${
-      e.ovulation
-        ? ""
-        : (ovIndex >= 0 && idx > ovIndex ? (idx - ovIndex) : "")
-    }
-  </span>
+ <td class="event-cell">
+  ${
+    ovIndex >= 0 && idx > ovIndex
+    ? `<span class="dpo-badge">${idx - ovIndex}</span>`
+    : ""
+  }
+  ${events.trim() || ""}
+</td>
 
   <span class="event-content">
     ${events.trim() || ""}
