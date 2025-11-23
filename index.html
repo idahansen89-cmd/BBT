@@ -1115,7 +1115,7 @@ if (ovIndex >= 0 && ovIndex < corrected.length - 1) {
             y: {
               type: "linear",
               position: "left",
-              min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.25) * 20) / 20,
+              min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.15) * 20) / 20,
               max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.35) * 20) / 20,
               ticks: {
                 stepSize: 0.05,
