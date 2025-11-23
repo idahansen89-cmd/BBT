@@ -1054,7 +1054,8 @@ if (ovIndex >= 0 && ovIndex < corrected.length - 1) {
           labels: dateLabels,      // används av xTop + månadsplugin
           datasets: [
             {
-              label: "Medelspann före ägglossning",
+              datasetID: "meanband",
+              label: "Medel",
               data: bandData,
               borderWidth: 0,
               pointRadius: 0,
@@ -1066,7 +1067,8 @@ if (ovIndex >= 0 && ovIndex < corrected.length - 1) {
               spanGaps: true
             },
             {
-              label: "Faktisk temperatur",
+              datasetID: "actual",
+              label: "Faktisk",
               data: actual,
               borderColor: "rgba(90,140,255,0.9)",
               backgroundColor: "rgba(90,140,255,0.9)",
@@ -1077,7 +1079,8 @@ if (ovIndex >= 0 && ovIndex < corrected.length - 1) {
               spanGaps: true
             },
             {
-              label: "Korrigerad temperatur",
+             datasetID: "corrected",
+              label: "Korrigerad",
               data: corrected,
               borderColor: "rgba(240,100,120,0.85)",
               backgroundColor: "rgba(240,100,120,0.85)",
@@ -1089,7 +1092,8 @@ if (ovIndex >= 0 && ovIndex < corrected.length - 1) {
               spanGaps: true
             },
             {
-              label: "Trend – lutealfas",
+              datasetID: "trend",
+              label: "Trend",
               data: corrected.map((_, i) =>
                 (i > ovIndex ? lutealTrend[i - (ovIndex + 1)] : null)
               ),
@@ -1397,36 +1401,52 @@ animation: false
     }, {passive:true});
   }
 
-  /* ============================
-        INFO-KNAPP / LEGEND
-  ============================ */
-// =============================
-//   LEGEND-KLICK FÖR DATASETS
-// =============================
+/* ============================
+      INFO-KNAPP / LEGEND
+============================ */
+
+/* ============================
+   LEGEND-KLICK FÖR DATASETS
+============================ */
 document.addEventListener("click", (e) => {
-  const item = e.target.closest(".legend-toggle");
+  // Hitta klick på en legend-entry
+  const item = e.target.closest(".legend-entry");
   if (!item) return;
 
-  const dsIndex = Number(item.dataset.dataset);
+  // Dataset-index hämtas från data-dataset-index
+  const dsIndex = Number(item.dataset.datasetIndex);
   const ds = chart.data.datasets[dsIndex];
+  if (!ds) return;
 
   // Toggle visibility
   ds.hidden = !ds.hidden;
+
+  // Lägg till/ta bort .off för styling (gråa ut)
   item.classList.toggle("off", ds.hidden);
 
   chart.update();
 });
-  const legendPopup = document.getElementById("legendPopup");
-  document.getElementById("infoBtn").addEventListener("click", () => {
-    legendPopup.style.display = "flex";
-  });
-  document.getElementById("legendCloseBtn").addEventListener("click", () => {
-    legendPopup.style.display = "none";
-  });
-  legendPopup.addEventListener("click", (e) => {
-    if (e.target === legendPopup) legendPopup.style.display = "none";
-  });
 
+
+/* ============================
+        ÖPPNA / STÄNG POPUP
+============================ */
+const legendPopup = document.getElementById("legendPopup");
+
+document.getElementById("infoBtn").addEventListener("click", () => {
+  legendPopup.style.display = "flex";
+});
+
+document.getElementById("legendCloseBtn").addEventListener("click", () => {
+  legendPopup.style.display = "none";
+});
+
+// Klick utanför boxen stänger popupen
+legendPopup.addEventListener("click", (e) => {
+  if (e.target === legendPopup) {
+    legendPopup.style.display = "none";
+  }
+});
   /* ============================
              TABS
   ============================ */
