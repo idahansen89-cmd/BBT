@@ -261,6 +261,9 @@ td button {
   align-items: center;
   gap: 0.6rem;
 }
+.legend-entry.off {
+  opacity: 0.4;
+}
 .legend-color {
   width: 20px;
   height: 8px;
@@ -494,26 +497,26 @@ td button {
   <div class="legend-box">
 
     <h3>Förklaring</h3>
-    
-    <div class="legend-entry legend-toggle" data-dataset="actual">
-      <div class="legend-color" style="background:rgba(90,140,255,0.9);"></div>
-      <span>Faktisk temperatur</span>
-    </div>
-    
-    <div class="legend-entry legend-toggle" data-dataset="corrected">
-      <div class="legend-color" style="background:rgba(240,100,120,0.85);"></div>
-      <span>Korrigerad temperatur</span>
-    </div>
-    
-    <div class="legend-entry legend-toggle" data-dataset="meanband">
-      <div class="legend-color" style="background:rgba(195,215,180,0.45); height:10px;"></div>
-      <span>Medel före ägglossning</span>
-    </div>
-    
-    <div class="legend-entry legend-toggle" data-dataset="trend">
-      <div class="legend-color" style="background:rgba(155,117,208,1);"></div>
-      <span>Trendlinje (luteal)</span>
-    </div>
+  
+  <div class="legend-entry" data-dataset-index="0">
+  <div class="legend-color" style="background:#c3d7b4;"></div>
+  <span>Medelspann</span>
+</div>
+
+<div class="legend-entry" data-dataset-index="1">
+  <div class="legend-color" style="background:#5a8cff;"></div>
+  <span>Faktisk temperatur</span>
+</div>
+
+<div class="legend-entry" data-dataset-index="2">
+  <div class="legend-color" style="background:#f06478;"></div>
+  <span>Korrigerad temperatur</span>
+</div>
+
+<div class="legend-entry" data-dataset-index="3">
+  <div class="legend-color" style="background:#8b5cd6;"></div>
+  <span>Trendlinje</span>
+</div>
 
     <div class="legend-entry">
       <div class="legend-color" style="background:rgba(255,244,176,0.65); height:10px;"></div>
@@ -1405,32 +1408,16 @@ animation: false
       INFO-KNAPP / LEGEND
 ============================ */
 
-/* LEGEND-KLICK FÖR DATASETS (robust) */
 document.addEventListener("click", (e) => {
   const item = e.target.closest(".legend-entry");
   if (!item) return;
 
-  // Säkerhetskontroll: chart måste finnas
-  if (typeof chart === "undefined" || !chart || !chart.data) return;
+  const index = Number(item.dataset.datasetIndex);
+  if (isNaN(index)) return;
 
-  // Försök läsa index från data-attribute först (data-dataset-index)
-  let dsIndex = null;
-  if (item.dataset && item.dataset.datasetIndex !== undefined && item.dataset.datasetIndex !== "") {
-    dsIndex = Number(item.dataset.datasetIndex);
-  } else {
-    // Fallback: beräkna index utifrån ordningen bland .legend-entry i DOM
-    const all = Array.from(document.querySelectorAll(".legend-entry"));
-    dsIndex = all.indexOf(item);
-  }
+  const ds = chart.data.datasets[index];
 
-  if (dsIndex < 0 || dsIndex == null || !chart.data.datasets[dsIndex]) return;
-
-  const ds = chart.data.datasets[dsIndex];
-
-  // Toggle visibility
   ds.hidden = !ds.hidden;
-
-  // uppdatera styling i popup (klass "off" → du kan styla i CSS)
   item.classList.toggle("off", ds.hidden);
 
   chart.update();
