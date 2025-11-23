@@ -1128,6 +1128,12 @@ if (ovIndex >= 0 && ovIndex < corrected.length - 1) {
       const bandData = bandMax != null
         ? new Array(dataEntries.length).fill(bandMax)
         : [];
+        
+        const dpoList = dataEntries.map((e, i) => {
+  if (ovIndex < 0) return null;
+  const dpo = i - ovIndex;
+  return dpo >= 1 ? dpo : null;
+});
 
       chart = new Chart(el.chartCanvas, {
         type: "line",
@@ -1284,7 +1290,7 @@ plugins: {
   },
   monthLabelPlugin: {
     months: monthNumbers
-  }
+  },
   dpoLabelPlugin: {
   dpoList: dpoList
 }
