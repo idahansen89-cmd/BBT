@@ -225,7 +225,7 @@ td button {
 ============================ */
 #chartContainer {
   width: 100%;
-  max-width: 1100px;
+  max-width: none;
   margin: 0 auto;
   height: 560px;
   position: relative;
@@ -912,7 +912,7 @@ const MonthLabelPlugin = {
       const text = monthNames[monthIndex] || mNum;
 
       const x = xAxis.getPixelForValue(i);
-      const y = chartArea.top - 70;  // höjd ovanför datumraden
+      const y = chartArea.top - 50;  // höjd ovanför datumraden
 
       ctx.save();
       ctx.font = "13px Helvetica";
@@ -1223,7 +1223,7 @@ if (ovIndex >= 0 && ovIndex < corrected.length - 1) {
           maintainAspectRatio: false,
 
           layout: {
-            padding: { top: 40, bottom: 40, left: 20, right: 20 }
+            padding: { top: 20, bottom: 15, left: 10, right: 10 }
           },
 
           scales: {
