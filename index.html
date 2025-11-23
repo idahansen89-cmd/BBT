@@ -1227,107 +1227,88 @@ if (ovIndex >= 0 && ovIndex < corrected.length - 1) {
           },
 
           scales: {
-            y: {
-              type: "linear",
-              position: "left",
-              min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.15) * 20) / 20,
-              max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.35) * 20) / 20,
-              ticks: {
-                stepSize: 0.05,
-                callback(v) { return Number(v).toFixed(2); }
-              },
-              grid: {
-                drawTicks: true,
-                drawBorder: true,
-                color: "rgba(0,0,0,0.12)",
-                lineWidth: 1
-              },
-              title: {
-                display: false,
-                text: "°C"
-              }
-            },
-
-xTop: {
-  type: "category",
-  position: "top",
-  labels: dateLabels,
-ticks: {
-  font: { size: 13 },
-  maxRotation: 0,
-  minRotation: 0,
-  autoSkip: false,
-  padding: 6,
-  callback: function (value, index) {
-
-    // Hämta textetiketten korrekt:
-    const label = this.chart.data.labels[index];
-
-    // jämna index → dd på rad 1
-    if (index % 2 === 0) {
-      return [label, ""];
+  y: {
+    type: "linear",
+    position: "left",
+    min: Math.floor((Math.min(...corrected.filter(v => v != null)) - 0.15) * 20) / 20,
+    max: Math.ceil((Math.max(...corrected.filter(v => v != null)) + 0.35) * 20) / 20,
+    ticks: {
+      stepSize: 0.05,
+      callback(v) { return Number(v).toFixed(2); }
+    },
+    grid: {
+      drawTicks: true,
+      drawBorder: true,
+      color: "rgba(0,0,0,0.12)",
+      lineWidth: 1
+    },
+    title: {
+      display: false,
+      text: "°C"
     }
-    // udda index → dd på rad 2
-    else {
-      return ["", label];
+  },
+
+  xTop: {
+    type: "category",
+    position: "top",
+    labels: dateLabels,
+    ticks: {
+      font: { size: 13 },
+      maxRotation: 0,
+      minRotation: 0,
+      autoSkip: false,
+      padding: 6,
+      callback: function (value, index) {
+        const label = this.chart.data.labels[index];
+        return index % 2 === 0 ? [label, ""] : ["", label];
+      }
+    },
+    offset: true,
+    grid: { display: false }
+  },
+
+  x: {
+    type: "category",
+    position: "bottom",
+    labels: cdLabels,
+    ticks: {
+      autoSkip: false,
+      maxRotation: 0,
+      minRotation: 0,
+      font: { size: 12 },
+      padding: 4,
+      callback: function (value, index) {
+        const label = this.getLabelForValue(value);
+        return index % 2 === 0 ? [label, ""] : ["", label];
+      }
+    },
+    title: { display: false },
+    grid: {
+      display: true,
+      drawOnChartArea: true,
+      drawTicks: false,
+      color: "rgba(150, 235, 220, 0.25)",   // diskret turkos
+      lineWidth: 1
     }
   }
 },
-  offset: true,
-  grid: { display: false }
-},
 
-            x: {
-              type: "category",
-              position: "bottom",
-              labels: cdLabels,
-              ticks: {
-                autoSkip: false,
-                maxRotation: 0,
-                minRotation: 0,
-                font: { size: 12 },
-                padding: 4,
-                callback: function (value, index) {
-                  const label = this.getLabelForValue(value);
-
-                  // jämna index → CD på rad 1
-                  if (index % 2 === 0) {
-                    return [label, ""];
-                  }
-                  // udda index → CD på rad 2
-                  else {
-                  return ["", label];
-                  }
-                }
-              },
-              title: {
-                display: false
-              },
-              grid: {
-                display: true,
-                drawOnChartArea: true,
-                drawTicks: false,
-                color: "rgba(150, 235, 220, 0.25)",   // diskret turkos
-                lineWidth: 1
+            plugins: {
+                legend: { display: false },
+                annotation: {
+                  drawTime: "beforeDatasetsDraw",
+                  annotations: anns
+                },
+                monthLabelPlugin: {
+                  months: monthNumbers
+                },
+                dpoLabelPlugin: {
+                dpoList: dpoList
               }
-          },
-
-plugins: {
-  legend: { display: false },
-  annotation: {
-    drawTime: "beforeDatasetsDraw",
-    annotations: anns
-  },
-  monthLabelPlugin: {
-    months: monthNumbers
-  },
-  dpoLabelPlugin: {
-  dpoList: dpoList
-}
-},
-animation: false
-}
-});
+              },
+              animation: false
+              }
+              });
 
     } catch (err) {
       console.error("❌ Fel i renderChart:", err);
