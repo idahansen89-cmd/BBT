@@ -185,18 +185,17 @@ td button {
 }
 
 .dpo-badge {
-  display: inline-block;
-  width: 20px;
-  height: 20px;
-  line-height: 20px;
-  border-radius: 50%;
-  background: rgba(200,170,250,1); /* ljust lila */
-  color: #2b2b2b;
-  font-size: 11px;
-  font-weight: 600;
-  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
   margin-right: 4px;
-  border: 1px solid rgba(150,120,210,0.9);
+  background: #d6c4ff;
+  color: #333;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 50%;
 }
 
 /* ============================
@@ -777,24 +776,29 @@ document.addEventListener("DOMContentLoaded", () => {
       if (e.lhPos) events += "➕ ";
       if (e.lhNeg) events += "➖ ";
 
+   
       tr.innerHTML = `
-        <td>${e.date || ""}</td>
-        <td>${e.time || ""}</td>
-        <td>${e.actual ?? ""}</td>
-        <td>${e.corrected ?? ""}</td>
-        <td>${events.trim() || "–"}</td>
-        <td>${e.note || ""}</td>
-        <td>
-          <button class="table-btn small-edit" title="Redigera">✏️</button>
-          <button class="table-btn small-del" title="Radera">🗑️</button>
-        </td>
-        <td>
-          ${e.ovulation ? "" : (ovIndex >= 0 && idx > ovIndex ? 
-            `<span class="dpo-badge">${idx - ovIndex}</span>` : ""
-          )}
-          ${events.trim() || "–"}
-        </td>
-      `;
+  <td>${e.date || ""}</td>
+  <td>${e.time || ""}</td>
+  <td>${e.actual ?? ""}</td>
+  <td>${e.corrected ?? ""}</td>
+
+  <!-- Händelser + DPO-badge i samma kolumn -->
+  <td class="event-cell">
+    ${e.ovulation ? "" : (ovIndex >= 0 && idx > ovIndex
+      ? `<span class="dpo-badge">${idx - ovIndex}</span>`
+      : ""
+    )}
+    ${events.trim() || "–"}
+  </td>
+
+  <td>${e.note || ""}</td>
+
+  <td>
+    <button class="table-btn small-edit" title="Redigera">✏️</button>
+    <button class="table-btn small-del" title="Radera">🗑️</button>
+  </td>
+`;
 
       const delBtn = tr.querySelector(".small-del");
       if (delBtn) {
