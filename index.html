@@ -165,6 +165,7 @@ thead th {
 tbody tr:nth-child(even) { background-color: #f9f9f9; }
 tbody tr.mens-row { background-color: #ffe8ee !important; }
 tbody tr.ovulation-row { background-color: #fff9d9 !important; }
+tbody tr.luteal-row { background-color: rgba(224,195,252,0.35) !important; }
 
 td:nth-child(1), th:nth-child(1) { width: 85px; }
 td:nth-child(2), th:nth-child(2) { width: 70px; }
@@ -746,6 +747,12 @@ document.addEventListener("DOMContentLoaded", () => {
       if (e.mens) tr.style.backgroundColor = "#ffe8ee";
       if (e.ovulation) tr.classList.add("ovulation-row");
       if (e.mens && e.ovulation) tr.classList.remove("ovulation-row");
+
+      // MARKERA LUTEALFAS (efter ägglossning)
+      const ovIndex = dataEntries.findIndex(x => x.ovulation);
+      if (ovIndex >= 0 && idx > ovIndex) {
+        tr.classList.add("luteal-row");
+      }
 
       let events = "";
       if (e.mens) events += "🩸 ";
