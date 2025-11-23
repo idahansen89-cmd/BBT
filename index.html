@@ -186,30 +186,32 @@ td button {
 
 .event-cell {
   position: relative;
-  text-align: center;            /* gör symboler centrerade */
-  padding-left: 1.4rem;          /* plats för DPO-badge */
-  height: 32px;
-  vertical-align: middle;
+  padding-left: 0.4rem;
+  text-align: center;   /* centrera symbolerna */
 }
 
-/* DPO-cirkel bibehåller vänster position */
+.event-symbols {
+  display: inline-block;
+}
+
 .dpo-badge {
   position: absolute;
-  left: 4px;                     /* nära tabellens vänstra linje */
+  left: 4px;            /* alltid vid vänsterkanten */
   top: 50%;
   transform: translateY(-50%);
-  display: inline-flex;
+  
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  
+  display: flex;
   align-items: center;
   justify-content: center;
 
-  width: 15px;
-  height: 15px;
-  font-size: 9px;
-  font-weight: 600;
-
   background: #d9ccff;
   color: #333;
-  border-radius: 50%;
+  font-size: 9px;
+  font-weight: 600;
 }
 
 /* Symbolerna – centreras helt själva */
