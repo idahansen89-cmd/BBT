@@ -184,6 +184,21 @@ td button {
   padding: 0.3rem 0.6rem;
 }
 
+.dpo-badge {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  line-height: 20px;
+  border-radius: 50%;
+  background: rgba(200,170,250,1); /* ljust lila */
+  color: #2b2b2b;
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+  margin-right: 4px;
+  border: 1px solid rgba(150,120,210,0.9);
+}
+
 /* ============================
         GRAFSTIL
 ============================ */
@@ -773,6 +788,12 @@ document.addEventListener("DOMContentLoaded", () => {
           <button class="table-btn small-edit" title="Redigera">✏️</button>
           <button class="table-btn small-del" title="Radera">🗑️</button>
         </td>
+        <td>
+          ${e.ovulation ? "" : (ovIndex >= 0 && idx > ovIndex ? 
+            `<span class="dpo-badge">${idx - ovIndex}</span>` : ""
+          )}
+          ${events.trim() || "–"}
+        </td>
       `;
 
       const delBtn = tr.querySelector(".small-del");
@@ -944,9 +965,51 @@ ctx.strokeStyle = "rgba(90, 160, 150, 0.40)";     // Diskret kantlinje
       ctx.restore();
     }
   };
+  
+  const DpoLabelPlugin = {
+  id: "dpoLabelPlugin",
+  afterDatasetsDraw(chart, args, opts) {
+    const { ctx } = chart;
+    const dpoList = opts?.dpoList || [];
+    const datasets = chart.data.datasets;
+    const correctedDs = datasets[2]; // dataset 2 = korrigerad temperatur
 
-  Chart.register(MonthLabelPlugin, CdLabelPlugin);
+    if (!correctedDs) return;
 
+    const meta = chart.getDatasetMeta(2);
+
+    ctx.save();
+    ctx.font = "11px Helvetica";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+
+    meta.data.forEach((point, i) => {
+      const dpo = dpoList[i];
+      if (!dpo || dpo < 1) return; // bara 1,2,3...
+
+      const x = point.x;
+      const y = point.y - 16; // höjd ovanför datapunkten
+
+      // cirkel
+      ctx.beginPath();
+      ctx.fillStyle = "rgba(200,170,250,1)"; // ljust lila
+      ctx.strokeStyle = "rgba(150,120,210,0.9)";
+      ctx.lineWidth = 1.2;
+      ctx.arc(x, y, 10, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      // texten
+      ctx.fillStyle = "#2b2b2b";
+      ctx.fillText(dpo, x, y);
+    });
+
+    ctx.restore();
+  }
+};
+
+  Chart.register(MonthLabelPlugin, CdLabelPlugin, DpoLabelPlugin);
+  
   function renderChart() {
     try {
       if (chart) chart.destroy();
@@ -1222,6 +1285,9 @@ plugins: {
   monthLabelPlugin: {
     months: monthNumbers
   }
+  dpoLabelPlugin: {
+  dpoList: dpoList
+}
 },
 animation: false
 }
