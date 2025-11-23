@@ -1405,47 +1405,47 @@ animation: false
       INFO-KNAPP / LEGEND
 ============================ */
 
-/* ============================
-   LEGEND-KLICK FÖR DATASETS
-============================ */
+/* LEGEND-KLICK FÖR DATASETS (robust) */
 document.addEventListener("click", (e) => {
-  // Hitta klick på en legend-entry
   const item = e.target.closest(".legend-entry");
   if (!item) return;
 
-  // Dataset-index hämtas från data-dataset-index
-  const dsIndex = Number(item.dataset.datasetIndex);
+  // Säkerhetskontroll: chart måste finnas
+  if (typeof chart === "undefined" || !chart || !chart.data) return;
+
+  // Försök läsa index från data-attribute först (data-dataset-index)
+  let dsIndex = null;
+  if (item.dataset && item.dataset.datasetIndex !== undefined && item.dataset.datasetIndex !== "") {
+    dsIndex = Number(item.dataset.datasetIndex);
+  } else {
+    // Fallback: beräkna index utifrån ordningen bland .legend-entry i DOM
+    const all = Array.from(document.querySelectorAll(".legend-entry"));
+    dsIndex = all.indexOf(item);
+  }
+
+  if (dsIndex < 0 || dsIndex == null || !chart.data.datasets[dsIndex]) return;
+
   const ds = chart.data.datasets[dsIndex];
-  if (!ds) return;
 
   // Toggle visibility
   ds.hidden = !ds.hidden;
 
-  // Lägg till/ta bort .off för styling (gråa ut)
+  // uppdatera styling i popup (klass "off" → du kan styla i CSS)
   item.classList.toggle("off", ds.hidden);
 
   chart.update();
 });
 
-
-/* ============================
-        ÖPPNA / STÄNG POPUP
-============================ */
+/* ÖPPNA / STÄNG LEGEND-POPUP */
 const legendPopup = document.getElementById("legendPopup");
-
 document.getElementById("infoBtn").addEventListener("click", () => {
   legendPopup.style.display = "flex";
 });
-
 document.getElementById("legendCloseBtn").addEventListener("click", () => {
   legendPopup.style.display = "none";
 });
-
-// Klick utanför boxen stänger popupen
 legendPopup.addEventListener("click", (e) => {
-  if (e.target === legendPopup) {
-    legendPopup.style.display = "none";
-  }
+  if (e.target === legendPopup) legendPopup.style.display = "none";
 });
   /* ============================
              TABS
