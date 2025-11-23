@@ -188,24 +188,31 @@ td button {
   position: relative;
   padding-left: 0.5rem;
   padding-right: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem; /* lite luft mellan badge och symboler */
 }
 
 .dpo-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+
   width: 14px;
   height: 14px;
-  margin-left: 0px;        /* skjuter ut den åt höger */
-  margin-right: 10px;       /* gör lite luft till emojis */
-  background: #d9ccff;     /* mildare lila */
+
+  margin-left: 0;     /* nu alltid längst till vänster */
+  margin-right: 0.35rem;
+
+  background: #d9ccff; /* mjuk lila */
   color: #333;
+
   font-size: 9px;
   font-weight: 600;
-  border-radius: 50%;
-  vertical-align: middle;
-}
 
+  border-radius: 50%;
+  flex-shrink: 0; /* hindrar att etiketten förskjuts */
+}
 /* ============================
         GRAFSTIL
 ============================ */
@@ -785,19 +792,15 @@ document.addEventListener("DOMContentLoaded", () => {
       if (e.lhNeg) events += "➖ ";
 
    
-      tr.innerHTML = `
+tr.innerHTML = `
   <td>${e.date || ""}</td>
   <td>${e.time || ""}</td>
   <td>${e.actual ?? ""}</td>
   <td>${e.corrected ?? ""}</td>
 
-  <!-- Händelser + DPO-badge i samma kolumn -->
-  <td class="event-cell">
-    ${e.ovulation ? "" : (ovIndex >= 0 && idx > ovIndex
-      ? `<span class="dpo-badge">${idx - ovIndex}</span>`
-      : ""
-    )}
-    ${events.trim() || "–"}
+  <td class="events-cell">
+    ${idx > ovIndex ? `<span class="dpo-badge">${idx - ovIndex}</span>` : ""}
+    <span class="event-icons">${events.trim()}</span>
   </td>
 
   <td>${e.note || ""}</td>
