@@ -279,6 +279,34 @@ td button {
   cursor: pointer;
   color: #1f3b5b;
 }
+/* Popup – glas + animation */
+#legendPopup {
+  backdrop-filter: blur(6px);
+  transition: opacity 0.25s ease;
+}
+
+.legend-box {
+  animation: legendIn 0.25s ease;
+  border: 1px solid rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.85);
+}
+
+@keyframes legendIn {
+  from { transform: translateY(10px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+/* Hover på klickbara dataset */
+.legend-toggle {
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 4px;
+}
+.legend-toggle:hover {
+  background: rgba(0,0,0,0.07);
+}
+.legend-toggle.off {
+  opacity: 0.35;
+}
 
 /* ============================
           LH-FLIK
@@ -469,35 +497,42 @@ td button {
 
     <div class="legend-entry">
       <div class="legend-color" style="background:rgba(90,140,255,0.9);"></div>
-      <span>Blå linje – Faktisk temperatur</span>
+      <span>Faktisk temperatur</span>
     </div>
 
     <div class="legend-entry">
       <div class="legend-color" style="background:rgba(240,100,120,0.85);"></div>
-      <span>Röd prickad linje – Korrigerad temperatur</span>
+      <span>Korrigerad temperatur</span>
     </div>
 
     <div class="legend-entry">
       <div class="legend-color" style="background:rgba(195,215,180,0.45); height:10px;"></div>
-      <span>Grönt band – Medellinje före ägglossning</span>
+      <span>Medeltemperatur före ägglossning</span>
     </div>
 
     <div class="legend-entry">
       <div class="legend-color" style="background:rgba(255,244,176,0.65); height:10px;"></div>
-      <span>Gult fält – Ägglossningsdag</span>
+      <span>Ägglossningsdag</span>
     </div>
 
     <div class="legend-entry">
       <div class="legend-color" style="background:rgba(224,195,252,0.6); height:10px;"></div>
-      <span>Lila fält – Lutealfas</span>
+      <span>Lutealfas</span>
+    </div>
+    
+    <!-- Trendlinje (lila) -->
+    <div class="legend-entry legend-toggle" data-dataset="3">
+      <div class="legend-color" style="background:rgba(155, 117, 208, 1); height:10px;"></div>
+      <span>Trend (lutealfas)</span>
     </div>
 
+<hr style="margin:1rem 0;">
     <hr style="margin:1rem 0;">
 
     <strong>Symboler:</strong>
     <div class="legend-entry">💞 – Samlag</div>
     <div class="legend-entry">🌼 – Ägglossning</div>
-    <div class="legend-entry">💧 – Cervixsekret</div>
+    <div class="legend-entry">💧 – Sekret</div>
 
     <div class="legend-close">
       <button id="legendCloseBtn">Stäng</button>
@@ -1366,6 +1401,22 @@ animation: false
   /* ============================
         INFO-KNAPP / LEGEND
   ============================ */
+// =============================
+//   LEGEND-KLICK FÖR DATASETS
+// =============================
+document.addEventListener("click", (e) => {
+  const item = e.target.closest(".legend-toggle");
+  if (!item) return;
+
+  const dsIndex = Number(item.dataset.dataset);
+  const ds = chart.data.datasets[dsIndex];
+
+  // Toggle visibility
+  ds.hidden = !ds.hidden;
+  item.classList.toggle("off", ds.hidden);
+
+  chart.update();
+});
   const legendPopup = document.getElementById("legendPopup");
   document.getElementById("infoBtn").addEventListener("click", () => {
     legendPopup.style.display = "flex";
