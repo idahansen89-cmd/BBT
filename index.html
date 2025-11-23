@@ -992,41 +992,40 @@ ctx.strokeStyle = "rgba(90, 160, 150, 0.40)";     // Diskret kantlinje
     }
   };
   
-  const DpoLabelPlugin = {
+const DpoLabelPlugin = {
   id: "dpoLabelPlugin",
-  afterDatasetsDraw(chart, args, opts) {
-    const { ctx } = chart;
+  afterDraw(chart, args, opts) {
+    const { ctx, chartArea, scales } = chart;
     const dpoList = opts?.dpoList || [];
-    const datasets = chart.data.datasets;
-    const correctedDs = datasets[2]; // dataset 2 = korrigerad temperatur
 
-    if (!correctedDs) return;
+    const xScale = scales.x;
+    if (!xScale) return;
 
-    const meta = chart.getDatasetMeta(2);
+    // --- Position högst upp i grafen ---
+    const y = chartArea.top + 12;  // justera vid behov
 
     ctx.save();
-    ctx.font = "11px Helvetica";
+    ctx.font = "9px Helvetica";         // samma stil som tabellen
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
 
-    meta.data.forEach((point, i) => {
-      const dpo = dpoList[i];
-      if (!dpo || dpo < 1) return; // bara 1,2,3...
+    dpoList.forEach((dpo, i) => {
+      if (!dpo || dpo < 1) return;
 
-      const x = point.x;
-      const y = point.y - 16; // höjd ovanför datapunkten
+      // x-koordinat = datapunktens position
+      const x = xScale.getPixelForValue(i);
 
-      // cirkel
+      // --- Rita liten cirkel ---
       ctx.beginPath();
-      ctx.fillStyle = "rgba(200,170,250,1)"; // ljust lila
-      ctx.strokeStyle = "rgba(150,120,210,0.9)";
-      ctx.lineWidth = 1.2;
-      ctx.arc(x, y, 10, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(217, 204, 255, 1)";    // lila (tabell)
+      ctx.strokeStyle = "rgba(170,150,220,0.9)";
+      ctx.lineWidth = 1;
+      ctx.arc(x, y, 7, 0, Math.PI * 2);            // radius 7 → 14px total
       ctx.fill();
       ctx.stroke();
 
-      // texten
-      ctx.fillStyle = "#2b2b2b";
+      // DPO-numret
+      ctx.fillStyle = "#333";
       ctx.fillText(dpo, x, y);
     });
 
