@@ -1253,11 +1253,11 @@ if (ovIndex >= 0 && ovIndex < corrected.length - 1) {
     position: "top",
     labels: dateLabels,
     ticks: {
-      font: { size: 13 },
+      font: { size: 12 },
       maxRotation: 0,
       minRotation: 0,
       autoSkip: false,
-      padding: 4,
+      padding: 2,
       callback: function (value, index) {
         const label = this.chart.data.labels[index];
         return index % 2 === 0 ? [label, ""] : ["", label];
