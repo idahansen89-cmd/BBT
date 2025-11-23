@@ -496,45 +496,53 @@ td button {
 <div id="legendPopup">
   <div class="legend-box">
 
-    <h3>Förklaring</h3>
-  
-  <div class="legend-entry" data-dataset-index="0">
-  <div class="legend-color" style="background:#c3d7b4;"></div>
-  <span>Medelspann</span>
-</div>
+<h3>Förklaring</h3>
 
-<div class="legend-entry" data-dataset-index="1">
-  <div class="legend-color" style="background:#5a8cff;"></div>
+<!-- LINJER -->
+<div class="legend-entry legend-toggle" data-dataset-index="1">
+  <div class="legend-color" style="background:rgba(90,140,255,0.9);"></div>
   <span>Faktisk temperatur</span>
 </div>
 
-<div class="legend-entry" data-dataset-index="2">
-  <div class="legend-color" style="background:#f06478;"></div>
+<div class="legend-entry legend-toggle" data-dataset-index="2">
+  <div class="legend-color" style="background:rgba(240,100,120,0.85);"></div>
   <span>Korrigerad temperatur</span>
 </div>
 
-<div class="legend-entry" data-dataset-index="3">
-  <div class="legend-color" style="background:#8b5cd6;"></div>
+<div class="legend-entry legend-toggle" data-dataset-index="0">
+  <div class="legend-color" style="background:rgba(195,215,180,0.45);"></div>
+  <span>Medeltemperatur</span>
+</div>
+
+<div class="legend-entry legend-toggle" data-dataset-index="3">
+  <div class="legend-color" style="background:rgba(155,117,208,1);"></div>
   <span>Trendlinje</span>
 </div>
 
-    <div class="legend-entry">
-      <div class="legend-color" style="background:rgba(255,244,176,0.65); height:10px;"></div>
-      <span>Ägglossningsdag</span>
-    </div>
+<hr style="margin: 1rem 0;">
 
-    <div class="legend-entry">
-      <div class="legend-color" style="background:rgba(224,195,252,0.6); height:10px;"></div>
-      <span>Lutealfas</span>
-    </div>
+<!-- BAKGRUNDSFÄLT -->
+<div class="legend-entry">
+  <div class="legend-color" style="background:rgba(244,182,194,0.55); height:10px;"></div>
+  <span>Mens</span>
+</div>
+
+<div class="legend-entry">
+  <div class="legend-color" style="background:rgba(255,244,176,0.65); height:10px;"></div>
+  <span>Ägglossningsdag</span>
+</div>
+
+<div class="legend-entry">
+  <div class="legend-color" style="background:rgba(224,195,252,0.6); height:10px;"></div>
+  <span>Lutealfas</span>
+</div>
 
 <hr style="margin:1rem 0;">
-    <hr style="margin:1rem 0;">
 
-    <strong>Symboler:</strong>
-    <div class="legend-entry">💞 – Samlag</div>
-    <div class="legend-entry">🌼 – Ägglossning</div>
-    <div class="legend-entry">💧 – Sekret</div>
+<strong>Symboler:</strong>
+<div class="legend-entry">💞 – Samlag</div>
+<div class="legend-entry">🌼 – Ägglossning</div>
+<div class="legend-entry">💧 – Sekret</div>
 
     <div class="legend-close">
       <button id="legendCloseBtn">Stäng</button>
