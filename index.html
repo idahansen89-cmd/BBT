@@ -494,20 +494,25 @@ td button {
   <div class="legend-box">
 
     <h3>Förklaring</h3>
-
-    <div class="legend-entry">
+    
+    <div class="legend-entry legend-toggle" data-dataset="actual">
       <div class="legend-color" style="background:rgba(90,140,255,0.9);"></div>
       <span>Faktisk temperatur</span>
     </div>
-
-    <div class="legend-entry">
+    
+    <div class="legend-entry legend-toggle" data-dataset="corrected">
       <div class="legend-color" style="background:rgba(240,100,120,0.85);"></div>
       <span>Korrigerad temperatur</span>
     </div>
-
-    <div class="legend-entry">
+    
+    <div class="legend-entry legend-toggle" data-dataset="meanband">
       <div class="legend-color" style="background:rgba(195,215,180,0.45); height:10px;"></div>
-      <span>Medeltemperatur före ägglossning</span>
+      <span>Medel före ägglossning</span>
+    </div>
+    
+    <div class="legend-entry legend-toggle" data-dataset="trend">
+      <div class="legend-color" style="background:rgba(155,117,208,1);"></div>
+      <span>Trendlinje (luteal)</span>
     </div>
 
     <div class="legend-entry">
@@ -518,12 +523,6 @@ td button {
     <div class="legend-entry">
       <div class="legend-color" style="background:rgba(224,195,252,0.6); height:10px;"></div>
       <span>Lutealfas</span>
-    </div>
-    
-    <!-- Trendlinje (lila) -->
-    <div class="legend-entry legend-toggle" data-dataset="3">
-      <div class="legend-color" style="background:rgba(155, 117, 208, 1); height:10px;"></div>
-      <span>Trend (lutealfas)</span>
     </div>
 
 <hr style="margin:1rem 0;">
